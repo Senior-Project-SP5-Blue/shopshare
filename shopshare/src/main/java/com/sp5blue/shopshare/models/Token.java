@@ -3,7 +3,6 @@ package com.sp5blue.shopshare.models;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
-import org.hibernate.dialect.PostgresPlusDialect;
 
 @Entity
 @Table(name = "tokens")

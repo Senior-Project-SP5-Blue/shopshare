@@ -2,7 +2,6 @@ package com.sp5blue.shopshare.services.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
-import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
 import com.sp5blue.shopshare.exceptions.token.InvalidRefreshTokenException;
 import com.sp5blue.shopshare.models.Shopper;
 import com.sp5blue.shopshare.models.Token;
@@ -10,8 +9,8 @@ import com.sp5blue.shopshare.models.TokenType;
 import com.sp5blue.shopshare.security.request.SignInRequest;
 import com.sp5blue.shopshare.security.request.SignUpRequest;
 import com.sp5blue.shopshare.security.response.AuthenticationResponse;
-import com.sp5blue.shopshare.services.token.ITokenService;
 import com.sp5blue.shopshare.services.shopper.IShopperService;
+import com.sp5blue.shopshare.services.token.ITokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -68,8 +67,9 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     @Transactional
-    public AuthenticationResponse signIn(SignInRequest request) throws UserNotFoundException {
+    public AuthenticationResponse signIn(SignInRequest request) {
         Shopper user = shopperService.readByEmail(request.email());
+        System.out.printf("Shopper is %s\n", user);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         final String accessToken = jwtService.generateToken(user);
         final String refreshToken = jwtService.generateRefreshToken(user);

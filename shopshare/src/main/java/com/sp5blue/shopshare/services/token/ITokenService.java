@@ -1,10 +1,7 @@
 package com.sp5blue.shopshare.services.token;
 
 import com.sp5blue.shopshare.exceptions.token.TokenNotFoundException;
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.ShoppingList;
 import com.sp5blue.shopshare.models.Token;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;

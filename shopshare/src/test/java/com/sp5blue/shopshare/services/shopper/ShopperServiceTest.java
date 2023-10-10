@@ -1,28 +1,23 @@
 package com.sp5blue.shopshare.services.shopper;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
+import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
+import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
+import com.sp5blue.shopshare.models.Shopper;
+import com.sp5blue.shopshare.repositories.ShopperRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
-import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.repositories.ShopperRepository;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 //@SpringBootTest
 //@ExtendWith(SpringExtension.class)

@@ -1,8 +1,5 @@
 package com.sp5blue.shopshare.services.security;
 
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.Token;
-import com.sp5blue.shopshare.services.shopper.ShopperService;
 import com.sp5blue.shopshare.services.token.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,7 +9,6 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

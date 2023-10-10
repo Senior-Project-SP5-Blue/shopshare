@@ -1,26 +1,22 @@
 package com.sp5blue.shopshare.services.listitem;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
 import com.sp5blue.shopshare.models.ListItem;
 import com.sp5blue.shopshare.models.Shopper;
 import com.sp5blue.shopshare.repositories.ListItemRepository;
 import com.sp5blue.shopshare.services.shopper.ShopperService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ListItemServiceTest {

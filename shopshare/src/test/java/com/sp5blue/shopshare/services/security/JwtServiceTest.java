@@ -5,40 +5,41 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.security.Key;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = JwtService.class)
+//@TestPropertySource(properties = {"${jwt.secret-key} = 5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437"} )
 class JwtServiceTest {
 
-    private static JwtService jwtService;
+    private final JwtService jwtService = new JwtService();
 
     private static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+
 
     private Key getSignKey() {
         byte[] keyBytes= Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    @BeforeAll
-    static void beforeAll() {
-//        jwtService = new JwtService();
-    }
+
 
     @Test
     void generateToken() {
-        Shopper shopper = mock();
-        when(shopper.getId()).thenReturn(UUID.randomUUID());
-
+        Shopper shopper = new Shopper("Jack", "Ripper", "jackr", "jackr@email.com", "jackpassword");
+        ReflectionTestUtils.setField(jwtService, "SECRET", SECRET);
         String result  = jwtService.generateToken(shopper);
 
         assertNotNull(result);
@@ -47,6 +48,7 @@ class JwtServiceTest {
     @Test
     void extractSubject() {
         String subject = "subject";
+        ReflectionTestUtils.setField(jwtService, "SECRET", SECRET);
         String token = Jwts.builder().setSubject(subject)
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
 
@@ -57,8 +59,8 @@ class JwtServiceTest {
 
     @Test
     void extractExpiration() {
+        ReflectionTestUtils.setField(jwtService, "SECRET", SECRET);
         Date expirationDate = new Date(2023, Calendar.SEPTEMBER, 23);
-
         String token = Jwts.builder()
                 .setExpiration(expirationDate)
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
@@ -69,6 +71,7 @@ class JwtServiceTest {
 
     @Test
     void extractClaim() {
+        ReflectionTestUtils.setField(jwtService, "SECRET", SECRET);
         Map<String, Object> claims = new HashMap<>();
         claims.put("name", "john");
         claims.put("year", 2023);
@@ -85,8 +88,10 @@ class JwtServiceTest {
 
     @Test
     void validateToken() {
+        ReflectionTestUtils.setField(jwtService, "SECRET", SECRET);
         Shopper shopper = new Shopper("User", "Test", "username1", "user@email.com", "password");
         String token = Jwts.builder().setSubject("username1")
+                .setExpiration(new Date(System.currentTimeMillis() + 860000))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
 
         boolean result = jwtService.validateToken(token, shopper);
