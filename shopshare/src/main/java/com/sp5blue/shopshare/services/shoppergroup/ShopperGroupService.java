@@ -41,10 +41,7 @@ public class ShopperGroupService implements IShopperGroupService {
 
     @Override
     public ShopperGroup readById(UUID groupId) throws GroupNotFoundException {
-        Optional<ShopperGroup> shopperGroup = shopperGroupRepository.findById(groupId);
-        if (shopperGroup.isEmpty()) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
-
-        return shopperGroup.get();
+        return shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
     }
 
     @Override
@@ -65,31 +62,27 @@ public class ShopperGroupService implements IShopperGroupService {
     @Override
     @Transactional
     public boolean addShopperToGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException {
-        Optional<ShopperGroup> group = shopperGroupRepository.findById(groupId);
-        if (group.isEmpty()) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
+        ShopperGroup group = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
         Shopper shopper = shopperService.readById(shopperId);
-        return group.get().addShopper(shopper);
+        return group.addShopper(shopper);
     }
     @Override
     @Transactional
     public boolean addShopperToGroup(UUID groupId, Shopper shopper) throws GroupNotFoundException {
-        Optional<ShopperGroup> group = shopperGroupRepository.findById(groupId);
-        if (group.isEmpty()) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
-        return group.get().addShopper(shopper);
+        ShopperGroup group = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        return group.addShopper(shopper);
     }
 
     @Override
     @Transactional
     public boolean removeShopperFromGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException {
-        Optional<ShopperGroup> group = shopperGroupRepository.findById(groupId);
-        if (group.isEmpty()) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
-        return group.get().removeShopper(shopperId);
+        ShopperGroup group = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        return group.removeShopper(shopperId);
     }
     @Override
     @Transactional
     public boolean removeShopperFromGroup(UUID groupId, Shopper shopper) throws GroupNotFoundException {
-        Optional<ShopperGroup> group = shopperGroupRepository.findById(groupId);
-        if (group.isEmpty()) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
-        return group.get().removeShopper(shopper);
+        ShopperGroup group = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        return group.removeShopper(shopper);
     }
 }

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -43,9 +42,7 @@ public class ListItemService implements IListItemService {
 
     @Override
     public ListItem readById(UUID id) throws ListNotFoundException {
-        Optional<ListItem> listItem = listItemRepository.findById(id);
-        if (listItem.isEmpty()) throw new ListItemNotFoundException("List item does not exist - " + id);
-        return listItem.get();
+        return listItemRepository.findById(id).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + id));
     }
 
     @Override
@@ -55,7 +52,7 @@ public class ListItemService implements IListItemService {
 
     @Override
     public List<ListItem> readByShopperId(UUID shopperId) {
-        boolean shopperExists = shopperService.shopperExists(shopperId);
+        boolean shopperExists = shopperService.exists(shopperId);
         if (!shopperExists) throw new UserNotFoundException("Shopper with id " + shopperId + " does not exist");
         return listItemRepository.findAllByCreatedBy_Id(shopperId);
     }

@@ -11,7 +11,6 @@ import java.util.UUID;
 public class ListItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private final UUID id = UUID.randomUUID();
 

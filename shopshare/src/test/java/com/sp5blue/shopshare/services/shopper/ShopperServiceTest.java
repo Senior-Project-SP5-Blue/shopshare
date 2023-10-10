@@ -167,7 +167,7 @@ class ShopperServiceTest {
         UUID shopperId = UUID.randomUUID();
         when(mockShopperRepo.existsById(shopperId)).thenReturn(false);
 
-        var result = shopperService.shopperExists(shopperId);
+        var result = shopperService.exists(shopperId);
         assertFalse(result);
     }
     @Test
@@ -175,7 +175,7 @@ class ShopperServiceTest {
         UUID shopperId = UUID.randomUUID();
         when(mockShopperRepo.existsById(shopperId)).thenReturn(true);
 
-        var result = shopperService.shopperExists(shopperId);
+        var result = shopperService.exists(shopperId);
         assertTrue(result);
     }
 }

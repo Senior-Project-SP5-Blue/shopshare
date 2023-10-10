@@ -31,7 +31,7 @@ class JwtServiceTest {
 
     @BeforeAll
     static void beforeAll() {
-        jwtService = new JwtService();
+//        jwtService = new JwtService();
     }
 
     @Test

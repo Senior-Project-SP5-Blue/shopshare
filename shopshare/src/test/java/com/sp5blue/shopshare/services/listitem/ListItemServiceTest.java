@@ -88,7 +88,7 @@ class ListItemServiceTest {
     @Test
     void readByShopperId_InvalidId_ThrowsUserNotFoundException() {
         Shopper shopper = new Shopper("Jack", "Jill", "JackJill", "jack@email.com", "paswword");
-        when(mockShopperService.shopperExists(shopper.getId())).thenReturn(false);
+        when(mockShopperService.exists(shopper.getId())).thenReturn(false);
 
         var exception = assertThrows(UserNotFoundException.class, () -> listItemService.readByShopperId(shopper.getId()));
         assertEquals("Shopper with id " + shopper.getId() + " does not exist", exception.getMessage());
@@ -101,7 +101,7 @@ class ListItemServiceTest {
         ListItem listItem3 = new ListItem("Pizza", shopper);
         ListItem listItem4 = new ListItem("Eggs", shopper);
         when(mockListItemRepo.findAllByCreatedBy_Id(shopper.getId())).thenReturn(Arrays.asList(listItem1, listItem2, listItem3, listItem4));
-        when(mockShopperService.shopperExists(shopper.getId())).thenReturn(true);
+        when(mockShopperService.exists(shopper.getId())).thenReturn(true);
 
         var results = listItemService.readByShopperId(shopper.getId());
 

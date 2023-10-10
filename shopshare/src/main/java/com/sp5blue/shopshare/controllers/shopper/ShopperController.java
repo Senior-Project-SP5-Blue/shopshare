@@ -11,23 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/shoppers")
 public class ShopperController {
 
-    private final AuthenticationService authenticationService;
-
-
-    @Autowired
-    public ShopperController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
-
-    @PostMapping("/signin")
-    public ResponseEntity<?> authenticateAndGetToken(@RequestBody SignInRequest authRequest) {
-        return ResponseEntity.ok(authenticationService.signIn(authRequest));
-    }
-    @PostMapping("/signup")
-    public ResponseEntity<?> authenticateAndGetToken(@RequestBody SignUpRequest authRequest) {
-        return ResponseEntity.ok(authenticationService.signUp(authRequest));
-    }
-
     @GetMapping
     public String getShoppers() {
 //        List<Shopper> shopperList = shopperRepository.findAll();

@@ -18,7 +18,13 @@ public interface IShopperService {
 
     Shopper readByEmail(String email) throws UserNotFoundException;
 
+    Shopper readByUsername(String username) throws UserNotFoundException;
+
     List<Shopper> read();
 
-    boolean shopperExists(UUID id);
+    boolean exists(UUID id);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByUsername(String username);
 }
