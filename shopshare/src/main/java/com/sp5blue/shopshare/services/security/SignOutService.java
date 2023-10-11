@@ -31,7 +31,7 @@ public class SignOutService implements LogoutHandler {
     @Transactional
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         String authHeader = request.getHeader("Authorization");
-        String jwt = null;
+        String jwt;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
@@ -41,8 +41,6 @@ public class SignOutService implements LogoutHandler {
         if (id.isEmpty()) return;
         UUID _id = id.get();
 
-        tokenService.revokeAllTokens(_id);
-//        tokenService.invalidateAccessToken(jwt);
-//        tokenService.revokeRefreshToken(_id);
+        tokenService.revokeAllUserTokens(_id);
     }
 }

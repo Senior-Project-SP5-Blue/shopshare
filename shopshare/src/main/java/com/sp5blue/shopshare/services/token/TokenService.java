@@ -13,7 +13,7 @@ import java.util.UUID;
 @Service
 public class TokenService implements ITokenService {
 
-    TokenRepository tokenRepository;
+    final TokenRepository tokenRepository;
 
     @Autowired
     public TokenService(TokenRepository tokenRepository) {
@@ -40,12 +40,12 @@ public class TokenService implements ITokenService {
 
     @Override
     public List<Token> readAllAccessByShopperId(UUID shopperId, boolean validOnly) {
-        if (!validOnly) return tokenRepository.findAllByShopper_Id(shopperId);
-        return tokenRepository.findAllValidTokensByShopper_Id(shopperId);
+        if (!validOnly) return tokenRepository.findAllAccessTokensByShopper_Id(shopperId);
+        return tokenRepository.findAllValidAccessTokensByShopper_Id(shopperId);
     }
     @Override
     public Token readRefreshByShopperId(UUID shopperId) throws TokenNotFoundException {
-        return tokenRepository.findRefreshTokenByShopper_Id(shopperId).orElseThrow(() -> new TokenNotFoundException("User - " + shopperId + " does not have valid refresh token" ));
+        return tokenRepository.findRefreshTokenByShopper_Id(shopperId).orElseThrow(() -> new TokenNotFoundException("User - " + shopperId + " does not have valid refresh token"));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class TokenService implements ITokenService {
 
     @Override
     @Transactional
-    public void invalidateAccessToken(String jwt) {
+    public void revokeAccessToken(String jwt) {
         Token storedToken = tokenRepository.findByToken(jwt).orElseThrow(() -> new TokenNotFoundException("Token does not exist - " + jwt));
         storedToken.setExpired(true);
         storedToken.setRevoked(true);
@@ -63,15 +63,7 @@ public class TokenService implements ITokenService {
 
     @Override
     @Transactional
-    public void revokeRefreshToken(UUID shopperId) {
-        Token refreshToken = tokenRepository.findRefreshTokenByShopper_Id(shopperId).orElseThrow(() -> new TokenNotFoundException("User - " + shopperId + " does not have valid refresh token" ));
-        refreshToken.setExpired(true);
-        refreshToken.setRevoked(true);
-        tokenRepository.delete(refreshToken);
-    }
-    @Override
-    @Transactional
-    public void revokeAllTokens(UUID shopperId) {
+    public void revokeAllUserTokens(UUID shopperId) {
         List<Token> tokens = tokenRepository.findAllByShopper_Id(shopperId);
         tokens.forEach(t -> {
             t.setExpired(true);

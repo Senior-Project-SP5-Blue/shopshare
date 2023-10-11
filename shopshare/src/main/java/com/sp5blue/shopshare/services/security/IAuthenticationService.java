@@ -9,8 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-
 public interface IAuthenticationService {
     AuthenticationResponse signUp(SignUpRequest request);
 
@@ -19,7 +17,7 @@ public interface IAuthenticationService {
     @Transactional
     void saveUserToken(Shopper user, String token, TokenType tokenType);
 
-    void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void refreshToken(HttpServletRequest request, HttpServletResponse response);
 
     @Transactional
     void _revokeAllTokens(Shopper shopper);

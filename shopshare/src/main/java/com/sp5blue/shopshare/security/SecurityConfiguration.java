@@ -60,9 +60,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
         http.logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer
                 .logoutUrl("/api/v1/auth/signout")
                 .addLogoutHandler(logoutHandler)
-                .logoutSuccessHandler((request, response, authentication) -> {
-                    SecurityContextHolder.clearContext();
-                }));
+                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()));
         return http.build();
     }
 }

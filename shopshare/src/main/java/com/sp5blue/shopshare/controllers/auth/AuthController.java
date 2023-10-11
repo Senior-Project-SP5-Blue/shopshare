@@ -38,9 +38,6 @@ public class AuthController {
     @PostMapping("/refresh-signin")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
         authenticationService.refreshToken(request, response);
-
-        return;
-//        return ResponseEntity.ok(authenticationService.signUp(authRequest));
     }
 
 }

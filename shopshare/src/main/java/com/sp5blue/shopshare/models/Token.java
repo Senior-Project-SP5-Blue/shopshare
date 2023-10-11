@@ -38,6 +38,14 @@ public class Token {
         isExpired = false;
     }
 
+    public Token(String token, TokenType type, boolean isExpired, boolean isRevoked, Shopper shopper) {
+        this.token = token;
+        this.type = type;
+        this.isExpired = isExpired;
+        this.isRevoked = isRevoked;
+        this.shopper = shopper;
+    }
+
     public Token(String token, Shopper shopper, TokenType type) {
         this.token = token;
         this.type = type;

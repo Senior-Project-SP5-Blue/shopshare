@@ -35,7 +35,7 @@ public class AuthenticationService implements IAuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
+    final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     @Autowired
     public AuthenticationService(IShopperService shopperService, ITokenService tokenService, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
@@ -73,7 +73,8 @@ public class AuthenticationService implements IAuthenticationService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         final String accessToken = jwtService.generateToken(user);
         final String refreshToken = jwtService.generateRefreshToken(user);
-        _revokeAllTokens(user);
+        tokenService.revokeAllUserTokens(user.getId());
+//        _revokeAllTokens(user);
         saveUserToken(user, accessToken, TokenType.ACCESS);
         saveUserToken(user, refreshToken, TokenType.REFRESH);
         return new AuthenticationResponse(accessToken, refreshToken);
@@ -91,7 +92,7 @@ public class AuthenticationService implements IAuthenticationService {
     @Transactional
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String refreshToken = null;
+        String refreshToken;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return;
 
