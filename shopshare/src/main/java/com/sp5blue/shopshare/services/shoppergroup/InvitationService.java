@@ -39,7 +39,7 @@ public class InvitationService implements IInvitationService {
             return false;
         }
 
-        return rowsChanged != 1;
+        return rowsChanged == 1;
     }
 
     @Override
@@ -51,7 +51,12 @@ public class InvitationService implements IInvitationService {
                 .getSingleResult();
         if (!hasInvite) throw new UserNotInvitedException(String.format("User - %s has not been invited to Group - %s", shopperId, groupId));
 
-        return shopperGroupService.addShopperToGroup(groupId, shopperId);
+        boolean added = shopperGroupService.addShopperToGroup(groupId, shopperId);
+        int rowsChanged = entityManager.createNativeQuery("DELETE FROM group_invitations WHERE shopper_group_id = :groupId AND shopper_id = :shopperId")
+                .setParameter("groupId", groupId)
+                .setParameter("shopperId", shopperId)
+                .executeUpdate();
+        return added && rowsChanged == 1;
     }
 
 

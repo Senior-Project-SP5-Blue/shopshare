@@ -6,37 +6,49 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 
 @Service
 public class JwtService {
-    private static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+
+    @Value("${jwt.secret-key}")
+    private String SECRET;
+
+    @Value("${jwt.token.expiration}")
+    private long jwtExpiration;
+
+    @Value("${jwt.refresh-token.expiration}")
+    private long jwtRefreshExpiration;
+
+    Logger logger = LoggerFactory.getLogger(JwtService.class);
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", ((Shopper)userDetails).getId());
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+        return createToken(claims, userDetails.getUsername(), jwtExpiration);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    public String generateRefreshToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("refresh", "true");
+        return createToken(claims, userDetails.getUsername(), jwtRefreshExpiration);
+    }
+
+    private String createToken(Map<String, Object> claims, String subject, long expiration) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
     }
 
@@ -54,9 +66,20 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    public Optional<UUID> extractId(String token) {
+        Object _id = extractClaim(token, c -> c.get("id"));
+        if (_id == null) return Optional.empty();
+        return Optional.of(UUID.fromString((String)_id));
+    }
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
+    }
+
+    public Boolean extractRefreshStatus(String token) {
+        Object refresh = extractClaim(token, c -> c.get("refresh"));
+        return refresh != null;
     }
 
     private Claims extractAllClaims(String token) {
@@ -74,8 +97,6 @@ public class JwtService {
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractSubject(token);
-//        remove once created refresh token system
-        return (username.equals(userDetails.getUsername()) /*&& !isTokenExpired(token)*/);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-
 }

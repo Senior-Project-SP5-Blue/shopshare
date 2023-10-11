@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -48,9 +47,7 @@ public class ShoppingListService implements IShoppingListService {
 
     @Override
     public ShoppingList readById(UUID id) throws ListNotFoundException {
-        Optional<ShoppingList> shoppingList = shoppingListRepository.findById(id);
-        if (shoppingList.isEmpty()) throw new ListNotFoundException("Shopping list does not exist - " + id);
-        return shoppingList.get();
+        return shoppingListRepository.findById(id).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + id));
     }
 
     @Override
@@ -71,33 +68,29 @@ public class ShoppingListService implements IShoppingListService {
     @Override
     @Transactional
     public boolean removeItemFromList(UUID listId, UUID itemId) throws ListNotFoundException {
-        Optional<ShoppingList> shoppingList = shoppingListRepository.findById(listId);
-        if (shoppingList.isEmpty()) throw new ListNotFoundException("Shopping list does not exist - " + listId);
-        return shoppingList.get().removeItem(itemId);
+        ShoppingList shoppingList = shoppingListRepository.findById(listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+        return shoppingList.removeItem(itemId);
     }
 
     @Override
     @Transactional
     public boolean removeItemFromList(UUID listId, ListItem item) throws ListNotFoundException {
-        Optional<ShoppingList> shoppingList = shoppingListRepository.findById(listId);
-        if (shoppingList.isEmpty()) throw new ListNotFoundException("Shopping list does not exist - " + listId);
-        return shoppingList.get().removeItem(item);
+        ShoppingList shoppingList = shoppingListRepository.findById(listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+        return shoppingList.removeItem(item);
     }
 
     @Override
     @Transactional
     public boolean addItemToList(UUID listId, UUID itemId) throws ListNotFoundException {
-        Optional<ShoppingList> shoppingList = shoppingListRepository.findById(listId);
-        if (shoppingList.isEmpty()) throw new ListNotFoundException("Shopping list does not exist - " + listId);
+        ShoppingList shoppingList = shoppingListRepository.findById(listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
         ListItem listItem = listItemService.readById(itemId);
-        return shoppingList.get().addItem(listItem);
+        return shoppingList.addItem(listItem);
     }
 
     @Override
     @Transactional
     public boolean addItemToList(UUID listId, ListItem item) throws ListNotFoundException {
-        Optional<ShoppingList> shoppingList = shoppingListRepository.findById(listId);
-        if (shoppingList.isEmpty()) throw new ListNotFoundException("Shopping list does not exist - " + listId);
-        return shoppingList.get().addItem(item);
+        ShoppingList shoppingList = shoppingListRepository.findById(listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+        return shoppingList.addItem(item);
     }
 }

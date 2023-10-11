@@ -10,7 +10,7 @@ import java.util.*;
 @Table(name = "shoppers")
 public class Shopper implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private final UUID id = UUID.randomUUID();
 
     @Column(name = "first_name")
@@ -31,7 +31,6 @@ public class Shopper implements UserDetails {
     @Column(name = "password")
     private String password;
 
-
     @ManyToMany(mappedBy = "shoppers", fetch = FetchType.EAGER)
     private List<ShopperGroup> groups;
 
@@ -41,8 +40,19 @@ public class Shopper implements UserDetails {
     @OneToMany(mappedBy = "shopper", fetch = FetchType.EAGER)
     private List<Role> roles;
 
+    @OneToMany(mappedBy = "shopper", fetch = FetchType.EAGER)
+    private List<Token> tokens;
+
     @Column(name = "active")
     private boolean active;
+
+    public List<Token> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(List<Token> tokens) {
+        this.tokens = tokens;
+    }
 
     public boolean isActive() {
         return active;
@@ -56,9 +66,6 @@ public class Shopper implements UserDetails {
 //        this.id = UUID.randomUUID();
     }
 
-    /**
-     *
-     */
     public Shopper(String firstName, String lastName, String username, String email, String password, List<Role> roles) {
 //        this.id = UUID.randomUUID();
         this.firstName = firstName;
@@ -70,9 +77,6 @@ public class Shopper implements UserDetails {
         this.active = true;
     }
 
-    /**
-     *
-     */
     public Shopper(String firstName, String lastName, String username, String email, String password) {
 //        this.id = UUID.randomUUID();
         this.firstName = firstName;
@@ -168,10 +172,6 @@ public class Shopper implements UserDetails {
     public boolean isEnabled() {
         return active;
     }
-
-
-
-
 
     public void setPassword(String password) {
         this.password = password;

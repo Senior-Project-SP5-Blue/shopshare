@@ -11,8 +11,8 @@ import java.util.UUID;
 @Table(name = "shopping_lists")
 public class ShoppingList {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(name = "id")
+    private final UUID id = UUID.randomUUID();
 
     @Column(name = "name")
     private String name;

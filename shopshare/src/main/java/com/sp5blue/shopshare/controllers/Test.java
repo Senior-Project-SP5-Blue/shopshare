@@ -5,15 +5,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/next/")
+@RequestMapping("/next")
 public class Test {
 
-    @GetMapping("page")
+    @GetMapping("/page")
     public String nextPage() {
         return "Successfully logged in";
     }
 
-    @GetMapping("page1")
+    @GetMapping("/page1")
     public String nextPage1() {
         return "Successfully logged in 2";
     }

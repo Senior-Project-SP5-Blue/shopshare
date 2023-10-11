@@ -4,6 +4,8 @@ import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsExceptio
 import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
 import com.sp5blue.shopshare.models.Shopper;
 import com.sp5blue.shopshare.repositories.ShopperRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -20,6 +21,8 @@ import java.util.UUID;
 public class ShopperService implements UserDetailsService, IShopperService {
 
     private final ShopperRepository shopperRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(ShopperService.class);
 
     @Autowired
     public ShopperService(ShopperRepository shopperRepository) {
@@ -45,9 +48,7 @@ public class ShopperService implements UserDetailsService, IShopperService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
-        Optional<Shopper> shopper = shopperRepository.findByEmail(username);
-        if (shopper.isEmpty()) throw new UserNotFoundException("User does not exist - " + username);
-        return shopper.get();
+        return shopperRepository.findByEmail(username).orElseThrow(() -> new UserNotFoundException("User does not exist - " + username));
     }
 
     @Override
@@ -58,16 +59,17 @@ public class ShopperService implements UserDetailsService, IShopperService {
 
     @Override
     public Shopper readById(UUID id) throws UserNotFoundException {
-        Optional<Shopper> shopper = shopperRepository.findById(id);
-        if (shopper.isEmpty()) throw new UserNotFoundException("User does not exist - " + id);
-        return shopper.get();
+        return shopperRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User does not exist - " + id));
     }
 
     @Override
     public Shopper readByEmail(String email) throws UserNotFoundException {
-        Optional<Shopper> shopper = shopperRepository.findByEmail(email);
-        if (shopper.isEmpty()) throw new UserNotFoundException("User does not exist - " + email);
-        return shopper.get();
+        return shopperRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User does not exist - " + email));
+    }
+
+    @Override
+    public Shopper readByUsername(String username) throws UserNotFoundException {
+        return shopperRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User does not exist - " + username));
     }
 
     @Override
@@ -76,7 +78,18 @@ public class ShopperService implements UserDetailsService, IShopperService {
     }
 
     @Override
-    public boolean shopperExists(UUID id) {
+    public boolean exists(UUID id) {
         return shopperRepository.existsById(id);
+    }
+
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return shopperRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return shopperRepository.existsByUsername(username);
     }
 }
