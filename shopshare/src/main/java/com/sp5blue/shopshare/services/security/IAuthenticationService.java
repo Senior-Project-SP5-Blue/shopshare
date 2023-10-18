@@ -1,7 +1,7 @@
 package com.sp5blue.shopshare.services.security;
 
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.TokenType;
+import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.shopper.TokenType;
 import com.sp5blue.shopshare.security.request.SignInRequest;
 import com.sp5blue.shopshare.security.request.SignUpRequest;
 import com.sp5blue.shopshare.security.response.AuthenticationResponse;

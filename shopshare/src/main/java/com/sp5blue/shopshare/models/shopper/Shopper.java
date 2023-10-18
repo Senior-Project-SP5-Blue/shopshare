@@ -1,14 +1,20 @@
-package com.sp5blue.shopshare.models;
+package com.sp5blue.shopshare.models.shopper;
 
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
+import com.sp5blue.shopshare.serializers.ShopperSerializer;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
+@JsonSerialize(using = ShopperSerializer.class)
 @Entity
 @Table(name = "shoppers")
 public class Shopper implements UserDetails {
+
     @Id
     @Column(name = "id")
     private final UUID id = UUID.randomUUID();
@@ -25,24 +31,28 @@ public class Shopper implements UserDetails {
     @Column(name = "profile_picture")
     private String profilePicture;
 
+//    @JsonIgnore
     @Column(name = "email")
     private String email;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(mappedBy = "shoppers", fetch = FetchType.EAGER)
-    private List<ShopperGroup> groups;
+    @ManyToMany(mappedBy = "shoppers", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    private List<ShopperGroup> groups = new ArrayList<>();
 
-    @OneToMany(mappedBy = "shopper", fetch = FetchType.EAGER)
-    private List<ShoppingList> personalLists;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    @JoinTable(name = "shoppers_roles",
+            joinColumns = @JoinColumn(name = "shopper_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<Role> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "shopper", fetch = FetchType.EAGER)
-    private List<Role> roles;
+    @JsonIgnore
+    @OneToMany(mappedBy = "shopper", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Token> tokens = new ArrayList<>();
 
-    @OneToMany(mappedBy = "shopper", fetch = FetchType.EAGER)
-    private List<Token> tokens;
-
+    @JsonIgnore
     @Column(name = "active")
     private boolean active;
 
@@ -63,11 +73,9 @@ public class Shopper implements UserDetails {
     }
 
     public Shopper() {
-//        this.id = UUID.randomUUID();
     }
 
     public Shopper(String firstName, String lastName, String username, String email, String password, List<Role> roles) {
-//        this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -78,7 +86,6 @@ public class Shopper implements UserDetails {
     }
 
     public Shopper(String firstName, String lastName, String username, String email, String password) {
-//        this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -97,7 +104,6 @@ public class Shopper implements UserDetails {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", groups=" + groups +
-                ", personalList=" + personalLists +
                 ", roles=" + roles +
                 ", active=" + active +
                 '}';
@@ -153,16 +159,19 @@ public class Shopper implements UserDetails {
         return username;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
@@ -185,32 +194,23 @@ public class Shopper implements UserDetails {
         this.groups = groups;
     }
 
-    public List<ShoppingList> getPersonalList() {
-        return personalLists;
-    }
-
-    public void setPersonalList(List<ShoppingList> personalLists) {
-        this.personalLists = personalLists;
-    }
-
     public List<Role> getRoles() {
         return roles;
     }
 
+    public boolean addRole(Role role) {
+        return roles.add(role);
+    }
+    public boolean removeRole(Role role) {
+        return roles.remove(role);
+    }
+
+    public boolean removeRole(String roleName) {
+        return roles.removeIf(r -> r.getAuthority().equals(roleName));
+    }
+
     public void setRoles(List<Role> roles) {
         this.roles = roles;
-    }
-
-    public void addShoppingList(ShoppingList list) {
-        if (personalLists == null) personalLists = new ArrayList<>();
-
-        personalLists.add(list);
-    }
-
-    public boolean removeShoppingList(UUID listId) {
-        if (personalLists == null) return false;
-
-        return personalLists.removeIf(l -> l.getId().equals(listId));
     }
 
     @Override

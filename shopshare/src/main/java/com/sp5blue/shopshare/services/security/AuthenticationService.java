@@ -3,9 +3,9 @@ package com.sp5blue.shopshare.services.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
 import com.sp5blue.shopshare.exceptions.token.InvalidRefreshTokenException;
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.Token;
-import com.sp5blue.shopshare.models.TokenType;
+import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.shopper.Token;
+import com.sp5blue.shopshare.models.shopper.TokenType;
 import com.sp5blue.shopshare.security.request.SignInRequest;
 import com.sp5blue.shopshare.security.request.SignUpRequest;
 import com.sp5blue.shopshare.security.response.AuthenticationResponse;
@@ -49,15 +49,15 @@ public class AuthenticationService implements IAuthenticationService {
     @Override
     @Transactional
     public AuthenticationResponse signUp(SignUpRequest request) throws UserAlreadyExistsException {
-        if (shopperService.existsByUsername(request.username())) throw new UserAlreadyExistsException("An account with entered username already exists - " + request.username());
-        if (shopperService.existsByEmail(request.email())) throw new UserAlreadyExistsException("An account with entered email already exists - " + request.email());
+        if (shopperService.shopperExistsByUsername(request.username())) throw new UserAlreadyExistsException("An account with entered username already exists - " + request.username());
+        if (shopperService.shopperExistsByEmail(request.email())) throw new UserAlreadyExistsException("An account with entered email already exists - " + request.email());
         Shopper user = new Shopper(
                 request.firstName(),
                 request.lastName(),
                 request.username(),
                 request.email(),
                 passwordEncoder.encode(request.password()));
-        Shopper savedUser = shopperService.create(user);
+        Shopper savedUser = shopperService.createShopper(user);
         final String accessToken = jwtService.generateToken(user);
         final String refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, accessToken, TokenType.ACCESS);
@@ -68,7 +68,7 @@ public class AuthenticationService implements IAuthenticationService {
     @Override
     @Transactional
     public AuthenticationResponse signIn(SignInRequest request) {
-        Shopper user = shopperService.readByEmail(request.email());
+        Shopper user = shopperService.readShopperByEmail(request.email());
         System.out.printf("Shopper is %s\n", user);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         final String accessToken = jwtService.generateToken(user);
@@ -102,7 +102,7 @@ public class AuthenticationService implements IAuthenticationService {
         String userName = jwtService.extractSubject(refreshToken);
 
         if (userName != null) {
-            Shopper shopper = shopperService.readByUsername(userName);
+            Shopper shopper = shopperService.readShopperByUsername(userName);
 
             if (jwtService.validateToken(refreshToken, shopper)) {
                 String accessToken = jwtService.generateToken(shopper);

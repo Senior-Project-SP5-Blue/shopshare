@@ -1,6 +1,6 @@
 package com.sp5blue.shopshare.repositories;
 
-import com.sp5blue.shopshare.models.Token;
+import com.sp5blue.shopshare.models.shopper.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

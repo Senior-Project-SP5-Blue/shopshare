@@ -1,10 +1,9 @@
 package com.sp5blue.shopshare.services.shoppinglist;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
-import com.sp5blue.shopshare.models.ListItem;
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.ShopperGroup;
-import com.sp5blue.shopshare.models.ShoppingList;
+import com.sp5blue.shopshare.models.listitem.ListItem;
+import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.repositories.ShoppingListRepository;
 import com.sp5blue.shopshare.services.listitem.ListItemService;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,7 @@ class ShoppingListServiceTest {
         ShoppingList shoppingList = new ShoppingList();
         when(mockShoppingListRepo.save(shoppingList)).thenReturn(shoppingList);
 
-        var result = shoppingListService.create(shoppingList);
+        var result = shoppingListService.createShoppingList(shoppingList);
         assertEquals(shoppingList, result);
     }
 
@@ -46,7 +45,7 @@ class ShoppingListServiceTest {
         UUID shoppingListId = UUID.randomUUID();
         when(mockShoppingListRepo.findById(shoppingListId)).thenReturn(Optional.empty());
 
-        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.readById(shoppingListId));
+        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.getShoppingListById(shoppingListId));
 
         assertEquals("Shopping list does not exist - " + shoppingListId, exception.getMessage());
     }
@@ -56,14 +55,14 @@ class ShoppingListServiceTest {
         ShoppingList shoppingList = new ShoppingList();
         when(mockShoppingListRepo.findById(shoppingList.getId())).thenReturn(Optional.of(shoppingList));
 
-        var result = shoppingListService.readById(shoppingList.getId());
+        var result = shoppingListService.getShoppingListById(shoppingList.getId());
 
         assertEquals(shoppingList, result);
     }
 
     @Test
     void readByName_NoMatches_ReturnsEmptyList() {
-        var result = shoppingListService.readByName("List 1");
+        var result = shoppingListService.getShoppingListsByName("List 1");
 
         assertEquals(0, result.size());
     }
@@ -75,7 +74,7 @@ class ShoppingListServiceTest {
         ShoppingList shoppingList3 = new ShoppingList();
         when(mockShoppingListRepo.findAllByName("List 1")).thenReturn(Arrays.asList(shoppingList1, shoppingList2, shoppingList3));
 
-        var result = shoppingListService.readByName("List 1");
+        var result = shoppingListService.getShoppingListsByName("List 1");
 
         assertEquals(3, result.size());
         assertAll(
@@ -86,43 +85,11 @@ class ShoppingListServiceTest {
     }
 
     @Test
-    void readByShopperId() {
-        Shopper shopper = new Shopper();
-        ShoppingList shoppingList1 = new ShoppingList("Shopping list 1", shopper);
-        ShoppingList shoppingList2 = new ShoppingList("Shopping list 2", shopper);
-        when(mockShoppingListRepo.findAllByShopper_Id(shopper.getId())).thenReturn(Arrays.asList(shoppingList1, shoppingList2));
-
-        var results = shoppingListService.readByShopperId(shopper.getId());
-
-        assertEquals(2, results.size());
-        assertAll(
-                () -> assertEquals(shoppingList1, results.get(0)),
-                () -> assertEquals(shoppingList2, results.get(1))
-        );
-    }
-
-    @Test
-    void readByShopperGroupId() {
-        ShopperGroup shopperGroup = new ShopperGroup();
-        ShoppingList shoppingList1 = new ShoppingList("Shopping list 1", shopperGroup);
-        ShoppingList shoppingList2 = new ShoppingList("Shopping list 2", shopperGroup);
-        when(mockShoppingListRepo.findAllByShopper_Id(shopperGroup.getId())).thenReturn(Arrays.asList(shoppingList1, shoppingList2));
-
-        var results = shoppingListService.readByShopperId(shopperGroup.getId());
-
-        assertEquals(2, results.size());
-        assertAll(
-                () -> assertEquals(shoppingList1, results.get(0)),
-                () -> assertEquals(shoppingList2, results.get(1))
-        );
-    }
-
-    @Test
     void removeItemFromList_InvalidId_ThrowsListNotFoundException() {
         UUID shoppingListId = UUID.randomUUID();
         ListItem item = new ListItem("Item 1");
 
-        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.removeItemFromList(shoppingListId, item.getId()));
+        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.removeItemFromShoppingList(shoppingListId, item.getId()));
         assertEquals("Shopping list does not exist - " + shoppingListId, exception.getMessage());
     }
 
@@ -136,7 +103,7 @@ class ShoppingListServiceTest {
         shoppingList1.addItem(item2);
         when(mockShoppingListRepo.findById(shopperGroup.getId())).thenReturn(Optional.of(shoppingList1));
 
-        var result = shoppingListService.removeItemFromList(shopperGroup.getId(), item1.getId());
+        var result = shoppingListService.removeItemFromShoppingList(shopperGroup.getId(), item1.getId());
 
         assertTrue(result);
         assertEquals(1, shoppingList1.getItems().size());
@@ -148,7 +115,7 @@ class ShoppingListServiceTest {
         UUID shoppingListId = UUID.randomUUID();
         ListItem item = new ListItem("Item 1");
 
-        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.addItemToList(shoppingListId, item.getId()));
+        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.addItemToShoppingList(shoppingListId, item));
         assertEquals("Shopping list does not exist - " + shoppingListId, exception.getMessage());
     }
 
@@ -161,7 +128,7 @@ class ShoppingListServiceTest {
         shoppingList1.addItem(item1);
         when(mockShoppingListRepo.findById(shopperGroup.getId())).thenReturn(Optional.of(shoppingList1));
 
-        var result = shoppingListService.addItemToList(shopperGroup.getId(), item2);
+        var result = shoppingListService.addItemToShoppingList(shopperGroup.getId(), item2);
 
         assertTrue(result);
         assertEquals(2, shoppingList1.getItems().size());

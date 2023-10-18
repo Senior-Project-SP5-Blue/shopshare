@@ -1,6 +1,13 @@
-package com.sp5blue.shopshare.models;
+package com.sp5blue.shopshare.models.listitem;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -17,16 +24,23 @@ public class ListItem {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "status")
+    @Column(name = "status", columnDefinition = "item_status")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
     private ItemStatus status;
 
     @Column(name = "created_on")
     private LocalDateTime createdOn;
 
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne(optional = false)
-    @JoinColumn(name = "shopper_id")
+    @JoinColumn(name = "created_by")
     private Shopper createdBy;
+
+    @ManyToOne
+    @JoinColumn(name = "shopping_list_id")
+    private ShoppingList list;
 
     @Column(name = "locked")
     private boolean locked;
@@ -37,6 +51,20 @@ public class ListItem {
     public ListItem(String name, Shopper createdBy) {
         this.name = name;
         this.createdBy = createdBy;
+        this.createdOn = LocalDateTime.now();
+    }
+
+    public ListItem(String name, ItemStatus status, boolean locked) {
+        this.name = name;
+        this.status = status;
+        this.locked = locked;
+    }
+
+    public ListItem(String name, ItemStatus status, Shopper createdBy, boolean locked) {
+        this.name = name;
+        this.status = status;
+        this.createdBy = createdBy;
+        this.locked = locked;
     }
 
     public ListItem(String name) {

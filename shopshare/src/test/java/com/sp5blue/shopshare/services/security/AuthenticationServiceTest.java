@@ -2,7 +2,7 @@ package com.sp5blue.shopshare.services.security;
 
 import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
 import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
-import com.sp5blue.shopshare.models.Shopper;
+import com.sp5blue.shopshare.models.shopper.Shopper;
 import com.sp5blue.shopshare.security.request.SignInRequest;
 import com.sp5blue.shopshare.security.request.SignUpRequest;
 import com.sp5blue.shopshare.services.shopper.ShopperService;
@@ -53,7 +53,7 @@ class AuthenticationServiceTest {
 
     @Test
     void signUp_DuplicateUsername_ThrowsUserAlreadyExistsException() {
-        when(shopperService.existsByUsername(anyString())).thenReturn(true);
+        when(shopperService.shopperExistsByUsername(anyString())).thenReturn(true);
 
         var exception = assertThrows(UserAlreadyExistsException.class, () -> authenticationService.signUp(signUpRequest));
         assertEquals("An account with entered username already exists - usertest", exception.getMessage());
@@ -61,8 +61,8 @@ class AuthenticationServiceTest {
 
     @Test
     void signUp_DuplicateEmail_ThrowsUserAlreadyExistsException() {
-        when(shopperService.existsByUsername(anyString())).thenReturn(false);
-        when(shopperService.existsByEmail(anyString())).thenReturn(true);
+        when(shopperService.shopperExistsByUsername(anyString())).thenReturn(false);
+        when(shopperService.shopperExistsByEmail(anyString())).thenReturn(true);
 
         var exception = assertThrows(UserAlreadyExistsException.class, () -> authenticationService.signUp(signUpRequest));
         assertEquals("An account with entered email already exists - userlast@email.com", exception.getMessage());
@@ -74,21 +74,21 @@ class AuthenticationServiceTest {
 
         var result = authenticationService.signUp(signUpRequest);
 
-        verify(shopperService).create(captor.capture());
+        verify(shopperService).createShopper(captor.capture());
         verify(jwtService).generateToken(captor.getValue());
         assertNotNull(result);
     }
 
     @Test
     void signIn_UserDoesNotExist_ThrowsUserDoesNotExistException() {
-        when(shopperService.readByEmail(anyString())).thenThrow( new UserNotFoundException("User does not exist - " + signInRequest.email()));
+        when(shopperService.readShopperByEmail(anyString())).thenThrow( new UserNotFoundException("User does not exist - " + signInRequest.email()));
         var exception = assertThrows(UserNotFoundException.class, () -> authenticationService.signIn(signInRequest));
         assertEquals("User does not exist - hey@email.com", exception.getMessage());
     }
 
     @Test
     void signIn_Valid_ReturnsJwt() {
-        when(shopperService.readByEmail(anyString())).thenReturn(new Shopper("hey", "last", "heyLast", "hey@email.com", "password"));
+        when(shopperService.readShopperByEmail(anyString())).thenReturn(new Shopper("hey", "last", "heyLast", "hey@email.com", "password"));
 
         var result = authenticationService.signIn(signInRequest);
 

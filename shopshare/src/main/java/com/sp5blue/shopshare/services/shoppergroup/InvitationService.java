@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,13 @@ public class InvitationService implements IInvitationService {
                 .setParameter("groupId", groupId)
                 .setParameter("shopperId", shopperId)
                 .getSingleResult();
-        if (alreadyInvited) throw new UserAlreadyInvitedException(String.format("User - %s already has active invitation to Group - %s", shopperId, groupId));
+         Boolean alreadyInGroup = (Integer) entityManager.createNativeQuery("""
+SELECT 1 FROM groups WHERE shopper_group_id = :groupId AND shopper_id = :shopperId
+""").setParameter("groupId", groupId)
+.setParameter("shopperId", shopperId)
+.getSingleResult() == 1 ? true : false;
+
+        if (alreadyInvited || alreadyInGroup) throw new UserAlreadyInvitedException(String.format("User - %s already has active invitation to Group - %s", shopperId, groupId));
         try {
             Query query = entityManager.createNativeQuery("INSERT INTO group_invitations(shopper_group_id, shopper_id) VALUES (:groupId, :shopperId)");
             rowsChanged = query.setParameter("groupId", groupId).setParameter("shopperId", shopperId).executeUpdate();
@@ -51,7 +58,7 @@ public class InvitationService implements IInvitationService {
                 .getSingleResult();
         if (!hasInvite) throw new UserNotInvitedException(String.format("User - %s has not been invited to Group - %s", shopperId, groupId));
 
-        boolean added = shopperGroupService.addShopperToGroup(groupId, shopperId);
+        boolean added = shopperGroupService.addShopperToShopperGroup(groupId, shopperId);
         int rowsChanged = entityManager.createNativeQuery("DELETE FROM group_invitations WHERE shopper_group_id = :groupId AND shopper_id = :shopperId")
                 .setParameter("groupId", groupId)
                 .setParameter("shopperId", shopperId)

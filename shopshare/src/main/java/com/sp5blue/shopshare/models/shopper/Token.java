@@ -1,5 +1,6 @@
-package com.sp5blue.shopshare.models;
+package com.sp5blue.shopshare.models.shopper;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
@@ -26,6 +27,7 @@ public class Token {
     @Column(name = "is_revoked")
     private boolean isRevoked;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "shopper_id")
     private Shopper shopper;
@@ -53,6 +55,10 @@ public class Token {
     }
 
     public Token() {
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     public String getToken() {

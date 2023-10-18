@@ -1,6 +1,6 @@
 package com.sp5blue.shopshare.repositories;
 
-import com.sp5blue.shopshare.models.ListItem;
+import com.sp5blue.shopshare.models.listitem.ListItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,10 +16,15 @@ public interface ListItemRepository extends JpaRepository<ListItem, UUID> {
     Page<ListItem> findAllByCreatedBy_Id(UUID shopperId, Pageable pageable);
 
     List<ListItem> findAllByCreatedBy_Id(UUID shopperId);
+    Page<ListItem> findAllByList_Id(UUID shopperId, Pageable pageable);
+
+    List<ListItem> findAllByList_Id(UUID shopperId);
 
     long countByCreatedBy_Id(UUID shopperId);
 
     boolean existsByName(String name);
 
     boolean existsByCreatedBy_Id(UUID shopperId);
+
+    boolean existsByList_Id(UUID listId);
 }

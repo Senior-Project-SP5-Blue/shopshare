@@ -1,7 +1,7 @@
 package com.sp5blue.shopshare.services.token;
 
 import com.sp5blue.shopshare.exceptions.token.TokenNotFoundException;
-import com.sp5blue.shopshare.models.Token;
+import com.sp5blue.shopshare.models.shopper.Token;
 import com.sp5blue.shopshare.repositories.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

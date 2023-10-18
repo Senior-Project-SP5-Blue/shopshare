@@ -1,19 +1,23 @@
 package com.sp5blue.shopshare.services.listitem;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
-import com.sp5blue.shopshare.models.ListItem;
+import com.sp5blue.shopshare.models.listitem.ListItem;
+import com.sp5blue.shopshare.models.listitem.ListItemDto;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IListItemService {
-    ListItem create(String name);
+    ListItem createListItem(String name);
 
-    ListItem create(ListItem listItem);
+    ListItem createListItem(ListItem listItem);
 
-    ListItem readById(UUID id) throws ListNotFoundException;
+    ListItem getListItemById(UUID id) throws ListNotFoundException;
 
-    List<ListItem> readByName(String name);
+    List<ListItem> getListItemsByShopper(UUID shopperId);
 
-    List<ListItem> readByShopperId(UUID shopperId);
+    List<ListItem> getListItemsByShoppingList(UUID listId);
+
+    boolean addListItemToShoppingList(ShoppingList list, ListItemDto listItemDto);
 }

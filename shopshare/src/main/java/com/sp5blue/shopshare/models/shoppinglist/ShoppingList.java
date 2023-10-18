@@ -1,5 +1,11 @@
-package com.sp5blue.shopshare.models;
+package com.sp5blue.shopshare.models.shoppinglist;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.sp5blue.shopshare.models.listitem.ListItem;
+import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -20,31 +26,22 @@ public class ShoppingList {
     @Column(name = "modified_on")
     private LocalDateTime modifiedOn;
 
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne
     @JoinColumn(name = "modified_by")
     private Shopper modifiedBy;
 
-    @OneToMany
-    @JoinColumn(name = "shopping_list_id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "list")
     private List<ListItem> items;
 
-    @ManyToOne
-    @JoinColumn(name = "shopper_id")
-    private Shopper shopper;
-
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne
     @JoinColumn(name = "group_id")
     private ShopperGroup group;
 
     public ShoppingList() {
-    }
-
-    /**
-     *
-     */
-    public ShoppingList(String name, Shopper shopper) {
-        this.name = name;
-        this.shopper = shopper;
     }
 
     /**
@@ -89,14 +86,6 @@ public class ShoppingList {
 
     public void setItems(List<ListItem> items) {
         this.items = items;
-    }
-
-    public Shopper getShopper() {
-        return shopper;
-    }
-
-    public void setShopper(Shopper shopper) {
-        this.shopper = shopper;
     }
 
     public ShopperGroup getGroup() {

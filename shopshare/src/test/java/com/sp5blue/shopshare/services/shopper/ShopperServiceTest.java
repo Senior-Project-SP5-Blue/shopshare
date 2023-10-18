@@ -2,7 +2,7 @@ package com.sp5blue.shopshare.services.shopper;
 
 import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
 import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
-import com.sp5blue.shopshare.models.Shopper;
+import com.sp5blue.shopshare.models.shopper.Shopper;
 import com.sp5blue.shopshare.repositories.ShopperRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +38,7 @@ class ShopperServiceTest {
         when(mockShopperRepo.existsByEmail("tom@email.com")).thenReturn(true);
         Shopper shopper = new Shopper("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
 
-        var exception = assertThrows(UserAlreadyExistsException.class, () -> shopperService.create(shopper));
+        var exception = assertThrows(UserAlreadyExistsException.class, () -> shopperService.createShopper(shopper));
 
         assertEquals("Shopper with email already exists - tom@email.com", exception.getMessage());
     }
@@ -49,7 +49,7 @@ class ShopperServiceTest {
         when(mockShopperRepo.existsByUsername("tomUserName")).thenReturn(true);
         Shopper shopper = new Shopper("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
 
-        var exception = assertThrows(UserAlreadyExistsException.class, () -> shopperService.create(shopper));
+        var exception = assertThrows(UserAlreadyExistsException.class, () -> shopperService.createShopper(shopper));
 
         assertEquals("Shopper with username already exists - tomUserName", exception.getMessage());
     }
@@ -59,7 +59,7 @@ class ShopperServiceTest {
         Shopper shopper = new Shopper("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         when(mockShopperRepo.save(shopper)).thenReturn(shopper);
 
-        var result = shopperService.create(shopper);
+        var result = shopperService.createShopper(shopper);
 
         verify(mockShopperRepo).existsByEmail("tom@email.com");
         verify(mockShopperRepo).existsByUsername("tomUserName");
@@ -89,7 +89,7 @@ class ShopperServiceTest {
     void readById_InvalidId_ThrowsUserNotFoundException() {
         UUID shopperId = UUID.randomUUID();
 
-        var exception = assertThrows(UserNotFoundException.class, () -> shopperService.readById(shopperId));
+        var exception = assertThrows(UserNotFoundException.class, () -> shopperService.readShopperById(shopperId));
 
         assertEquals("User does not exist - " + shopperId, exception.getMessage());
     }
@@ -100,7 +100,7 @@ class ShopperServiceTest {
         UUID shopperId = shopper.getId();
         when(mockShopperRepo.findById(shopperId)).thenReturn(Optional.of(shopper));
 
-        var result = shopperService.readById(shopperId);
+        var result = shopperService.readShopperById(shopperId);
 
         assertEquals(shopper, result);
     }
@@ -109,7 +109,7 @@ class ShopperServiceTest {
     void readByEmail_InvalidEmail_ThrowsUserNotFoundException() {
         String shopperEmail = "tom@email.com";
 
-        var exception = assertThrows(UserNotFoundException.class, () -> shopperService.readByEmail(shopperEmail));
+        var exception = assertThrows(UserNotFoundException.class, () -> shopperService.readShopperByEmail(shopperEmail));
 
         assertEquals("User does not exist - tom@email.com", exception.getMessage());
     }
@@ -119,14 +119,14 @@ class ShopperServiceTest {
         Shopper shopper = new Shopper("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         when(mockShopperRepo.findByEmail("tom@email.com")).thenReturn(Optional.of(shopper));
 
-        var result = shopperService.readByEmail("tom@email.com");
+        var result = shopperService.readShopperByEmail("tom@email.com");
 
         assertEquals(shopper, result);
     }
 
     @Test
     void read_NoShoppers_ReturnsEmptyList() {
-        var result = shopperService.read();
+        var result = shopperService.readShoppers();
         assertEquals(0, result.size());
     }
 
@@ -135,7 +135,7 @@ class ShopperServiceTest {
         Shopper shopper = new Shopper("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         when(mockShopperRepo.findAll()).thenReturn(List.of(shopper));
 
-        var results = shopperService.read();
+        var results = shopperService.readShoppers();
 
         assertEquals(1, results.size());
         assertEquals(shopper, results.get(0));
@@ -147,7 +147,7 @@ class ShopperServiceTest {
         Shopper shopper2 = new Shopper("Steve", "Henry", "steveH", "steve@email.com", "steveass");
         when(mockShopperRepo.findAll()).thenReturn(Arrays.asList(shopper, shopper1, shopper2));
 
-        var results = shopperService.read();
+        var results = shopperService.readShoppers();
 
         assertEquals(3, results.size());
         assertAll(
@@ -162,7 +162,7 @@ class ShopperServiceTest {
         UUID shopperId = UUID.randomUUID();
         when(mockShopperRepo.existsById(shopperId)).thenReturn(false);
 
-        var result = shopperService.exists(shopperId);
+        var result = shopperService.shopperExists(shopperId);
         assertFalse(result);
     }
     @Test
@@ -170,7 +170,7 @@ class ShopperServiceTest {
         UUID shopperId = UUID.randomUUID();
         when(mockShopperRepo.existsById(shopperId)).thenReturn(true);
 
-        var result = shopperService.exists(shopperId);
+        var result = shopperService.shopperExists(shopperId);
         assertTrue(result);
     }
 }

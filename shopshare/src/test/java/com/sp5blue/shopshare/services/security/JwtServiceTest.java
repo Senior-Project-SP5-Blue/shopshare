@@ -1,6 +1,6 @@
 package com.sp5blue.shopshare.services.security;
 
-import com.sp5blue.shopshare.models.Shopper;
+import com.sp5blue.shopshare.models.shopper.Shopper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
