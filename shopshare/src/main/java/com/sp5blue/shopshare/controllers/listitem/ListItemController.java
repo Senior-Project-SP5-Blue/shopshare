@@ -1,6 +1,7 @@
 package com.sp5blue.shopshare.controllers.listitem;
 
-import com.sp5blue.shopshare.models.listitem.ListItemDto;
+import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
+import com.sp5blue.shopshare.models.listitem.EditListItemDto;
 import com.sp5blue.shopshare.services.listitem.IListItemService;
 import com.sp5blue.shopshare.services.shopper.IShopperService;
 import com.sp5blue.shopshare.services.shoppergroup.ShopperGroupService;
@@ -15,23 +16,39 @@ import java.util.UUID;
 public class ListItemController {
     private final IListItemService listItemService;
 
-    public ListItemController(IShopperService shopperService, ShopperGroupService shopperGroupService, IListItemService listItemService, IShoppingListService shoppingListService) {
+    public ListItemController(IListItemService listItemService) {
         this.listItemService = listItemService;
     }
 
     @GetMapping
-    public ResponseEntity<?> getShoppingListItems(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId) {
+    public ResponseEntity<?> getListItems(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId) {
         return ResponseEntity.ok().body(listItemService.getListItemsByShoppingList(userId, groupId, listId));
     }
 
     @PostMapping
-    public ResponseEntity<?> addListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody ListItemDto listItemDto) {
-        return ResponseEntity.ok().body(listItemService.addListItemToList(userId, groupId, listId, listItemDto));
+    public ResponseEntity<?> addListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody CreateListItemDto createListItemDto) {
+        return ResponseEntity.ok().body(listItemService.addListItemToList(userId, groupId, listId, createListItemDto));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteListItems(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId) {
+        listItemService.removeListItemsFromList(userId, groupId, listId);
+        return ResponseEntity.ok().body("All items removed from list");
     }
 
     @GetMapping("/{list-item_id}")
-    public ResponseEntity<?> getShoppingListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId) {
+    public ResponseEntity<?> getListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId) {
         return ResponseEntity.ok().body(listItemService.getListItemById(userId, groupId, listId, itemId));
     }
 
+    @PatchMapping("/{list-item_id}")
+    public ResponseEntity<?> changeListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId, @RequestBody EditListItemDto editListItemDto) {
+        listItemService.editListItem(userId, groupId, listId, itemId, editListItemDto);
+        return ResponseEntity.ok().body("Successfully edited list item");
+    }
+
+    @DeleteMapping("/{list-item_id}")
+    public ResponseEntity<?> deleteListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId) {
+        return ResponseEntity.ok().body(listItemService.getListItemById(userId, groupId, listId, itemId));
+    }
 }

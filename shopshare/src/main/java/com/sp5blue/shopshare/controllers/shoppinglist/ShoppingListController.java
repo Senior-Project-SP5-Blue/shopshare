@@ -10,7 +10,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("${api-prefix}/users/{user_id}/groups/{group_id}/shopping-lists")
 public class ShoppingListController {
-    private IShoppingListService shoppingListService;
+    private final IShoppingListService shoppingListService;
 
     @Autowired
     public ShoppingListController(IShoppingListService shoppingListService) {
@@ -36,5 +36,11 @@ public class ShoppingListController {
     public ResponseEntity<?> editShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody String name) {
         shoppingListService.changeShoppingListName(userId, groupId, listId, name);
         return ResponseEntity.ok().body("Shopping list name changed successfully.");
+    }
+
+    @DeleteMapping("/{shopping-list_id}")
+    public ResponseEntity<?> deleteShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId) {
+        shoppingListService.deleteShoppingList(userId, groupId, listId);
+        return ResponseEntity.ok().body("Successfully deleted shopping list");
     }
 }

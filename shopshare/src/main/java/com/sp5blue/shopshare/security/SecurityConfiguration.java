@@ -38,7 +38,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
         this.logoutHandler = logoutHandler;
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

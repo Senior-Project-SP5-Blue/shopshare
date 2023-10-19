@@ -18,7 +18,6 @@ public class ShoppingListService implements IShoppingListService {
 
     private final IShopperGroupService shopperGroupService;
 
-
     @Autowired
     public ShoppingListService(ShoppingListRepository shoppingListRepository, IShopperGroupService shopperGroupService) {
         this.shoppingListRepository = shoppingListRepository;
@@ -62,5 +61,13 @@ public class ShoppingListService implements IShoppingListService {
     @Override
     public void verifyGroupHasList(UUID groupId, UUID listId) {
         shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+    }
+
+    @Override
+    @Transactional
+    public void deleteShoppingList(UUID userId, UUID groupId, UUID listId) {
+        shopperGroupService.verifyUserHasGroup(userId, groupId);
+        ShoppingList shoppingList = shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+        shoppingListRepository.delete(shoppingList);
     }
 }

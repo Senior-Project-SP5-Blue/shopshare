@@ -1,9 +1,10 @@
 package com.sp5blue.shopshare.services.listitem;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
+import com.sp5blue.shopshare.models.listitem.EditListItemDto;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.listitem.ListItemDto;
+import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
 import com.sp5blue.shopshare.models.shopper.Shopper;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.repositories.ListItemRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,10 +42,10 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Transactional
-    public ListItem addListItemToList(UUID userId, UUID groupId, UUID listId, ListItemDto listItemDto) {
+    public ListItem addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemDto createListItemDto) {
         Shopper creator = shopperService.getShopperById(userId);
         ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
-        ListItem listItem = new ListItem(listItemDto.name(), creator, shoppingList, listItemDto.locked());
+        ListItem listItem = new ListItem(createListItemDto.name(), creator, shoppingList, createListItemDto.locked());
         shoppingList.setModifiedOn(LocalDateTime.now());
         shoppingList.setModifiedBy(creator);
         return listItemRepository.save(listItem);
@@ -122,5 +124,24 @@ public class ListItemService implements IListItemService {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
         return listItemRepository.findAllByList_Id(listId);
+    }
+
+    @Override
+    @Transactional
+    public void removeListItemsFromList(UUID userId, UUID groupId, UUID listId) {
+        ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
+        shoppingList.setItems(new ArrayList<>());
+    }
+
+    @Override
+    @Transactional
+    public void editListItem(UUID userId, UUID groupId, UUID listId, UUID itemId, EditListItemDto editListItemDto) throws ListItemNotFoundException {
+        shopperGroupService.verifyUserHasGroup(userId, groupId);
+        shoppingListService.verifyGroupHasList(groupId, listId);
+        ListItem listItem = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
+        if (!itemId.equals(editListItemDto.id())) return;
+        listItem.setName(editListItemDto.name());
+        listItem.setStatus(editListItemDto.status());
+        listItem.setLocked(editListItemDto.locked());
     }
 }

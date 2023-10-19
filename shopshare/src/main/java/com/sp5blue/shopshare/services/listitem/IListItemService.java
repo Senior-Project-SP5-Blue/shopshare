@@ -1,15 +1,18 @@
 package com.sp5blue.shopshare.services.listitem;
 
+import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
+import com.sp5blue.shopshare.models.listitem.EditListItemDto;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.listitem.ListItemDto;
+import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IListItemService {
 
-    ListItem addListItemToList(UUID userId, UUID groupId, UUID listId, ListItemDto listItemDto);
+    ListItem addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemDto listItemDto);
 
     void removeListItemFromList(UUID userId, UUID groupId, UUID listId, UUID itemId);
 
@@ -28,4 +31,9 @@ public interface IListItemService {
     List<ListItem> getListItemsByCreator(UUID userId);
 
     List<ListItem> getListItemsByShoppingList(UUID userId, UUID groupId, UUID listId);
+
+    void removeListItemsFromList(UUID userId, UUID groupId, UUID listId);
+
+    @Transactional
+    void editListItem(UUID userId, UUID groupId, UUID listId, UUID itemId, EditListItemDto editListItemDto) throws ListItemNotFoundException;
 }
