@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ListItemRepository extends JpaRepository<ListItem, UUID> {
@@ -13,18 +14,20 @@ public interface ListItemRepository extends JpaRepository<ListItem, UUID> {
 
     List<ListItem> findAllByName (String name);
 
-    Page<ListItem> findAllByCreatedBy_Id(UUID shopperId, Pageable pageable);
+    Page<ListItem> findAllByCreatedBy_Id(UUID listId, Pageable pageable);
 
-    List<ListItem> findAllByCreatedBy_Id(UUID shopperId);
-    Page<ListItem> findAllByList_Id(UUID shopperId, Pageable pageable);
+    List<ListItem> findAllByCreatedBy_Id(UUID listId);
+    Page<ListItem> findAllByList_Id(UUID listId, Pageable pageable);
 
-    List<ListItem> findAllByList_Id(UUID shopperId);
+    List<ListItem> findAllByList_Id(UUID listId);
 
-    long countByCreatedBy_Id(UUID shopperId);
+    Optional<ListItem> findByList_IdAndId(UUID listId, UUID itemId);
+
+    long countByCreatedBy_Id(UUID listId);
 
     boolean existsByName(String name);
 
-    boolean existsByCreatedBy_Id(UUID shopperId);
+    boolean existsByCreatedBy_Id(UUID listId);
 
     boolean existsByList_Id(UUID listId);
 }

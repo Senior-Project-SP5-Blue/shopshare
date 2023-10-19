@@ -1,140 +1,117 @@
 package com.sp5blue.shopshare.services.shoppinglist;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
-import com.sp5blue.shopshare.models.listitem.ListItem;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.repositories.ShoppingListRepository;
-import com.sp5blue.shopshare.services.listitem.ListItemService;
+import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 class ShoppingListServiceTest {
 
     @Mock
-    ShoppingListRepository mockShoppingListRepo;
+    ShoppingListRepository shoppingListRepository;
 
     @Mock
-    ListItemService mockListItemService;
+    IShopperGroupService shopperGroupService;
 
     @InjectMocks
     ShoppingListService shoppingListService;
 
-    @Test
-    void create_CreatesNewList_ReturnsNewList() {
-        ShoppingList shoppingList = new ShoppingList();
-        when(mockShoppingListRepo.save(shoppingList)).thenReturn(shoppingList);
 
-        var result = shoppingListService.createShoppingList(shoppingList);
+    @Test
+    void createShoppingList_CreatesShoppingList() {
+        ShopperGroup shopperGroup = new ShopperGroup();
+        ArgumentCaptor<ShoppingList> addedList = ArgumentCaptor.forClass(ShoppingList.class);
+        UUID userId = UUID.randomUUID();
+        when(shopperGroupService.getShopperGroupById(userId, shopperGroup.getId())).thenReturn(shopperGroup);
+        when(shoppingListRepository.save(any(ShoppingList.class))).thenAnswer(m -> m.getArguments()[0]);
+
+        var result = shoppingListService.createShoppingList(userId, shopperGroup.getId(), "New List");
+        verify(shoppingListRepository).save(addedList.capture());
+        assertEquals(addedList.getValue(), result);
+
+    }
+
+    @Test
+    void changeShoppingListName_InvalidId_ThrowsListNotFoundException() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+
+        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.changeShoppingListName(userId, groupId, listId, "New Name"));
+        assertEquals("Shopping list does not exist - " + listId, exception.getMessage());
+    }
+
+    @Test
+    void changeShoppingListName_ChangesListName() {
+        UUID userId = UUID.randomUUID();
+        ShoppingList shoppingList = new ShoppingList();
+        UUID groupId = UUID.randomUUID();
+        when(shoppingListRepository.findByGroup_IdAndId(groupId, shoppingList.getId())).thenReturn(Optional.of(shoppingList));
+
+        shoppingListService.changeShoppingListName(userId, groupId, shoppingList.getId(), "New Name");
+        assertEquals("New Name", shoppingList.getName());
+    }
+
+    @Test
+    void getShoppingListById_InvalidId_ThrowsListNotFoundException() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+
+        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.getShoppingListById(userId, groupId, listId));
+        assertEquals("Shopping list does not exist - " + listId, exception.getMessage());
+    }
+
+    @Test
+    void getShoppingListById_ReturnsShoppingList() {
+        UUID userId = UUID.randomUUID();
+        ShoppingList shoppingList = new ShoppingList();
+        UUID groupId = UUID.randomUUID();
+        when(shoppingListRepository.findByGroup_IdAndId(groupId, shoppingList.getId())).thenReturn(Optional.of(shoppingList));
+
+        var result = shoppingListService.getShoppingListById(userId, groupId, shoppingList.getId());
         assertEquals(shoppingList, result);
     }
 
     @Test
-    void readById_InvalidId_ThrowsListNotFoundException() {
-        UUID shoppingListId = UUID.randomUUID();
-        when(mockShoppingListRepo.findById(shoppingListId)).thenReturn(Optional.empty());
+    void getShoppingLists_NoMatches_ReturnsEmptyList() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
 
-        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.getShoppingListById(shoppingListId));
-
-        assertEquals("Shopping list does not exist - " + shoppingListId, exception.getMessage());
+        var results = shoppingListService.getShoppingLists(userId, groupId);
+        assertTrue(results.isEmpty());
     }
 
     @Test
-    void readById_ValidId_ThrowsListNotFoundException() {
-        ShoppingList shoppingList = new ShoppingList();
-        when(mockShoppingListRepo.findById(shoppingList.getId())).thenReturn(Optional.of(shoppingList));
-
-        var result = shoppingListService.getShoppingListById(shoppingList.getId());
-
-        assertEquals(shoppingList, result);
-    }
-
-    @Test
-    void readByName_NoMatches_ReturnsEmptyList() {
-        var result = shoppingListService.getShoppingListsByName("List 1");
-
-        assertEquals(0, result.size());
-    }
-
-    @Test
-    void readByName_MultipleMatches_ReturnsMatches() {
-        ShoppingList shoppingList1 = new ShoppingList();
-        ShoppingList shoppingList2 = new ShoppingList();
-        ShoppingList shoppingList3 = new ShoppingList();
-        when(mockShoppingListRepo.findAllByName("List 1")).thenReturn(Arrays.asList(shoppingList1, shoppingList2, shoppingList3));
-
-        var result = shoppingListService.getShoppingListsByName("List 1");
-
-        assertEquals(3, result.size());
-        assertAll(
-                () -> assertEquals(shoppingList1, result.get(0)),
-                () -> assertEquals(shoppingList2, result.get(1)),
-                () -> assertEquals(shoppingList3, result.get(2))
-        );
-    }
-
-    @Test
-    void removeItemFromList_InvalidId_ThrowsListNotFoundException() {
-        UUID shoppingListId = UUID.randomUUID();
-        ListItem item = new ListItem("Item 1");
-
-        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.removeItemFromShoppingList(shoppingListId, item.getId()));
-        assertEquals("Shopping list does not exist - " + shoppingListId, exception.getMessage());
-    }
-
-    @Test
-    void removeItemFromList_ValidId_RemovesItemFromList() {
+    void getShoppingLists_Matches_ReturnsShoppingLists() {
+        UUID userId = UUID.randomUUID();
+        ShoppingList shoppingList1 = new ShoppingList("List 1");
+        ShoppingList shoppingList2 = new ShoppingList("List 2");
         ShopperGroup shopperGroup = new ShopperGroup();
-        ShoppingList shoppingList1 = new ShoppingList("Shopping list 1", shopperGroup);
-        ListItem item1 = new ListItem("Item 1");
-        ListItem item2 = new ListItem("Item 2");
-        shoppingList1.addItem(item1);
-        shoppingList1.addItem(item2);
-        when(mockShoppingListRepo.findById(shopperGroup.getId())).thenReturn(Optional.of(shoppingList1));
+        shopperGroup.addList(shoppingList1);
+        shopperGroup.addList(shoppingList2);
+        when(shoppingListRepository.findAllByGroup_Id(shopperGroup.getId())).thenReturn(shopperGroup.getLists());
 
-        var result = shoppingListService.removeItemFromShoppingList(shopperGroup.getId(), item1.getId());
-
-        assertTrue(result);
-        assertEquals(1, shoppingList1.getItems().size());
-        assertEquals(item2, shoppingList1.getItems().get(0));
-    }
-
-    @Test
-    void addItemToList_InvalidId_ThrowsListNotFoundException() {
-        UUID shoppingListId = UUID.randomUUID();
-        ListItem item = new ListItem("Item 1");
-
-        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.addItemToShoppingList(shoppingListId, item));
-        assertEquals("Shopping list does not exist - " + shoppingListId, exception.getMessage());
-    }
-
-    @Test
-    void addItemToList_ValidId_AddsItemToList() {
-        ShopperGroup shopperGroup = new ShopperGroup();
-        ShoppingList shoppingList1 = new ShoppingList("Shopping list 1", shopperGroup);
-        ListItem item1 = new ListItem("Item 1");
-        ListItem item2 = new ListItem("Item 2");
-        shoppingList1.addItem(item1);
-        when(mockShoppingListRepo.findById(shopperGroup.getId())).thenReturn(Optional.of(shoppingList1));
-
-        var result = shoppingListService.addItemToShoppingList(shopperGroup.getId(), item2);
-
-        assertTrue(result);
-        assertEquals(2, shoppingList1.getItems().size());
-        assertAll(
-                () -> assertEquals(item1, shoppingList1.getItems().get(0)),
-                () -> assertEquals(item2, shoppingList1.getItems().get(1))
+        var results = shoppingListService.getShoppingLists(userId, shopperGroup.getId());
+        assertEquals(2, results.size());
+        assertAll (
+                () -> assertEquals(shoppingList1, results.get(0)),
+                () -> assertEquals(shoppingList2, results.get(1))
         );
     }
 }

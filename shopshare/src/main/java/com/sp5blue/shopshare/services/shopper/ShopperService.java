@@ -52,39 +52,44 @@ public class ShopperService implements UserDetailsService, IShopperService {
     }
 
     @Override
-    public Shopper readShopperById(String id){
+    public Shopper getShopperById(String id){
         UUID _id = UUID.fromString(id);
-        return readShopperById(_id);
+        return getShopperById(_id);
     }
 
     @Override
-    public Shopper readShopperById(UUID id) throws UserNotFoundException {
+    public Shopper getShopperById(UUID id) throws UserNotFoundException {
         return shopperRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User does not exist - " + id));
     }
 
     @Override
-    public Shopper readShopperByEmail(String email) throws UserNotFoundException {
+    public Shopper getShopperByEmail(String email) throws UserNotFoundException {
         return shopperRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User does not exist - " + email));
     }
 
     @Override
-    public Shopper readShopperByUsername(String username) throws UserNotFoundException {
+    public Shopper getShopperByUsername(String username) throws UserNotFoundException {
         return shopperRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User does not exist - " + username));
     }
 
     @Override
-    public List<Shopper> readShoppersByShopperGroup(UUID groupId) {
+    public List<Shopper> getShoppersByShopperGroup(UUID groupId) {
         return shopperRepository.findByShopperGroup(groupId);
     }
 
     @Override
-    public List<Shopper> readShoppers() {
+    public List<Shopper> getShoppers() {
         return shopperRepository.findAll();
     }
 
     @Override
     public boolean shopperExists(UUID id) {
         return shopperRepository.existsById(id);
+    }
+
+    @Override
+    public boolean shopperExistsByGroup(UUID shopperId, UUID groupId) {
+        return shopperRepository.existsByGroup(shopperId, groupId);
     }
 
 
@@ -96,5 +101,10 @@ public class ShopperService implements UserDetailsService, IShopperService {
     @Override
     public boolean shopperExistsByUsername(String username) {
         return shopperRepository.existsByUsername(username);
+    }
+
+    @Override
+    public boolean shopperExistsAsAdminByGroup(UUID shopperId, UUID groupId) {
+        return shopperRepository.existsAsAdminByGroup(shopperId, groupId);
     }
 }

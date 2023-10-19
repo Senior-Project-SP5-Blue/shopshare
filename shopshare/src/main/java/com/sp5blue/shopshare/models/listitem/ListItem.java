@@ -27,10 +27,10 @@ public class ListItem {
     @Column(name = "status", columnDefinition = "item_status")
     @Enumerated(EnumType.STRING)
     @Type(PostgreSQLEnumType.class)
-    private ItemStatus status;
+    private ItemStatus status = ItemStatus.ACTIVE;
 
     @Column(name = "created_on")
-    private LocalDateTime createdOn;
+    private LocalDateTime createdOn = LocalDateTime.now();
 
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
@@ -43,7 +43,7 @@ public class ListItem {
     private ShoppingList list;
 
     @Column(name = "locked")
-    private boolean locked;
+    private boolean locked = false;
 
     public ListItem() {
     }
@@ -51,19 +51,33 @@ public class ListItem {
     public ListItem(String name, Shopper createdBy) {
         this.name = name;
         this.createdBy = createdBy;
-        this.createdOn = LocalDateTime.now();
     }
 
     public ListItem(String name, ItemStatus status, boolean locked) {
         this.name = name;
         this.status = status;
         this.locked = locked;
+        createdOn = LocalDateTime.now();
     }
 
     public ListItem(String name, ItemStatus status, Shopper createdBy, boolean locked) {
         this.name = name;
         this.status = status;
         this.createdBy = createdBy;
+        this.locked = locked;
+        createdOn = LocalDateTime.now();
+    }
+
+    public ListItem(String name, Shopper createdBy, boolean locked) {
+        this.name = name;
+        this.createdBy = createdBy;
+        this.locked = locked;
+    }
+
+    public ListItem(String name, Shopper createdBy, ShoppingList list, boolean locked) {
+        this.name = name;
+        this.createdBy = createdBy;
+        this.list = list;
         this.locked = locked;
     }
 
@@ -97,6 +111,10 @@ public class ListItem {
 
     public void setCreatedOn(LocalDateTime createdOn) {
         this.createdOn = createdOn;
+    }
+
+    public ShoppingList getList() {
+        return list;
     }
 
     public Shopper getCreatedBy() {

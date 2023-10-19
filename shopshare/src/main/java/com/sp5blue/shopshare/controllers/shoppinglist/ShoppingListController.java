@@ -19,22 +19,22 @@ public class ShoppingListController {
 
     @GetMapping
     public ResponseEntity<?> getShoppingLists(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId) {
-        return ResponseEntity.ok().body(shoppingListService.getShoppingListsByShopperGroupId(groupId));
+        return ResponseEntity.ok().body(shoppingListService.getShoppingLists(userId, groupId));
     }
 
     @PostMapping
     public ResponseEntity<?> addShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @RequestBody String name) {
-        return ResponseEntity.ok().body(shoppingListService.createShoppingList(groupId, name));
+        return ResponseEntity.ok().body(shoppingListService.createShoppingList(userId, groupId, name));
     }
 
     @GetMapping("/{shopping-list_id}")
     public ResponseEntity<?> getShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId) {
-        return ResponseEntity.ok().body(shoppingListService.getShoppingListById(listId));
+        return ResponseEntity.ok().body(shoppingListService.getShoppingListById(userId, groupId, listId));
     }
 
     @PatchMapping("/{shopping-list_id}")
     public ResponseEntity<?> editShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody String name) {
-        shoppingListService.changeShoppingListName(groupId, name);
+        shoppingListService.changeShoppingListName(userId, groupId, listId, name);
         return ResponseEntity.ok().body("Shopping list name changed successfully.");
     }
 }

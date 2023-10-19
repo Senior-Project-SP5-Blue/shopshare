@@ -1,7 +1,6 @@
 package com.sp5blue.shopshare.controllers.shoppinglist;
 
 
-import com.sp5blue.shopshare.exceptions.shoppergroup.GroupNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -2,10 +2,10 @@ package com.sp5blue.shopshare.models.shoppergroup;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.models.shopper.Role;
 import com.sp5blue.shopshare.models.shopper.RoleType;
 import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.serializers.ShopperGroupSerializer;
 import jakarta.persistence.*;
 

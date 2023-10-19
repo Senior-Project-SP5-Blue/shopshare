@@ -1,6 +1,8 @@
 package com.sp5blue.shopshare.services.shoppergroup;
 
 import com.sp5blue.shopshare.exceptions.shoppergroup.GroupNotFoundException;
+import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsException;
+import com.sp5blue.shopshare.exceptions.shoppergroup.RemoveGroupAdminException;
 import com.sp5blue.shopshare.models.shopper.Shopper;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.repositories.ShopperGroupRepository;
@@ -13,92 +15,57 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ShopperGroupServiceTest {
 
     @Mock
-    ShopperGroupRepository mockShopperGroupRepo;
+    ShopperService shopperService1;
 
     @Mock
-    ShopperService mockShopperService;
+    ShopperGroupRepository shopperGroupRepository;
 
     @InjectMocks
-    ShopperGroupService shopperGroupService;
-
+    ShopperGroupService shopperGroupService1;
 
     @Test
-    void create_CreatesGroup() {
-        ArgumentCaptor<ShopperGroup> addedShopperGroup = ArgumentCaptor.forClass(ShopperGroup.class);
-        Shopper creator = new Shopper();
-        ShopperGroup shopperGroup = new ShopperGroup("group1", creator);
+    void createShopperGroup_CreatesShopperGroup() {
+        Shopper shopper = new Shopper();
+        ArgumentCaptor<ShopperGroup> groupCaptor = ArgumentCaptor.forClass(ShopperGroup.class);
+        when(shopperService1.getShopperById(shopper.getId())).thenReturn(shopper);
+        when(shopperGroupRepository.save(any(ShopperGroup.class))).thenAnswer(i -> i.getArguments()[0]);
 
-        shopperGroupService.createShopperGroup(shopperGroup);
+        var result = shopperGroupService1.createShopperGroup(shopper.getId(), "Group 1");
 
-        verify(mockShopperGroupRepo).save(addedShopperGroup.capture());
-        assertEquals(shopperGroup, addedShopperGroup.getValue());
+        verify(shopperGroupRepository).save(groupCaptor.capture());
+        assertEquals(groupCaptor.getValue(), result);
+        assertTrue(shopper.getRoles().stream().anyMatch(g -> g.getAuthority().equals("ROLE_GROUP_ADMIN-" + groupCaptor.getValue().getId())));
     }
 
     @Test
-    void readById_InvalidId_ThrowsGroupNotFoundException() {
-        UUID groupId = UUID.randomUUID();
-        when(mockShopperGroupRepo.findById(groupId)).thenReturn(Optional.empty());
-
-        var exception = assertThrows(GroupNotFoundException.class, () -> shopperGroupService.getShopperGroupById(groupId));
-
-        assertEquals("Shopper group does not exist - " + groupId, exception.getMessage());
+    void getShopperGroups_NoMatches_ReturnsEmptyList() {
+        UUID shopperId = UUID.randomUUID();
+        var results = shopperGroupService1.getShopperGroups(shopperId);
+        assertTrue(results.isEmpty());
     }
 
     @Test
-    void readById_Valid_ReturnsGroupId() {
-        UUID groupId = UUID.randomUUID();
-        Shopper creator = new Shopper();
-        ShopperGroup shopperGroup = new ShopperGroup("group1", creator);
-        when(mockShopperGroupRepo.findById(groupId)).thenReturn(Optional.of(shopperGroup));
+    void getShopperGroups_Matches_ReturnsMatches() {
+        Shopper admin = new Shopper();
+        ShopperGroup shopperGroup1 = new ShopperGroup("Group1", admin);
+        ShopperGroup shopperGroup2 = new ShopperGroup("Group2", admin);
+        Shopper shopper1 = new Shopper();
+        shopperGroup1.addShopper(shopper1);
+        shopperGroup2.addShopper(shopper1);
 
-        var result = shopperGroupService.getShopperGroupById(groupId);
+        when(shopperGroupRepository.findAllByShopperId(shopper1.getId())).thenReturn(Arrays.asList(shopperGroup1, shopperGroup2));
 
-        assertEquals(shopperGroup, result);
-    }
-
-    @Test
-    void readByName_NoShopperGroups_ReturnsEmptyList() {
-        String shopperGroupName = "group1";
-        var result = shopperGroupService.getShopperGroupsByName(shopperGroupName);
-        assertEquals(0, result.size());
-    }
-    @Test
-    void readByName_OneShopperGroup_ReturnsShopperGroup() {
-        String shopperGroupName = "group1";
-        Shopper creator = new Shopper();
-        ShopperGroup shopperGroup = new ShopperGroup(shopperGroupName, creator);
-        when(mockShopperGroupRepo.findAllByName(shopperGroupName)).thenReturn(List.of(shopperGroup));
-
-        var result = shopperGroupService.getShopperGroupsByName("group1");
-        assertEquals(1, result.size());
-        assertEquals(shopperGroup, result.get(0));
-    }
-
-    @Test
-    void readByName_MultipleShopperGroupS_ReturnsShopperGroups() {
-        String shopperGroupName1 = "group1";
-        Shopper creator1 = new Shopper();
-        ShopperGroup shopperGroup1 = new ShopperGroup(shopperGroupName1, creator1);
-
-        String shopperGroupName2 = "group1";
-        Shopper creator2 = new Shopper();
-        ShopperGroup shopperGroup2 = new ShopperGroup(shopperGroupName2, creator2);
-
-        when(mockShopperGroupRepo.findAllByName("group1")).thenReturn(Arrays.asList(shopperGroup1, shopperGroup2));
-
-        var results = shopperGroupService.getShopperGroupsByName("group1");
+        var results = shopperGroupService1.getShopperGroups(shopper1.getId());
         assertEquals(2, results.size());
         assertAll(
                 () -> assertEquals(shopperGroup1, results.get(0)),
@@ -107,94 +74,187 @@ class ShopperGroupServiceTest {
     }
 
     @Test
-    void readByShopperId() {
-        String shopperGroupName1 = "group1";
-        Shopper creator1 = new Shopper();
-        UUID creatorId = creator1.getId();
-        ShopperGroup shopperGroup1 = new ShopperGroup(shopperGroupName1, creator1);
-
-        String shopperGroupName2 = "group2";
-        ShopperGroup shopperGroup2 = new ShopperGroup(shopperGroupName2, creator1);
-
-        when(mockShopperGroupRepo.findAllByAdmin_Id(creatorId)).thenReturn(Arrays.asList(shopperGroup1, shopperGroup2));
-
-//        var results = shopperGroupService.readShopperGroupsByShopperId(creatorId);
-//        assertEquals(2, results.size());
-//        assertAll(
-//                () -> assertEquals(shopperGroup1, results.get(0)),
-//                () -> assertEquals(shopperGroup2, results.get(1))
-//        );
-    }
-
-    @Test
-    void read() {
-        String shopperGroupName1 = "group1";
-        Shopper creator1 = new Shopper();
-        ShopperGroup shopperGroup1 = new ShopperGroup(shopperGroupName1, creator1);
-
-        String shopperGroupName2 = "group1";
-        Shopper creator2 = new Shopper();
-        ShopperGroup shopperGroup2 = new ShopperGroup(shopperGroupName2, creator2);
-
-        String shopperGroupName3 = "group2";
-        Shopper creator3 = new Shopper();
-        ShopperGroup shopperGroup3 = new ShopperGroup(shopperGroupName3, creator3);
-
-        when(mockShopperGroupRepo.findAll()).thenReturn(Arrays.asList(shopperGroup1, shopperGroup2, shopperGroup3));
-
-        var results = shopperGroupService.getShopperGroups();
-        assertEquals(3, results.size());
-        assertAll(
-                () -> assertEquals(shopperGroup1, results.get(0)),
-                () -> assertEquals(shopperGroup2, results.get(1)),
-                () -> assertEquals(shopperGroup3, results.get(2))
-        );
-    }
-
-    @Test
-    void addShopperToGroup_InvalidId_ThrowsGroupNotFoundException() {
-        UUID shopperGroupId = UUID.randomUUID();
-        UUID shopperId = UUID.randomUUID();
-
-        var exception =assertThrows(GroupNotFoundException.class, () -> shopperGroupService.addShopperToShopperGroup(shopperGroupId, shopperId));
-        assertEquals("Shopper group does not exist - " + shopperGroupId, exception.getMessage());
-    }
-
-    @Test
-    void addShopperToGroup_Valid_AddsShopperToGroup() {
+    void getShopperGroupById_NotMember_ThrowsGroupNotFoundException() {
+        Shopper admin = new Shopper();
+        ShopperGroup shopperGroup1 = new ShopperGroup("Group1", admin);
         Shopper shopper1 = new Shopper();
-        Shopper shopper2 = new Shopper();
-        ShopperGroup shopperGroup = new ShopperGroup("group 1", shopper1);
-        when(mockShopperGroupRepo.findById(shopperGroup.getId())).thenReturn(Optional.of(shopperGroup));
-        when(mockShopperService.readShopperById(shopper2.getId())).thenReturn(shopper2);
 
-        var result = shopperGroupService.addShopperToShopperGroup(shopperGroup.getId(), shopper2.getId());
-
-        assertTrue(result);
-        assertEquals(2, shopperGroup.getShoppers().size());
-        assertEquals(shopper2, shopperGroup.getShoppers().get(1));
-    }
-    @Test
-    void removeShopperFromGroup_InvalidId_ThrowsGroupNotFoundException() {
-        UUID shopperGroupId = UUID.randomUUID();
-        UUID shopperId = UUID.randomUUID();
-
-        var exception = assertThrows(GroupNotFoundException.class, () -> shopperGroupService.removeShopperFromShopperGroup(shopperGroupId, shopperId));
-        assertEquals("Shopper group does not exist - " + shopperGroupId, exception.getMessage());
+        var exception = assertThrows(GroupNotFoundException.class, () -> shopperGroupService1.getShopperGroupById(shopper1.getId(), shopperGroup1.getId()));
+        assertEquals("Shopper group does not exist - " + shopperGroup1.getId(), exception.getMessage());
     }
 
     @Test
-    void removeShopperFromGroup_Valid_RemovesShopperFromGroup() {
+    void getShopperGroupById_Member_ReturnsShopperGroup() {
+        Shopper admin = new Shopper();
+        ShopperGroup shopperGroup1 = new ShopperGroup("Group1", admin);
         Shopper shopper1 = new Shopper();
-        Shopper shopper2 = new Shopper();
-        ShopperGroup shopperGroup = new ShopperGroup("group 1", shopper1);
-        shopperGroup.addShopper(shopper2);
-        when(mockShopperGroupRepo.findById(shopperGroup.getId())).thenReturn(Optional.of(shopperGroup));
+        shopperGroup1.addShopper(shopper1);
+        when(shopperGroupRepository.findByShopperIdAndId(shopper1.getId(), shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
 
-        var result = shopperGroupService.removeShopperFromShopperGroup(shopperGroup.getId(), shopper2.getId());
+        var result = shopperGroupService1.getShopperGroupById(shopper1.getId(), shopperGroup1.getId());
+        assertEquals(shopperGroup1, result);
+    }
 
+    @Test
+    void deleteShopperGroup_NotMember_ThrowsGroupNotFoundException() {
+        Shopper shopper1 = new Shopper();
+        UUID groupId = UUID.randomUUID();
+
+        var exception = assertThrows(GroupNotFoundException.class, () -> shopperGroupService1.deleteShopperGroup(shopper1.getId(), groupId));
+        assertEquals("Shopper group does not exist - " + groupId, exception.getMessage());
+    }
+
+    @Test
+    void deleteShopperGroup_Member_RemovesShopperFromShopperGroup() {
+        Shopper admin = new Shopper();
+        ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
+
+        ArgumentCaptor<Shopper> removedShopper = ArgumentCaptor.forClass(Shopper.class);
+        Shopper shopper1 = new Shopper();
+        shopperGroup1.addShopper(shopper1);
+        when(shopperGroupRepository.findByShopperIdAndId(shopper1.getId(), shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
+        when(shopperService1.shopperExistsAsAdminByGroup(shopper1.getId(), shopperGroup1.getId())).thenReturn(false);
+        when(shopperService1.getShopperById(shopper1.getId())).thenReturn(shopper1);
+
+        shopperGroupService1.deleteShopperGroup(shopper1.getId(), shopperGroup1.getId());
+        verify(shopperGroup1).removeShopper(removedShopper.capture());
+        assertEquals(shopper1.getId(), removedShopper.getValue().getId());
+    }
+
+    @Test
+    void deleteShopperGroup_Admin_DeletesShopperGroup() {
+        Shopper admin = new Shopper();
+        ShopperGroup shopperGroup1 = new ShopperGroup("Group1", admin);
+        ArgumentCaptor<ShopperGroup> deletedGroup = ArgumentCaptor.forClass(ShopperGroup.class);
+        when(shopperGroupRepository.findByShopperIdAndId(admin.getId(), shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
+        when(shopperService1.shopperExistsAsAdminByGroup(admin.getId(), shopperGroup1.getId())).thenReturn(true);
+
+        shopperGroupService1.deleteShopperGroup(admin.getId(), shopperGroup1.getId());
+        verify(shopperGroupRepository).delete(deletedGroup.capture());
+        assertEquals(shopperGroup1, deletedGroup.getValue());
+    }
+
+
+    @Test
+    void changeShopperGroupName_InvalidId_ThrowsInvalidUserPermissionsException() {
+        UUID shopperId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+
+        var exception = assertThrows(GroupNotFoundException.class, () -> shopperGroupService1.changeShopperGroupName(shopperId, groupId, "New Name"));
+        assertEquals("Shopper group does not exist - " + groupId, exception.getMessage());
+    }
+
+    @Test
+    void changeShopperGroupName_NotAdmin_ThrowsInvalidUserPermissionsException() {
+        Shopper admin = new Shopper();
+        ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
+        Shopper shopper1 = new Shopper();
+        shopperGroup1.addShopper(shopper1);
+        when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
+        when(shopperService1.shopperExistsAsAdminByGroup(shopper1.getId(), shopperGroup1.getId())).thenReturn(false);
+
+        var exception = assertThrows(InvalidUserPermissionsException.class, () -> shopperGroupService1.changeShopperGroupName(shopper1.getId(), shopperGroup1.getId(), "New Name"));
+        assertEquals("User - " + shopper1.getId() + " does not have permission to modify group", exception.getMessage());
+    }
+
+    @Test
+    void changeShopperGroupName_Admin_ChangesGroupName() {
+        Shopper admin = new Shopper();
+        ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
+        ArgumentCaptor<String> newName = ArgumentCaptor.forClass(String.class);
+
+        when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
+        when(shopperService1.shopperExistsAsAdminByGroup(admin.getId(), shopperGroup1.getId())).thenReturn(true);
+
+        shopperGroupService1.changeShopperGroupName(admin.getId(), shopperGroup1.getId(), "New Name");
+        verify(shopperGroup1).setName(newName.capture());
+        assertEquals("New Name", shopperGroup1.getName());
+        assertEquals("New Name", newName.getValue());
+    }
+
+    @Test
+    void addShopperToShopperGroup_InvalidId_ThrowsGroupNotFoundException() {
+        UUID shopperId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+
+        var exception = assertThrows(GroupNotFoundException.class, () -> shopperGroupService1.addShopperToShopperGroup(groupId, shopperId));
+        assertEquals("Shopper group does not exist - " + groupId, exception.getMessage());
+    }
+
+    @Test
+    void addShopperToShopperGroup_AddsShopperToGroup() {
+        Shopper admin = new Shopper();
+        ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
+        Shopper shopper = new Shopper();
+        ArgumentCaptor<Shopper> addedShopper = ArgumentCaptor.forClass(Shopper.class);
+        when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
+        when(shopperService1.getShopperById(shopper.getId())).thenReturn(shopper);
+
+        shopperGroupService1.addShopperToShopperGroup(shopperGroup1.getId(), shopper.getId());
+
+        verify(shopperGroup1).addShopper(addedShopper.capture());
+        assertEquals(shopper, addedShopper.getValue());
+    }
+
+    @Test
+    void removeShopperFromShopperGroup_RemoveAdmin_ThrowsRemoveGroupAdminException() {
+        Shopper admin = new Shopper();
+        ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
+        when(shopperService1.shopperExistsAsAdminByGroup(admin.getId(), shopperGroup1.getId())).thenReturn(true);
+
+        var exception = assertThrows(RemoveGroupAdminException.class, () -> shopperGroupService1.removeShopperFromShopperGroup(admin.getId(), shopperGroup1.getId(), admin.getId()));
+        assertEquals("Cannot remove group admin.", exception.getMessage());
+    }
+
+    @Test
+    void removeShopperFromShopperGroup_RemoveSelf_InvalidId_ThrowsGroupNotFoundException() {
+        UUID shopperId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        when(shopperService1.shopperExistsAsAdminByGroup(shopperId, groupId)).thenReturn(false);
+
+        var exception = assertThrows(GroupNotFoundException.class, () -> shopperGroupService1.removeShopperFromShopperGroup(shopperId, groupId, shopperId));
+        assertEquals("Shopper group does not exist - " + groupId, exception.getMessage());
+    }
+    @Test
+    void removeShopperFromShopperGroup_RemoveSelf_RemovesSelfFromGroup() {
+        Shopper admin = new Shopper();
+        Shopper shopper = new Shopper();
+        ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
+        shopperGroup1.addShopper(shopper);
+        when(shopperService1.shopperExistsAsAdminByGroup(shopper.getId(), shopperGroup1.getId())).thenReturn(false);
+        when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
+
+        var result = shopperGroupService1.removeShopperFromShopperGroup(shopper.getId(), shopperGroup1.getId(), shopper.getId());
+        verify(shopperGroup1).removeShopper(shopper.getId());
         assertTrue(result);
-        assertEquals(1, shopperGroup.getShoppers().size());
-        assertEquals(shopper1, shopperGroup.getShoppers().get(0));
+    }
+
+    @Test
+    void removeShopperFromShopperGroup_RemoveOther_NotAdmin_ThrowsInvalidUserPermissionsException() {
+        Shopper admin = new Shopper();
+        Shopper shopper = new Shopper();
+        UUID removeShopperId = UUID.randomUUID();
+        ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
+        shopperGroup1.addShopper(shopper);
+        when(shopperService1.shopperExistsAsAdminByGroup(removeShopperId, shopperGroup1.getId())).thenReturn(false);
+        when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
+
+        var exception = assertThrows(InvalidUserPermissionsException.class, () -> shopperGroupService1.removeShopperFromShopperGroup(shopper.getId(), shopperGroup1.getId(), removeShopperId));
+        assertEquals("User - " + shopper.getId() + " does not have permission to remove from group", exception.getMessage());
+    }
+
+    @Test
+    void removeShopperFromShopperGroup_RemoveOther_Admin_RemovesOtherFromGroup() {
+        Shopper admin = new Shopper();
+        Shopper shopper = new Shopper();
+        Shopper removeShopper = new Shopper();
+        ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
+        shopperGroup1.addShopper(shopper);
+        shopperGroup1.addShopper(removeShopper);
+        when(shopperService1.shopperExistsAsAdminByGroup(removeShopper.getId(), shopperGroup1.getId())).thenReturn(false);
+        when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
+
+        var result = shopperGroupService1.removeShopperFromShopperGroup(admin.getId(), shopperGroup1.getId(), removeShopper.getId());
+        assertTrue(result);
     }
 }

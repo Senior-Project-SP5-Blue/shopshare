@@ -1,8 +1,6 @@
 package com.sp5blue.shopshare.controllers.shoppergroup;
 
 
-import com.sp5blue.shopshare.controllers.shopper.ShopperErrorResponse;
-import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
 import com.sp5blue.shopshare.exceptions.shoppergroup.GroupNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

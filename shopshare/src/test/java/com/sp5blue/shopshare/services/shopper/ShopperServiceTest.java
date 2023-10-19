@@ -89,7 +89,7 @@ class ShopperServiceTest {
     void readById_InvalidId_ThrowsUserNotFoundException() {
         UUID shopperId = UUID.randomUUID();
 
-        var exception = assertThrows(UserNotFoundException.class, () -> shopperService.readShopperById(shopperId));
+        var exception = assertThrows(UserNotFoundException.class, () -> shopperService.getShopperById(shopperId));
 
         assertEquals("User does not exist - " + shopperId, exception.getMessage());
     }
@@ -100,7 +100,7 @@ class ShopperServiceTest {
         UUID shopperId = shopper.getId();
         when(mockShopperRepo.findById(shopperId)).thenReturn(Optional.of(shopper));
 
-        var result = shopperService.readShopperById(shopperId);
+        var result = shopperService.getShopperById(shopperId);
 
         assertEquals(shopper, result);
     }
@@ -109,7 +109,7 @@ class ShopperServiceTest {
     void readByEmail_InvalidEmail_ThrowsUserNotFoundException() {
         String shopperEmail = "tom@email.com";
 
-        var exception = assertThrows(UserNotFoundException.class, () -> shopperService.readShopperByEmail(shopperEmail));
+        var exception = assertThrows(UserNotFoundException.class, () -> shopperService.getShopperByEmail(shopperEmail));
 
         assertEquals("User does not exist - tom@email.com", exception.getMessage());
     }
@@ -119,14 +119,14 @@ class ShopperServiceTest {
         Shopper shopper = new Shopper("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         when(mockShopperRepo.findByEmail("tom@email.com")).thenReturn(Optional.of(shopper));
 
-        var result = shopperService.readShopperByEmail("tom@email.com");
+        var result = shopperService.getShopperByEmail("tom@email.com");
 
         assertEquals(shopper, result);
     }
 
     @Test
     void read_NoShoppers_ReturnsEmptyList() {
-        var result = shopperService.readShoppers();
+        var result = shopperService.getShoppers();
         assertEquals(0, result.size());
     }
 
@@ -135,7 +135,7 @@ class ShopperServiceTest {
         Shopper shopper = new Shopper("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         when(mockShopperRepo.findAll()).thenReturn(List.of(shopper));
 
-        var results = shopperService.readShoppers();
+        var results = shopperService.getShoppers();
 
         assertEquals(1, results.size());
         assertEquals(shopper, results.get(0));
@@ -147,7 +147,7 @@ class ShopperServiceTest {
         Shopper shopper2 = new Shopper("Steve", "Henry", "steveH", "steve@email.com", "steveass");
         when(mockShopperRepo.findAll()).thenReturn(Arrays.asList(shopper, shopper1, shopper2));
 
-        var results = shopperService.readShoppers();
+        var results = shopperService.getShoppers();
 
         assertEquals(3, results.size());
         assertAll(

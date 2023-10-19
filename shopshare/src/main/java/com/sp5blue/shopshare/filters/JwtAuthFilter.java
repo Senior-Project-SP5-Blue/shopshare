@@ -52,7 +52,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = ((ShopperService)userDetailsService).readShopperById(id);
+            UserDetails userDetails = ((ShopperService)userDetailsService).getShopperById(id);
             Token _token = tokenService.readByToken(token);
             boolean isTokenValid = !_token.isExpired() && !_token.isRevoked();
 

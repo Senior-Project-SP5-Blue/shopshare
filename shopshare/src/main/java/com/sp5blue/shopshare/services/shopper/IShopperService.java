@@ -12,21 +12,25 @@ public interface IShopperService {
 
     Shopper createShopper(String firstName, String lastName, String username, String email, String password) throws UserAlreadyExistsException;
 
-    Shopper readShopperById(String id);
+    Shopper getShopperById(String id);
 
-    Shopper readShopperById(UUID id) throws UserNotFoundException;
+    Shopper getShopperById(UUID id) throws UserNotFoundException;
 
-    Shopper readShopperByEmail(String email) throws UserNotFoundException;
+    Shopper getShopperByEmail(String email) throws UserNotFoundException;
 
-    Shopper readShopperByUsername(String username) throws UserNotFoundException;
+    Shopper getShopperByUsername(String username) throws UserNotFoundException;
 
-    List<Shopper> readShoppersByShopperGroup(UUID groupId);
+    List<Shopper> getShoppersByShopperGroup(UUID groupId);
 
-    List<Shopper> readShoppers();
+    List<Shopper> getShoppers();
 
     boolean shopperExists(UUID id);
+
+    boolean shopperExistsByGroup(UUID shopperId, UUID groupId);
 
     boolean shopperExistsByEmail(String email);
 
     boolean shopperExistsByUsername(String username);
+
+    boolean shopperExistsAsAdminByGroup(UUID shopperId, UUID groupId);
 }

@@ -68,13 +68,12 @@ public class AuthenticationService implements IAuthenticationService {
     @Override
     @Transactional
     public AuthenticationResponse signIn(SignInRequest request) {
-        Shopper user = shopperService.readShopperByEmail(request.email());
+        Shopper user = shopperService.getShopperByEmail(request.email());
         System.out.printf("Shopper is %s\n", user);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         final String accessToken = jwtService.generateToken(user);
         final String refreshToken = jwtService.generateRefreshToken(user);
         tokenService.revokeAllUserTokens(user.getId());
-//        _revokeAllTokens(user);
         saveUserToken(user, accessToken, TokenType.ACCESS);
         saveUserToken(user, refreshToken, TokenType.REFRESH);
         return new AuthenticationResponse(accessToken, refreshToken);
@@ -102,7 +101,7 @@ public class AuthenticationService implements IAuthenticationService {
         String userName = jwtService.extractSubject(refreshToken);
 
         if (userName != null) {
-            Shopper shopper = shopperService.readShopperByUsername(userName);
+            Shopper shopper = shopperService.getShopperByUsername(userName);
 
             if (jwtService.validateToken(refreshToken, shopper)) {
                 String accessToken = jwtService.generateToken(shopper);

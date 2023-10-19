@@ -81,14 +81,14 @@ class AuthenticationServiceTest {
 
     @Test
     void signIn_UserDoesNotExist_ThrowsUserDoesNotExistException() {
-        when(shopperService.readShopperByEmail(anyString())).thenThrow( new UserNotFoundException("User does not exist - " + signInRequest.email()));
+        when(shopperService.getShopperByEmail(anyString())).thenThrow( new UserNotFoundException("User does not exist - " + signInRequest.email()));
         var exception = assertThrows(UserNotFoundException.class, () -> authenticationService.signIn(signInRequest));
         assertEquals("User does not exist - hey@email.com", exception.getMessage());
     }
 
     @Test
     void signIn_Valid_ReturnsJwt() {
-        when(shopperService.readShopperByEmail(anyString())).thenReturn(new Shopper("hey", "last", "heyLast", "hey@email.com", "password"));
+        when(shopperService.getShopperByEmail(anyString())).thenReturn(new Shopper("hey", "last", "heyLast", "hey@email.com", "password"));
 
         var result = authenticationService.signIn(signInRequest);
 

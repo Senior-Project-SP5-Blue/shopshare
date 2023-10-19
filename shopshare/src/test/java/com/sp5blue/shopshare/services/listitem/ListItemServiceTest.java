@@ -1,113 +1,308 @@
 package com.sp5blue.shopshare.services.listitem;
 
-import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
+import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
+import com.sp5blue.shopshare.models.listitem.ListItemDto;
 import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.repositories.ListItemRepository;
-import com.sp5blue.shopshare.services.shopper.ShopperService;
+import com.sp5blue.shopshare.services.shopper.IShopperService;
+import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
+import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ListItemServiceTest {
 
     @Mock
-    ListItemRepository mockListItemRepo;
+    ListItemRepository listItemRepository;
 
     @Mock
-    ShopperService mockShopperService;
+    IShopperGroupService shopperGroupService;
+
+    @Mock
+    IShoppingListService shoppingListService;
+
+    @Mock
+    IShopperService shopperService;
 
     @InjectMocks
     ListItemService listItemService;
 
-
-
     @Test
-    void create() {
-        ListItem listItem = new ListItem("Hamburger");
-        when(mockListItemRepo.save(listItem)).thenReturn(listItem);
+    void addListItemToList_AddsItemToList() {
+        Shopper user = new Shopper();
+        ShopperGroup shopperGroup = new ShopperGroup("Group 1", user);
+        ShoppingList shoppingList = spy(new ShoppingList("Group 1's List", shopperGroup));
+        ListItemDto listItemDto = new ListItemDto("List item one", ItemStatus.ACTIVE, false);
+        when(shopperService.getShopperById(user.getId())).thenReturn(user);
+        when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(shoppingList);
+        when(listItemRepository.save(any(ListItem.class))).thenAnswer(l -> l.getArguments()[0]);
 
-        var result = listItemService.createListItem(listItem);
-        assertEquals(listItem, result);
-    }
-
-    @Test
-    void readById_InvalidId_ThrowsListItemNotFoundException() {
-        ListItem listItem = new ListItem("Hamburger");
-        when(mockListItemRepo.findById(listItem.getId())).thenReturn(Optional.empty());
-
-        var exception = assertThrows(ListItemNotFoundException.class, () -> listItemService.getListItemById(listItem.getId()));
-        assertEquals("List item does not exist - " + listItem.getId(), exception.getMessage());
-    }
-
-    @Test
-    void readById_ValidId_ReturnsListItem() {
-        ListItem listItem = new ListItem("Hamburger");
-        when(mockListItemRepo.findById(listItem.getId())).thenReturn(Optional.of(listItem));
-
-        var result = listItemService.getListItemById(listItem.getId());
-        assertEquals(listItem, result);
-    }
-
-    @Test
-    void readByName_NoMatches_ReturnsEmptyList() {
-//        var result = listItemService.getListItemsByName("Name");
-//        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void readByName_MultipleMatches_ReturnsMatches() {
-        ListItem listItem1 = new ListItem("Pizza");
-        ListItem listItem4 = new ListItem("Pizza");
-        ListItem listItem5 = new ListItem("Pizza");
-        when(mockListItemRepo.findAllByName("Pizza")).thenReturn(Arrays.asList(listItem1, listItem4, listItem5));
-
-//        var result = listItemService.getListItemsByName("Pizza");
-//        assertEquals(3, result.size());
-//        assertAll(
-//                () -> assertEquals(listItem1.getName(), result.get(0).getName()),
-//                () -> assertEquals(listItem4.getName(), result.get(1).getName()),
-//                () -> assertEquals(listItem5.getName(), result.get(2).getName())
-//        );
-    }
-
-    @Test
-    void readByShopperId_InvalidId_ThrowsUserNotFoundException() {
-        Shopper shopper = new Shopper("Jack", "Jill", "JackJill", "jack@email.com", "paswword");
-        when(mockShopperService.shopperExists(shopper.getId())).thenReturn(false);
-
-        var exception = assertThrows(UserNotFoundException.class, () -> listItemService.getListItemsByShopper(shopper.getId()));
-        assertEquals("Shopper with id " + shopper.getId() + " does not exist", exception.getMessage());
-    }
-    @Test
-    void readByShopperId_ValidId_ReturnsListItems() {
-        Shopper shopper = new Shopper("Jack", "Jill", "JackJill", "jack@email.com", "paswword");
-        ListItem listItem1 = new ListItem("Tacos", shopper);
-        ListItem listItem2 = new ListItem("Bananas", shopper);
-        ListItem listItem3 = new ListItem("Pizza", shopper);
-        ListItem listItem4 = new ListItem("Eggs", shopper);
-        when(mockListItemRepo.findAllByCreatedBy_Id(shopper.getId())).thenReturn(Arrays.asList(listItem1, listItem2, listItem3, listItem4));
-        when(mockShopperService.shopperExists(shopper.getId())).thenReturn(true);
-
-        var results = listItemService.getListItemsByShopper(shopper.getId());
-
-        assertEquals(4, results.size());
+        var result = listItemService.addListItemToList(user.getId(), shopperGroup.getId(), shoppingList.getId(), listItemDto);
+        verify(shoppingList).setModifiedOn(any(LocalDateTime.class));
+        verify(shoppingList).setModifiedBy(user);
+        assertInstanceOf(ListItem.class, result);
         assertAll(
-                () -> assertEquals("Tacos", results.get(0).getName()),
-                () -> assertEquals("Bananas", results.get(1).getName()),
-                () -> assertEquals("Pizza", results.get(2).getName()),
-                () -> assertEquals("Eggs", results.get(3).getName())
+                () -> assertEquals("List item one", result.getName()),
+                () -> assertEquals(user, result.getCreatedBy()),
+                () -> assertEquals(shoppingList, result.getList())
         );
     }
 
+    @Test
+    void removeListItemFromList_InvalidId_ThrowsListItemNotFoundException() {
+        Shopper user = new Shopper();
+        ShopperGroup shopperGroup = new ShopperGroup("Group 1", user);
+        ShoppingList shoppingList = spy(new ShoppingList("Group 1's List", shopperGroup));
+        UUID itemId = UUID.randomUUID();
+
+        var exception = assertThrows(ListItemNotFoundException.class, () -> listItemService.removeListItemFromList(user.getId(), shopperGroup.getId(), shoppingList.getId(), itemId));
+        assertEquals("List item does not exist - " + itemId, exception.getMessage());
+    }
+
+    @Test
+    void removeListItemFromList() {
+        Shopper user = new Shopper();
+        ShopperGroup shopperGroup = new ShopperGroup("Group 1", user);
+        ShoppingList shoppingList = spy(new ShoppingList("Group 1's List", shopperGroup));
+        ArgumentCaptor<ListItem> removedListItem = ArgumentCaptor.forClass(ListItem.class);
+        ListItem listItem1 = new ListItem("Item 1", user);
+        ListItem listItem2 = new ListItem("Item 2", user);
+        shoppingList.addItem(listItem1);
+        shoppingList.addItem(listItem2);
+        when(shopperService.getShopperById(user.getId())).thenReturn(user);
+        when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(shoppingList);
+        when(listItemRepository.findByList_IdAndId(shoppingList.getId(), listItem1.getId())).thenReturn(Optional.of(listItem1));
+
+        listItemService.removeListItemFromList(user.getId(), shopperGroup.getId(), shoppingList.getId(), listItem1.getId());
+        verify(shoppingList).setModifiedOn(any(LocalDateTime.class));
+        verify(shoppingList).setModifiedBy(user);
+        verify(listItemRepository).delete(removedListItem.capture());
+        assertEquals(listItem1, removedListItem.getValue());
+    }
+
+    @Test
+    void lockListItem_InvalidId_ThrowsListItemNotFoundException() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+
+        var exception = assertThrows(ListItemNotFoundException.class, () -> listItemService.lockListItem(userId, groupId, listId, itemId));
+        assertEquals("List item does not exist - " + itemId, exception.getMessage());
+    }
+    @Test
+    void lockListItem_LocksListItem() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        ListItem listItem = spy(new ListItem("Item 1"));
+        listItem.setLocked(false);
+
+        when(listItemRepository.findByList_IdAndId(listId, listItem.getId())).thenReturn(Optional.of(listItem));
+
+        listItemService.lockListItem(userId, groupId, listId, listItem.getId());
+        verify(listItem).setLocked(true);
+        assertTrue(listItem.isLocked());
+    }
+
+    @Test
+    void unlockListItem_InvalidId_ThrowsListItemNotFoundException() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+
+        var exception = assertThrows(ListItemNotFoundException.class, () -> listItemService.unlockListItem(userId, groupId, listId, itemId));
+        assertEquals("List item does not exist - " + itemId, exception.getMessage());
+    }
+    @Test
+    void unlockListItem_UnlocksListItem() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        ListItem listItem = spy(new ListItem("Item 1"));
+        listItem.setLocked(true);
+
+        when(listItemRepository.findByList_IdAndId(listId, listItem.getId())).thenReturn(Optional.of(listItem));
+
+        listItemService.unlockListItem(userId, groupId, listId, listItem.getId());
+        verify(listItem).setLocked(false);
+        assertFalse(listItem.isLocked());
+    }
+
+    @Test
+    void markListItemAsComplete_InvalidId_ThrowsListItemNoFoundException() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+
+        var exception = assertThrows(ListItemNotFoundException.class, () -> listItemService.markListItemAsComplete(userId, groupId, listId, itemId));
+        assertEquals("List item does not exist - " + itemId, exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @EnumSource(names = {"ACTIVE", "ARCHIVED"})
+    void markListItemAsComplete_SetsStatusToComplete(ItemStatus status) {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        ListItem listItem = spy(new ListItem("Item 1"));
+        listItem.setStatus(status);
+
+        when(listItemRepository.findByList_IdAndId(listId, listItem.getId())).thenReturn(Optional.of(listItem));
+
+        listItemService.markListItemAsComplete(userId, groupId, listId, listItem.getId());
+        verify(listItem).setStatus(ItemStatus.COMPLETED);
+        assertEquals(ItemStatus.COMPLETED, listItem.getStatus());
+    }
+
+    @Test
+    void markListItemAsActive_InvalidId_ThrowsListItemNotFoundException() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+
+        var exception = assertThrows(ListItemNotFoundException.class, () -> listItemService.markListItemAsActive(userId, groupId, listId, itemId));
+        assertEquals("List item does not exist - " + itemId, exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @EnumSource(names = {"ARCHIVED", "COMPLETED"})
+    void markListItemAsActive_SetsStatusToActive(ItemStatus status) {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        ListItem listItem = spy(new ListItem("Item 1"));
+        listItem.setStatus(status);
+
+        when(listItemRepository.findByList_IdAndId(listId, listItem.getId())).thenReturn(Optional.of(listItem));
+
+        listItemService.markListItemAsActive(userId, groupId, listId, listItem.getId());
+        verify(listItem).setStatus(ItemStatus.ACTIVE);
+        assertEquals(ItemStatus.ACTIVE, listItem.getStatus());
+    }
+    @Test
+    void markListItemAsArchived_InvalidId_ThrowsListItemNotFoundException() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+
+        var exception = assertThrows(ListItemNotFoundException.class, () -> listItemService.markListItemAsArchived(userId, groupId, listId, itemId));
+        assertEquals("List item does not exist - " + itemId, exception.getMessage());
+    }
+
+    @ParameterizedTest
+    @EnumSource(names = {"ACTIVE", "COMPLETED"})
+    void markListItemAsArchived_SetsStatusToArchived(ItemStatus status) {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        ListItem listItem = spy(new ListItem("Item 1"));
+        listItem.setStatus(status);
+
+        when(listItemRepository.findByList_IdAndId(listId, listItem.getId())).thenReturn(Optional.of(listItem));
+
+        listItemService.markListItemAsArchived(userId, groupId, listId, listItem.getId());
+        verify(listItem).setStatus(ItemStatus.ARCHIVED);
+        assertEquals(ItemStatus.ARCHIVED, listItem.getStatus());
+    }
+    @Test
+    void getListItemById_InvalidId_ThrowsListItemNotFoundException() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+
+        var exception = assertThrows(ListItemNotFoundException.class, () -> listItemService.getListItemById(userId, groupId, listId, itemId));
+        assertEquals("List item does not exist - " + itemId, exception.getMessage());
+    }
+
+    @Test
+    void getListItemById_ReturnsListItem() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+        ListItem listItem = new ListItem("Item 1");
+
+        when(listItemRepository.findByList_IdAndId(listId, listItem.getId())).thenReturn(Optional.of(listItem));
+
+        var result = listItemService.getListItemById(userId, groupId, listId, listItem.getId());
+        assertEquals(listItem, result);
+    }
+
+    @Test
+    void getListItemsByCreator_NoMatches_ReturnsEmptyList() {
+        Shopper user = new Shopper();
+
+        var results = listItemService.getListItemsByCreator(user.getId());
+        assertTrue(results.isEmpty());
+    }
+
+    @Test
+    void getListItemsByCreator_Matches_ReturnsListItems() {
+        Shopper user = new Shopper();
+        ListItem listItem1 = new ListItem("Item 1", user);
+        ListItem listItem2 = new ListItem("Item 2", user);
+
+        when(listItemRepository.findAllByCreatedBy_Id(user.getId())).thenReturn(List.of(listItem1, listItem2));
+
+        var results = listItemService.getListItemsByCreator(user.getId());
+        assertEquals(2, results.size());
+        assertAll(
+                () -> assertEquals(listItem1, results.get(0)),
+                () -> assertEquals(listItem2, results.get(1))
+        );
+    }
+
+    @Test
+    void getListItemsByShoppingList_NoMatches_ReturnsEmptyList() {
+        UUID userId = UUID.randomUUID();
+        UUID groupId = UUID.randomUUID();
+        UUID listId = UUID.randomUUID();
+
+        var results = listItemService.getListItemsByShoppingList(userId, groupId, listId);
+        assertTrue(results.isEmpty());
+    }
+
+    @Test
+    void getListItemsByShoppingList_Matches_ReturnsListItems() {
+        ShopperGroup shopperGroup = new ShopperGroup();
+        ShoppingList shoppingList = new ShoppingList();
+        Shopper user = new Shopper();
+        ListItem listItem1 = new ListItem("Item 1", user);
+        ListItem listItem2 = new ListItem("Item 2", user);
+        shoppingList.addItem(listItem1);
+        shoppingList.addItem(listItem2);
+
+        when(listItemRepository.findAllByList_Id(shoppingList.getId())).thenReturn(shoppingList.getItems());
+
+        var results = listItemService.getListItemsByShoppingList(user.getId(), shopperGroup.getId(), shoppingList.getId());
+        assertEquals(2, results.size());
+        assertAll(
+                () -> assertEquals(listItem1, results.get(0)),
+                () -> assertEquals(listItem2, results.get(1))
+        );
+    }
 }
