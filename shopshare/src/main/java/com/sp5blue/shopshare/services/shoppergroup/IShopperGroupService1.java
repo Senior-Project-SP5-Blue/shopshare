@@ -26,4 +26,6 @@ public interface IShopperGroupService1 {
     boolean addShopperToShopperGroup(UUID groupId, Shopper shopper) throws GroupNotFoundException;
 
     boolean removeShopperFromShopperGroup(UUID userId, UUID groupId, UUID shopperId) throws GroupNotFoundException, RemoveGroupAdminException;
+
+    void verifyUserHasGroup(UUID userId, UUID groupId);
 }

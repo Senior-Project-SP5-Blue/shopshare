@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -44,9 +45,15 @@ public class ShoppingList {
     public ShoppingList() {
     }
 
+    public ShoppingList(String name) {
+        this.name = name;
+    }
+
     /**
      *
      */
+
+
     public ShoppingList(String name, ShopperGroup group) {
         this.name = name;
         this.group = group;
@@ -114,5 +121,15 @@ public class ShoppingList {
         return items.remove(item);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ShoppingList that)) return false;
+        return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) && Objects.equals(getModifiedOn(), that.getModifiedOn());
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getModifiedOn());
+    }
 }

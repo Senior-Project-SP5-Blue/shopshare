@@ -35,8 +35,6 @@ public class ShopperGroupService1 implements IShopperGroupService1 {
     public ShopperGroup createShopperGroup(UUID adminId, String groupName) {
         Shopper shopper = shopperService.readShopperById(adminId);
         ShopperGroup shopperGroup = new ShopperGroup(groupName, shopper);
-//        Role role = new Role("ROLE_GROUP_ADMIN-" + shopperGroup.getId(), RoleType.ROLE_GROUP_ADMIN);
-//        shopper.addRole(role);
         return shopperGroupRepository.save(shopperGroup);
     }
 
@@ -100,12 +98,13 @@ public class ShopperGroupService1 implements IShopperGroupService1 {
         return shopperGroup.removeShopper(shopperId);
     }
 
-    private void verifyUserInGroup(UUID userId, UUID groupId) throws GroupNotFoundException, InvalidUserPermissionsException {
-        boolean userIsMember = shopperService.shopperExistsByGroup(userId, groupId);
-        if (!userIsMember) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
-    }
 
     private boolean userIsAdmin(UUID userId, UUID groupId) throws InvalidUserPermissionsException {
         return shopperService.shopperExistsAsAdminByGroup(userId, groupId);
+    }
+
+    @Override
+    public void verifyUserHasGroup(UUID userId, UUID groupId) {
+        shopperGroupRepository.findByShopperIdAndId(userId, groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
     }
 }

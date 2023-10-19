@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ShoppingListRepository extends JpaRepository<ShoppingList, UUID> {
@@ -17,9 +18,13 @@ public interface ShoppingListRepository extends JpaRepository<ShoppingList, UUID
     Page<ShoppingList> findAllByGroup_Id(UUID groupId, Pageable pageable);
     List<ShoppingList> findAllByGroup_Id(UUID groupId);
 
+    Optional<ShoppingList> findByGroup_IdAndId(UUID groupId, UUID listId);
+
     long countByGroup_Id(UUID shopperId);
 
     boolean existsByGroup_Id(UUID groupId);
     boolean existsById(@NonNull UUID listId);
+
+
 
 }

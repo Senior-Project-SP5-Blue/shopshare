@@ -29,10 +29,10 @@ public class ShopperGroup {
     @JoinTable(name = "shoppers_shopper_groups",
     joinColumns = @JoinColumn(name = "shopper_group_id"),
     inverseJoinColumns = @JoinColumn(name = "shopper_id"))
-    private List<Shopper> shoppers;
+    private List<Shopper> shoppers = new ArrayList<>();
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
-    private List<ShoppingList> lists;
+    private List<ShoppingList> lists = new ArrayList<>();
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "admin_id")
@@ -87,7 +87,6 @@ public class ShopperGroup {
     }
 
     public boolean addShopper(Shopper shopper) {
-        if (shoppers == null) shoppers = new ArrayList<>();
         Role role = new Role("ROLE_GROUP_MEMBER-" + getId(), RoleType.ROLE_GROUP_MEMBER);
         shopper.addRole(role);
         return shoppers.add(shopper);
@@ -103,5 +102,16 @@ public class ShopperGroup {
         if (shopper == null) return false;
         shopper.removeRole("ROLE_GROUP_MEMBER-" + getId());
         return shoppers.removeIf(x -> x.getId().equals(shopperId));
+    }
+
+    public boolean addList(ShoppingList shoppingList) {
+        return lists.add(shoppingList);
+    }
+
+    public boolean removeList(ShoppingList shoppingList) {
+        return lists.remove(shoppingList);
+    }
+    public boolean removeList(UUID listId) {
+        return lists.removeIf(l -> l.getId().equals(listId));
     }
 }
