@@ -1,10 +1,17 @@
-package com.sp5blue.shopshare.models;
+package com.sp5blue.shopshare.models.shoppinglist;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.sp5blue.shopshare.models.listitem.ListItem;
+import com.sp5blue.shopshare.models.user.User;
+import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -20,18 +27,17 @@ public class ShoppingList {
     @Column(name = "modified_on")
     private LocalDateTime modifiedOn;
 
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne
     @JoinColumn(name = "modified_by")
-    private Shopper modifiedBy;
+    private User modifiedBy;
 
-    @OneToMany
-    @JoinColumn(name = "shopping_list_id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "list")
     private List<ListItem> items;
 
-    @ManyToOne
-    @JoinColumn(name = "shopper_id")
-    private Shopper shopper;
-
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne
     @JoinColumn(name = "group_id")
     private ShopperGroup group;
@@ -39,17 +45,11 @@ public class ShoppingList {
     public ShoppingList() {
     }
 
-    /**
-     *
-     */
-    public ShoppingList(String name, Shopper shopper) {
+    public ShoppingList(String name) {
         this.name = name;
-        this.shopper = shopper;
     }
 
-    /**
-     *
-     */
+
     public ShoppingList(String name, ShopperGroup group) {
         this.name = name;
         this.group = group;
@@ -75,11 +75,11 @@ public class ShoppingList {
         this.modifiedOn = modifiedOn;
     }
 
-    public Shopper getModifiedBy() {
+    public User getModifiedBy() {
         return modifiedBy;
     }
 
-    public void setModifiedBy(Shopper modifiedBy) {
+    public void setModifiedBy(User modifiedBy) {
         this.modifiedBy = modifiedBy;
     }
 
@@ -89,14 +89,6 @@ public class ShoppingList {
 
     public void setItems(List<ListItem> items) {
         this.items = items;
-    }
-
-    public Shopper getShopper() {
-        return shopper;
-    }
-
-    public void setShopper(Shopper shopper) {
-        this.shopper = shopper;
     }
 
     public ShopperGroup getGroup() {
@@ -125,5 +117,15 @@ public class ShoppingList {
         return items.remove(item);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ShoppingList that)) return false;
+        return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) && Objects.equals(getModifiedOn(), that.getModifiedOn());
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getModifiedOn());
+    }
 }

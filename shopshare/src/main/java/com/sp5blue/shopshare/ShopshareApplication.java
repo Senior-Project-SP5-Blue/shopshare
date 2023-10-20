@@ -1,6 +1,6 @@
 package com.sp5blue.shopshare;
 
-import com.sp5blue.shopshare.repositories.ShopperRepository;
+import com.sp5blue.shopshare.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -15,13 +15,13 @@ public class ShopshareApplication implements CommandLineRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(ShopshareApplication.class, args);
 	}
-	final ShopperRepository shopperRepository;
+	final UserRepository userRepository;
 
 	private final Environment environment;
 
 	@Autowired
-	public ShopshareApplication(ShopperRepository shopperRepository, Environment environment) {
-		this.shopperRepository = shopperRepository;
+	public ShopshareApplication(UserRepository userRepository, Environment environment) {
+		this.userRepository = userRepository;
 		this.environment = environment;
 	}
 

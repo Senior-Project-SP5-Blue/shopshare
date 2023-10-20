@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfiguration implements WebMvcConfigurer {
 
     private final UserDetailsService userDetailsService;
@@ -35,7 +37,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
         this.jwtAuthFilter = jwtAuthFilter;
         this.logoutHandler = logoutHandler;
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {

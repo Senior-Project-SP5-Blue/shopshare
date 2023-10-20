@@ -1,6 +1,6 @@
 package com.sp5blue.shopshare.services.security;
 
-import com.sp5blue.shopshare.models.Shopper;
+import com.sp5blue.shopshare.models.user.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -38,9 +38,9 @@ class JwtServiceTest {
 
     @Test
     void generateToken() {
-        Shopper shopper = new Shopper("Jack", "Ripper", "jackr", "jackr@email.com", "jackpassword");
+        User user = new User("Jack", "Ripper", "jackr", "jackr@email.com", "jackpassword");
         ReflectionTestUtils.setField(jwtService, "SECRET", SECRET);
-        String result  = jwtService.generateToken(shopper);
+        String result  = jwtService.generateToken(user);
 
         assertNotNull(result);
     }
@@ -89,12 +89,12 @@ class JwtServiceTest {
     @Test
     void validateToken() {
         ReflectionTestUtils.setField(jwtService, "SECRET", SECRET);
-        Shopper shopper = new Shopper("User", "Test", "username1", "user@email.com", "password");
+        User user = new User("User", "Test", "username1", "user@email.com", "password");
         String token = Jwts.builder().setSubject("username1")
                 .setExpiration(new Date(System.currentTimeMillis() + 860000))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
 
-        boolean result = jwtService.validateToken(token, shopper);
+        boolean result = jwtService.validateToken(token, user);
         assertTrue(result);
 
     }

@@ -35,6 +35,8 @@ public class AuthController {
         return ResponseEntity.ok(authenticationService.signUp(authRequest));
     }
 
+//    @PatchMapping("/password")
+
     @PostMapping("/refresh-signin")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
         authenticationService.refreshToken(request, response);

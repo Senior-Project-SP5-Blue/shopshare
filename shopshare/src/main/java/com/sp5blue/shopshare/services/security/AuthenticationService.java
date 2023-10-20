@@ -3,13 +3,13 @@ package com.sp5blue.shopshare.services.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
 import com.sp5blue.shopshare.exceptions.token.InvalidRefreshTokenException;
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.Token;
-import com.sp5blue.shopshare.models.TokenType;
+import com.sp5blue.shopshare.models.user.User;
+import com.sp5blue.shopshare.models.user.Token;
+import com.sp5blue.shopshare.models.user.TokenType;
 import com.sp5blue.shopshare.security.request.SignInRequest;
 import com.sp5blue.shopshare.security.request.SignUpRequest;
 import com.sp5blue.shopshare.security.response.AuthenticationResponse;
-import com.sp5blue.shopshare.services.shopper.IShopperService;
+import com.sp5blue.shopshare.services.user.IUserService;
 import com.sp5blue.shopshare.services.token.ITokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +28,7 @@ import java.util.List;
 
 @Service
 public class AuthenticationService implements IAuthenticationService {
-    private final IShopperService shopperService;
+    private final IUserService userService;
 
     private final ITokenService tokenService;
     private final PasswordEncoder passwordEncoder;
@@ -38,8 +38,8 @@ public class AuthenticationService implements IAuthenticationService {
     final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     @Autowired
-    public AuthenticationService(IShopperService shopperService, ITokenService tokenService, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
-        this.shopperService = shopperService;
+    public AuthenticationService(IUserService userService, ITokenService tokenService, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+        this.userService = userService;
         this.tokenService = tokenService;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -49,15 +49,15 @@ public class AuthenticationService implements IAuthenticationService {
     @Override
     @Transactional
     public AuthenticationResponse signUp(SignUpRequest request) throws UserAlreadyExistsException {
-        if (shopperService.existsByUsername(request.username())) throw new UserAlreadyExistsException("An account with entered username already exists - " + request.username());
-        if (shopperService.existsByEmail(request.email())) throw new UserAlreadyExistsException("An account with entered email already exists - " + request.email());
-        Shopper user = new Shopper(
+        if (userService.userExistsByUsername(request.username())) throw new UserAlreadyExistsException("An account with entered username already exists - " + request.username());
+        if (userService.userExistsByEmail(request.email())) throw new UserAlreadyExistsException("An account with entered email already exists - " + request.email());
+        User user = new User(
                 request.firstName(),
                 request.lastName(),
                 request.username(),
                 request.email(),
                 passwordEncoder.encode(request.password()));
-        Shopper savedUser = shopperService.create(user);
+        User savedUser = userService.createUser(user);
         final String accessToken = jwtService.generateToken(user);
         final String refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, accessToken, TokenType.ACCESS);
@@ -68,13 +68,12 @@ public class AuthenticationService implements IAuthenticationService {
     @Override
     @Transactional
     public AuthenticationResponse signIn(SignInRequest request) {
-        Shopper user = shopperService.readByEmail(request.email());
+        User user = userService.getUserByEmail(request.email());
         System.out.printf("Shopper is %s\n", user);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         final String accessToken = jwtService.generateToken(user);
         final String refreshToken = jwtService.generateRefreshToken(user);
         tokenService.revokeAllUserTokens(user.getId());
-//        _revokeAllTokens(user);
         saveUserToken(user, accessToken, TokenType.ACCESS);
         saveUserToken(user, refreshToken, TokenType.REFRESH);
         return new AuthenticationResponse(accessToken, refreshToken);
@@ -83,7 +82,7 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     @Transactional
-    public void saveUserToken(Shopper user, String token, TokenType tokenType) {
+    public void saveUserToken(User user, String token, TokenType tokenType) {
         Token _token = new Token(token, user, tokenType);
         tokenService.create(_token);
     }
@@ -102,11 +101,11 @@ public class AuthenticationService implements IAuthenticationService {
         String userName = jwtService.extractSubject(refreshToken);
 
         if (userName != null) {
-            Shopper shopper = shopperService.readByUsername(userName);
+            User user = userService.getUserByUsername(userName);
 
-            if (jwtService.validateToken(refreshToken, shopper)) {
-                String accessToken = jwtService.generateToken(shopper);
-                saveUserToken(shopper, accessToken, TokenType.ACCESS);
+            if (jwtService.validateToken(refreshToken, user)) {
+                String accessToken = jwtService.generateToken(user);
+                saveUserToken(user, accessToken, TokenType.ACCESS);
                 AuthenticationResponse authenticationResponse = new AuthenticationResponse(accessToken, refreshToken);
                 try {
                     new ObjectMapper().writeValue(response.getOutputStream(), authenticationResponse);
@@ -121,8 +120,8 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     @Transactional
-    public void _revokeAllTokens(Shopper shopper) {
-        List<Token> validTokens = tokenService.readAllByShopperId(shopper.getId(), true);
+    public void _revokeAllTokens(User user) {
+        List<Token> validTokens = tokenService.readAllByShopperId(user.getId(), true);
         if (validTokens.isEmpty()) return;
 
         validTokens.forEach(t -> {

@@ -1,27 +1,30 @@
 package com.sp5blue.shopshare.services.shoppergroup;
 
 import com.sp5blue.shopshare.exceptions.shoppergroup.GroupNotFoundException;
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.ShopperGroup;
+import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsException;
+import com.sp5blue.shopshare.exceptions.shoppergroup.RemoveGroupAdminException;
+import com.sp5blue.shopshare.models.user.User;
+import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IShopperGroupService {
-    boolean removeShopperFromGroup(UUID groupId, Shopper shopper) throws GroupNotFoundException;
+    ShopperGroup createShopperGroup(UUID adminId, String groupName);
 
-    ShopperGroup create(String shopperGroupName, Shopper creator);
-    ShopperGroup create(ShopperGroup shopperGroup);
-    boolean addShopperToGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException;
+    List<ShopperGroup> getShopperGroups(UUID userId);
 
-    boolean addShopperToGroup(UUID groupId, Shopper shopper) throws GroupNotFoundException;
+    ShopperGroup getShopperGroupById(UUID userId, UUID groupId) throws GroupNotFoundException;
 
-    boolean removeShopperFromGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException;
+    void deleteShopperGroup(UUID userId, UUID groupId) throws GroupNotFoundException, InvalidUserPermissionsException;
 
-    ShopperGroup readById(UUID groupId) throws GroupNotFoundException;
+    void changeShopperGroupName(UUID userId, UUID groupId, String newName);
 
-    List<ShopperGroup> readByName(String name);
+    boolean addUserToShopperGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException;
 
-    List<ShopperGroup> readByShopperId(UUID shopperId);
-    List<ShopperGroup> read();
+    boolean addUserToShopperGroup(UUID groupId, User user) throws GroupNotFoundException;
+
+    boolean removeUserFromShopperGroup(UUID userId, UUID groupId, UUID shopperId) throws GroupNotFoundException, RemoveGroupAdminException;
+
+    void verifyUserHasGroup(UUID userId, UUID groupId);
 }

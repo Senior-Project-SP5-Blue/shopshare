@@ -1,36 +1,24 @@
 package com.sp5blue.shopshare.services.shoppinglist;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
-import com.sp5blue.shopshare.models.ListItem;
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.ShopperGroup;
-import com.sp5blue.shopshare.models.ShoppingList;
-import org.springframework.transaction.annotation.Transactional;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IShoppingListService {
-    ShoppingList create(String name, Shopper shopper);
 
-    ShoppingList create(String name, ShopperGroup group);
+    ShoppingList createShoppingList(UUID userId, UUID groupId, String name);
 
-    ShoppingList create(ShoppingList shoppingList);
+    void changeShoppingListName(UUID userId, UUID groupId, UUID listId, String newName);
 
-    ShoppingList readById(UUID id) throws ListNotFoundException;
+    ShoppingList getShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException;
 
-    List<ShoppingList> readByName(String name) throws ListNotFoundException;
+    List<ShoppingList> getShoppingLists(UUID userId, UUID groupId);
 
-    List<ShoppingList> readByShopperId(UUID shopperId);
+    boolean shoppingListExistsById(UUID listId);
 
-    List<ShoppingList> readByShopperGroupId(UUID shopperGroupId);
+    void verifyGroupHasList(UUID groupId, UUID listId);
 
-    boolean removeItemFromList(UUID listId, UUID itemId) throws ListNotFoundException;
-
-    boolean removeItemFromList(UUID listId, ListItem item) throws ListNotFoundException;
-
-    @Transactional
-    boolean addItemToList(UUID listId, UUID itemId) throws ListNotFoundException;
-
-    boolean addItemToList(UUID listId, ListItem item) throws ListNotFoundException;
+    void deleteShoppingList(UUID userId, UUID groupId, UUID listId);
 }
