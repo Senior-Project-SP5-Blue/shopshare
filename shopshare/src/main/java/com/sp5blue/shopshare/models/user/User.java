@@ -1,19 +1,19 @@
-package com.sp5blue.shopshare.models.shopper;
+package com.sp5blue.shopshare.models.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
-import com.sp5blue.shopshare.serializers.ShopperSerializer;
+import com.sp5blue.shopshare.serializers.UserSerializer;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
-@JsonSerialize(using = ShopperSerializer.class)
+@JsonSerialize(using = UserSerializer.class)
 @Entity
-@Table(name = "shoppers")
-public class Shopper implements UserDetails {
+@Table(name = "users")
+public class User implements UserDetails {
 
     @Id
     @Column(name = "id")
@@ -39,17 +39,17 @@ public class Shopper implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(mappedBy = "shoppers", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     private List<ShopperGroup> groups = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
-    @JoinTable(name = "shoppers_roles",
-            joinColumns = @JoinColumn(name = "shopper_id"),
+    @JoinTable(name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "shopper", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Token> tokens = new ArrayList<>();
 
     @JsonIgnore
@@ -72,10 +72,10 @@ public class Shopper implements UserDetails {
         this.active = active;
     }
 
-    public Shopper() {
+    public User() {
     }
 
-    public Shopper(String firstName, String lastName, String username, String email, String password, List<Role> roles) {
+    public User(String firstName, String lastName, String username, String email, String password, List<Role> roles) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -85,7 +85,7 @@ public class Shopper implements UserDetails {
         this.active = true;
     }
 
-    public Shopper(String firstName, String lastName, String username, String email, String password) {
+    public User(String firstName, String lastName, String username, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -216,8 +216,8 @@ public class Shopper implements UserDetails {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Shopper shopper)) return false;
-        return Objects.equals(getId(), shopper.getId()) && Objects.equals(getUsername(), shopper.getUsername()) && Objects.equals(getEmail(), shopper.getEmail());
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(getId(), user.getId()) && Objects.equals(getUsername(), user.getUsername()) && Objects.equals(getEmail(), user.getEmail());
     }
 
     @Override

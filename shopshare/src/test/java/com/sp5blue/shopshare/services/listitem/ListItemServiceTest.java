@@ -4,11 +4,11 @@ import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
 import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
-import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.repositories.ListItemRepository;
-import com.sp5blue.shopshare.services.shopper.IShopperService;
+import com.sp5blue.shopshare.services.user.IUserService;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
 import org.junit.jupiter.api.Test;
@@ -41,18 +41,18 @@ class ListItemServiceTest {
     IShoppingListService shoppingListService;
 
     @Mock
-    IShopperService shopperService;
+    IUserService userService;
 
     @InjectMocks
     ListItemService listItemService;
 
     @Test
     void addListItemToList_AddsItemToList() {
-        Shopper user = new Shopper();
+        User user = new User();
         ShopperGroup shopperGroup = new ShopperGroup("Group 1", user);
         ShoppingList shoppingList = spy(new ShoppingList("Group 1's List", shopperGroup));
         CreateListItemDto createListItemDto = new CreateListItemDto("List item one", false);
-        when(shopperService.getShopperById(user.getId())).thenReturn(user);
+        when(userService.getUserById(user.getId())).thenReturn(user);
         when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(shoppingList);
         when(listItemRepository.save(any(ListItem.class))).thenAnswer(l -> l.getArguments()[0]);
 
@@ -69,7 +69,7 @@ class ListItemServiceTest {
 
     @Test
     void removeListItemFromList_InvalidId_ThrowsListItemNotFoundException() {
-        Shopper user = new Shopper();
+        User user = new User();
         ShopperGroup shopperGroup = new ShopperGroup("Group 1", user);
         ShoppingList shoppingList = spy(new ShoppingList("Group 1's List", shopperGroup));
         UUID itemId = UUID.randomUUID();
@@ -80,7 +80,7 @@ class ListItemServiceTest {
 
     @Test
     void removeListItemFromList() {
-        Shopper user = new Shopper();
+        User user = new User();
         ShopperGroup shopperGroup = new ShopperGroup("Group 1", user);
         ShoppingList shoppingList = spy(new ShoppingList("Group 1's List", shopperGroup));
         ArgumentCaptor<ListItem> removedListItem = ArgumentCaptor.forClass(ListItem.class);
@@ -88,7 +88,7 @@ class ListItemServiceTest {
         ListItem listItem2 = new ListItem("Item 2", user);
         shoppingList.addItem(listItem1);
         shoppingList.addItem(listItem2);
-        when(shopperService.getShopperById(user.getId())).thenReturn(user);
+        when(userService.getUserById(user.getId())).thenReturn(user);
         when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(shoppingList);
         when(listItemRepository.findByList_IdAndId(shoppingList.getId(), listItem1.getId())).thenReturn(Optional.of(listItem1));
 
@@ -254,7 +254,7 @@ class ListItemServiceTest {
 
     @Test
     void getListItemsByCreator_NoMatches_ReturnsEmptyList() {
-        Shopper user = new Shopper();
+        User user = new User();
 
         var results = listItemService.getListItemsByCreator(user.getId());
         assertTrue(results.isEmpty());
@@ -262,7 +262,7 @@ class ListItemServiceTest {
 
     @Test
     void getListItemsByCreator_Matches_ReturnsListItems() {
-        Shopper user = new Shopper();
+        User user = new User();
         ListItem listItem1 = new ListItem("Item 1", user);
         ListItem listItem2 = new ListItem("Item 2", user);
 
@@ -290,7 +290,7 @@ class ListItemServiceTest {
     void getListItemsByShoppingList_Matches_ReturnsListItems() {
         ShopperGroup shopperGroup = new ShopperGroup();
         ShoppingList shoppingList = new ShoppingList();
-        Shopper user = new Shopper();
+        User user = new User();
         ListItem listItem1 = new ListItem("Item 1", user);
         ListItem listItem2 = new ListItem("Item 2", user);
         shoppingList.addItem(listItem1);

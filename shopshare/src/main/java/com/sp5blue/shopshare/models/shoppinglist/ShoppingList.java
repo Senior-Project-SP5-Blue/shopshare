@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import jakarta.persistence.*;
 
@@ -31,7 +31,7 @@ public class ShoppingList {
     @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne
     @JoinColumn(name = "modified_by")
-    private Shopper modifiedBy;
+    private User modifiedBy;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "list")
     private List<ListItem> items;
@@ -48,10 +48,6 @@ public class ShoppingList {
     public ShoppingList(String name) {
         this.name = name;
     }
-
-    /**
-     *
-     */
 
 
     public ShoppingList(String name, ShopperGroup group) {
@@ -79,11 +75,11 @@ public class ShoppingList {
         this.modifiedOn = modifiedOn;
     }
 
-    public Shopper getModifiedBy() {
+    public User getModifiedBy() {
         return modifiedBy;
     }
 
-    public void setModifiedBy(Shopper modifiedBy) {
+    public void setModifiedBy(User modifiedBy) {
         this.modifiedBy = modifiedBy;
     }
 

@@ -5,10 +5,10 @@ import com.sp5blue.shopshare.models.listitem.EditListItemDto;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
 import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
-import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.repositories.ListItemRepository;
-import com.sp5blue.shopshare.services.shopper.IShopperService;
+import com.sp5blue.shopshare.services.user.IUserService;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,21 +29,21 @@ public class ListItemService implements IListItemService {
 
     private final IShoppingListService shoppingListService;
 
-    private final IShopperService shopperService;
+    private final IUserService userService;
 
 
     @Autowired
-    public ListItemService(ListItemRepository listItemRepository, IShopperGroupService shopperGroupService, IShoppingListService shoppingListService, IShopperService shopperService) {
+    public ListItemService(ListItemRepository listItemRepository, IShopperGroupService shopperGroupService, IShoppingListService shoppingListService, IUserService userService) {
         this.listItemRepository = listItemRepository;
         this.shopperGroupService = shopperGroupService;
         this.shoppingListService = shoppingListService;
-        this.shopperService = shopperService;
+        this.userService = userService;
     }
 
     @Override
     @Transactional
     public ListItem addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemDto createListItemDto) {
-        Shopper creator = shopperService.getShopperById(userId);
+        User creator = userService.getUserById(userId);
         ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
         ListItem listItem = new ListItem(createListItemDto.name(), creator, shoppingList, createListItemDto.locked());
         shoppingList.setModifiedOn(LocalDateTime.now());
@@ -54,7 +54,7 @@ public class ListItemService implements IListItemService {
     @Override
     @Transactional
     public void removeListItemFromList(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
-        Shopper user = shopperService.getShopperById(userId);
+        User user = userService.getUserById(userId);
         ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
         ListItem listItem = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
         shoppingList.setModifiedOn(LocalDateTime.now());

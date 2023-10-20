@@ -1,9 +1,9 @@
 package com.sp5blue.shopshare.filters;
 
 
-import com.sp5blue.shopshare.models.shopper.Token;
+import com.sp5blue.shopshare.models.user.Token;
 import com.sp5blue.shopshare.services.security.JwtService;
-import com.sp5blue.shopshare.services.shopper.ShopperService;
+import com.sp5blue.shopshare.services.user.UserService;
 import com.sp5blue.shopshare.services.token.ITokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -55,7 +55,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             logger.warn("inside if");
-            UserDetails userDetails = ((ShopperService)userDetailsService).getShopperById(id);
+            UserDetails userDetails = ((UserService)userDetailsService).getUserById(id);
             logger.warn("User deets: {}", userDetails);
             Token _token = tokenService.readByToken(token);
             boolean isTokenValid = !_token.isExpired() && !_token.isRevoked();

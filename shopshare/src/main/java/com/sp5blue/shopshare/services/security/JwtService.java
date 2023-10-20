@@ -1,6 +1,6 @@
 package com.sp5blue.shopshare.services.security;
 
-import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -33,7 +33,7 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id", ((Shopper)userDetails).getId());
+        claims.put("id", ((User)userDetails).getId());
         return createToken(claims, userDetails.getUsername(), jwtExpiration);
     }
 

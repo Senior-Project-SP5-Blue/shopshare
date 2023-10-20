@@ -2,10 +2,10 @@ package com.sp5blue.shopshare.services.security;
 
 import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
 import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
-import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.security.request.SignInRequest;
 import com.sp5blue.shopshare.security.request.SignUpRequest;
-import com.sp5blue.shopshare.services.shopper.ShopperService;
+import com.sp5blue.shopshare.services.user.UserService;
 import com.sp5blue.shopshare.services.token.TokenService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AuthenticationServiceTest {
     @Mock
-    private ShopperService shopperService;
+    private UserService userService;
 
     @Mock
     TokenService tokenService;
@@ -53,7 +53,7 @@ class AuthenticationServiceTest {
 
     @Test
     void signUp_DuplicateUsername_ThrowsUserAlreadyExistsException() {
-        when(shopperService.shopperExistsByUsername(anyString())).thenReturn(true);
+        when(userService.userExistsByUsername(anyString())).thenReturn(true);
 
         var exception = assertThrows(UserAlreadyExistsException.class, () -> authenticationService.signUp(signUpRequest));
         assertEquals("An account with entered username already exists - usertest", exception.getMessage());
@@ -61,8 +61,8 @@ class AuthenticationServiceTest {
 
     @Test
     void signUp_DuplicateEmail_ThrowsUserAlreadyExistsException() {
-        when(shopperService.shopperExistsByUsername(anyString())).thenReturn(false);
-        when(shopperService.shopperExistsByEmail(anyString())).thenReturn(true);
+        when(userService.userExistsByUsername(anyString())).thenReturn(false);
+        when(userService.userExistsByEmail(anyString())).thenReturn(true);
 
         var exception = assertThrows(UserAlreadyExistsException.class, () -> authenticationService.signUp(signUpRequest));
         assertEquals("An account with entered email already exists - userlast@email.com", exception.getMessage());
@@ -70,25 +70,25 @@ class AuthenticationServiceTest {
 
     @Test
     void signUp_Valid_CreatesNewShopper() {
-        final ArgumentCaptor<Shopper> captor = ArgumentCaptor.forClass(Shopper.class);
+        final ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
         var result = authenticationService.signUp(signUpRequest);
 
-        verify(shopperService).createShopper(captor.capture());
+        verify(userService).createUser(captor.capture());
         verify(jwtService).generateToken(captor.getValue());
         assertNotNull(result);
     }
 
     @Test
     void signIn_UserDoesNotExist_ThrowsUserDoesNotExistException() {
-        when(shopperService.getShopperByEmail(anyString())).thenThrow( new UserNotFoundException("User does not exist - " + signInRequest.email()));
+        when(userService.getUserByEmail(anyString())).thenThrow( new UserNotFoundException("User does not exist - " + signInRequest.email()));
         var exception = assertThrows(UserNotFoundException.class, () -> authenticationService.signIn(signInRequest));
         assertEquals("User does not exist - hey@email.com", exception.getMessage());
     }
 
     @Test
     void signIn_Valid_ReturnsJwt() {
-        when(shopperService.getShopperByEmail(anyString())).thenReturn(new Shopper("hey", "last", "heyLast", "hey@email.com", "password"));
+        when(userService.getUserByEmail(anyString())).thenReturn(new User("hey", "last", "heyLast", "hey@email.com", "password"));
 
         var result = authenticationService.signIn(signInRequest);
 

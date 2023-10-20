@@ -1,6 +1,6 @@
 package com.sp5blue.shopshare.repositories;
 
-import com.sp5blue.shopshare.models.shopper.Token;
+import com.sp5blue.shopshare.models.user.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,32 +12,32 @@ import java.util.UUID;
 public interface TokenRepository extends JpaRepository<Token, Integer> {
 
     @Query(nativeQuery = true, name = """
-            SELECT token FROM tokens t INNER JOIN shoppers s ON t.shopper_id = s.id
-            WHERE s.id = :shopper_id
+            SELECT token FROM tokens t INNER JOIN users u ON t.user_id = u.id
+            WHERE u.id = :user_id
             AND (t.is_expired = false AND t.is_revoked = false)""")
-    List<Token> findAllValidTokensByShopper_Id(@Param("shopper_id") UUID shopperId);
+    List<Token> findAllValidTokensByUser_Id(@Param("user_id") UUID user_id);
 
-    List<Token> findAllByShopper_Id(UUID shopperId);
+    List<Token> findAllByUser_Id(UUID user_id);
     @Query(nativeQuery = true, name = """
-            SELECT token FROM tokens t INNER JOIN shoppers s ON t.shopper_id = s.id
-            WHERE s.id = :shopper_id
+            SELECT token FROM tokens t INNER JOIN users u ON t.user_id = u.id
+            WHERE u.id = :user_id
             AND t.type = 'ACCESS'
             AND (t.is_expired = false AND t.is_revoked = false)""")
-    List<Token> findAllValidAccessTokensByShopper_Id(@Param("shopper_id") UUID shopperId);
+    List<Token> findAllValidAccessTokensByUser_Id(@Param("user_id") UUID user_id);
 
     @Query(nativeQuery = true, name = """
-            SELECT token FROM tokens t INNER JOIN shoppers s ON t.shopper_id = s.id
-            WHERE s.id = :shopper_id
+            SELECT token FROM tokens t INNER JOIN users u ON t.user_id = u.id
+            WHERE u.id = :user_id
             AND t.type = 'ACCESS'""")
-    List<Token> findAllAccessTokensByShopper_Id(@Param("shopper_id") UUID shopperId);
+    List<Token> findAllAccessTokensByUser_Id(@Param("user_id") UUID user_id);
 
     @Query(nativeQuery = true, name = """
-            SELECT token FROM tokens t INNER JOIN shoppers s ON t.shopper_id = s.id
-            WHERE s.id = :shopper_id
+            SELECT token FROM tokens t INNER JOIN users u ON t.user_id = u.id
+            WHERE u.id = :user_id
             AND t.type = 'REFRESH'
             AND t.is_expired = false
             AND t.is_revoked = false""")
-    Optional<Token> findRefreshTokenByShopper_Id(@Param("shopper_id") UUID shopperId);
+    Optional<Token> findRefreshTokenByUser_Id(@Param("user_id") UUID user_id);
 
     Optional<Token> findByToken(String token);
 }

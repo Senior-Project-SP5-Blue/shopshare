@@ -3,7 +3,7 @@ package com.sp5blue.shopshare.services.shoppergroup;
 import com.sp5blue.shopshare.exceptions.shoppergroup.GroupNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsException;
 import com.sp5blue.shopshare.exceptions.shoppergroup.RemoveGroupAdminException;
-import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 
 import java.util.List;
@@ -20,11 +20,11 @@ public interface IShopperGroupService {
 
     void changeShopperGroupName(UUID userId, UUID groupId, String newName);
 
-    boolean addShopperToShopperGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException;
+    boolean addUserToShopperGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException;
 
-    boolean addShopperToShopperGroup(UUID groupId, Shopper shopper) throws GroupNotFoundException;
+    boolean addUserToShopperGroup(UUID groupId, User user) throws GroupNotFoundException;
 
-    boolean removeShopperFromShopperGroup(UUID userId, UUID groupId, UUID shopperId) throws GroupNotFoundException, RemoveGroupAdminException;
+    boolean removeUserFromShopperGroup(UUID userId, UUID groupId, UUID shopperId) throws GroupNotFoundException, RemoveGroupAdminException;
 
     void verifyUserHasGroup(UUID userId, UUID groupId);
 }

@@ -1,6 +1,6 @@
 package com.sp5blue.shopshare.controllers.shoppergroup;
 
-import com.sp5blue.shopshare.services.shopper.IShopperService;
+import com.sp5blue.shopshare.services.user.IUserService;
 import com.sp5blue.shopshare.services.shoppergroup.IInvitationService;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import org.slf4j.Logger;
@@ -19,14 +19,14 @@ public class ShopperGroupController {
 
     private final IShopperGroupService shopperGroupService;
 
-    private final IShopperService shopperService;
+    private final IUserService userService;
 
     private final IInvitationService invitationService;
 
     @Autowired
-    public ShopperGroupController(IShopperGroupService shopperGroupService, IShopperService shopperService, IInvitationService invitationService) {
+    public ShopperGroupController(IShopperGroupService shopperGroupService, IUserService userService, IInvitationService invitationService) {
         this.shopperGroupService = shopperGroupService;
-        this.shopperService = shopperService;
+        this.userService = userService;
         this.invitationService = invitationService;
     }
 
@@ -58,19 +58,19 @@ public class ShopperGroupController {
     @GetMapping("/{group_id}/members")
     @PreAuthorize("hasRole('ADMIN') or (authentication.principal.getId() == #userId and hasRole('GROUP_MEMBER-' + #groupId))")
     public ResponseEntity<?> getShopperGroupMembers(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId) {
-        return ResponseEntity.ok().body(shopperService.getShoppersByShopperGroup(groupId));
+        return ResponseEntity.ok().body(userService.getUsersByShopperGroup(groupId));
     }
 
-    @PostMapping("/{group_id}/invitations/{shopper_id}")
+    @PostMapping("/{group_id}/invitations/{member_id}")
     @PreAuthorize("hasRole('ADMIN') or (authentication.principal.getId() == #userId and hasRole('GROUP_ADMIN-' + #groupId))")
-    public ResponseEntity<?> inviteShopperToGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopper_id") UUID invitedShopperId) {
+    public ResponseEntity<?> inviteShopperToGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("member_id") UUID invitedShopperId) {
         return ResponseEntity.ok().body(invitationService.invite(groupId, invitedShopperId));
     }
 
-    @DeleteMapping("/{group_id}/members/{shopper_id}")
+    @DeleteMapping("/{group_id}/members/{member_id}")
     @PreAuthorize("hasRole('ADMIN') or (authentication.principal.getId() == #userId and hasRole('GROUP_ADMIN-' + #groupId))")
-    public ResponseEntity<?> removeShopperFromGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopper_id") UUID shopperId) {
-        boolean shopperRemoved = shopperGroupService.removeShopperFromShopperGroup(userId, groupId, shopperId);
+    public ResponseEntity<?> removeShopperFromGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("member_id") UUID memberId) {
+        boolean shopperRemoved = shopperGroupService.removeUserFromShopperGroup(userId, groupId, memberId);
         if (!shopperRemoved) return ResponseEntity.status(404).body("Shopper is not in group");
         return ResponseEntity.ok().body("Shopper removed successfully");
     }

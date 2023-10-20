@@ -1,9 +1,9 @@
 package com.sp5blue.shopshare.services.token;
 
 import com.sp5blue.shopshare.exceptions.token.TokenNotFoundException;
-import com.sp5blue.shopshare.models.shopper.Shopper;
-import com.sp5blue.shopshare.models.shopper.Token;
-import com.sp5blue.shopshare.models.shopper.TokenType;
+import com.sp5blue.shopshare.models.user.User;
+import com.sp5blue.shopshare.models.user.Token;
+import com.sp5blue.shopshare.models.user.TokenType;
 import com.sp5blue.shopshare.repositories.TokenRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,8 +30,8 @@ class TokenServiceTest {
 
     @Test
     void create_CreatesNewToken_ReturnsNewToken() {
-        Shopper shopper = new Shopper();
-        Token token = new Token("jwt", shopper);
+        User user = new User();
+        Token token = new Token("jwt", user);
         when(mockTokenRepository.save(token)).thenReturn(token);
 
         var result = tokenService.create(token);
@@ -40,16 +40,16 @@ class TokenServiceTest {
 
     @Test
     void readAllByShopperId_ValidOnly_ReturnsAllValidTokens() {
-        Shopper shopper1 = new Shopper();
-        Token token1 = new Token("jwt", shopper1);
-        Token token2 = new Token("jwt", shopper1, TokenType.REFRESH);
-        Token token3 = new Token("jwt", shopper1);
+        User user1 = new User();
+        Token token1 = new Token("jwt", user1);
+        Token token2 = new Token("jwt", user1, TokenType.REFRESH);
+        Token token3 = new Token("jwt", user1);
         token3.setRevoked(true);
         token3.setExpired(true);
-        Token token4 = new Token("jwt", shopper1);
-        when(mockTokenRepository.findAllValidTokensByShopper_Id(shopper1.getId())).thenReturn(List.of(token1, token2, token4));
+        Token token4 = new Token("jwt", user1);
+        when(mockTokenRepository.findAllValidTokensByUser_Id(user1.getId())).thenReturn(List.of(token1, token2, token4));
 
-        var results = tokenService.readAllByShopperId(shopper1.getId(), true);
+        var results = tokenService.readAllByShopperId(user1.getId(), true);
 
         assertEquals(3, results.size());
         assertAll(
@@ -61,16 +61,16 @@ class TokenServiceTest {
 
     @Test
     void readAllByShopperId_All_ReturnsAllTokens() {
-        Shopper shopper1 = new Shopper();
-        Token token1 = new Token("jwt", shopper1);
-        Token token2 = new Token("jwt", shopper1, TokenType.REFRESH);
-        Token token3 = new Token("jwt", shopper1);
+        User user1 = new User();
+        Token token1 = new Token("jwt", user1);
+        Token token2 = new Token("jwt", user1, TokenType.REFRESH);
+        Token token3 = new Token("jwt", user1);
         token3.setRevoked(true);
         token3.setExpired(true);
-        Token token4 = new Token("jwt", shopper1);
-        when(mockTokenRepository.findAllByShopper_Id(shopper1.getId())).thenReturn(List.of(token1, token2, token3, token4));
+        Token token4 = new Token("jwt", user1);
+        when(mockTokenRepository.findAllByUser_Id(user1.getId())).thenReturn(List.of(token1, token2, token3, token4));
 
-        var results = tokenService.readAllByShopperId(shopper1.getId(), false);
+        var results = tokenService.readAllByShopperId(user1.getId(), false);
 
         assertEquals(4, results.size());
         assertAll(
@@ -83,16 +83,16 @@ class TokenServiceTest {
 
     @Test
     void readAllAccessByShopperId_ValidOnly_ReturnsAllValidAccessTokens() {
-        Shopper shopper1 = new Shopper();
-        Token token1 = new Token("jwt", shopper1);
-        Token token2 = new Token("jwt", shopper1, TokenType.REFRESH);
-        Token token3 = new Token("jwt", shopper1);
+        User user1 = new User();
+        Token token1 = new Token("jwt", user1);
+        Token token2 = new Token("jwt", user1, TokenType.REFRESH);
+        Token token3 = new Token("jwt", user1);
         token3.setRevoked(true);
         token3.setExpired(true);
-        Token token4 = new Token("jwt", shopper1);
-        when(mockTokenRepository.findAllValidAccessTokensByShopper_Id(shopper1.getId())).thenReturn(List.of(token1, token4));
+        Token token4 = new Token("jwt", user1);
+        when(mockTokenRepository.findAllValidAccessTokensByUser_Id(user1.getId())).thenReturn(List.of(token1, token4));
 
-        var results = tokenService.readAllAccessByShopperId(shopper1.getId(), true);
+        var results = tokenService.readAllAccessByShopperId(user1.getId(), true);
 
         assertEquals(2, results.size());
         assertAll(
@@ -103,16 +103,16 @@ class TokenServiceTest {
 
     @Test
     void readAllAccessByShopperId_All_ReturnsAllAccessTokens() {
-        Shopper shopper1 = new Shopper();
-        Token token1 = new Token("jwt", shopper1);
-        Token token2 = new Token("jwt", shopper1, TokenType.REFRESH);
-        Token token3 = new Token("jwt", shopper1);
+        User user1 = new User();
+        Token token1 = new Token("jwt", user1);
+        Token token2 = new Token("jwt", user1, TokenType.REFRESH);
+        Token token3 = new Token("jwt", user1);
         token3.setRevoked(true);
         token3.setExpired(true);
-        Token token4 = new Token("jwt", shopper1);
-        when(mockTokenRepository.findAllAccessTokensByShopper_Id(shopper1.getId())).thenReturn(List.of(token1, token3, token4));
+        Token token4 = new Token("jwt", user1);
+        when(mockTokenRepository.findAllAccessTokensByUser_Id(user1.getId())).thenReturn(List.of(token1, token3, token4));
 
-        var results = tokenService.readAllAccessByShopperId(shopper1.getId(), false);
+        var results = tokenService.readAllAccessByShopperId(user1.getId(), false);
 
         assertEquals(3, results.size());
         assertAll(
@@ -124,23 +124,23 @@ class TokenServiceTest {
 
     @Test
     void readRefreshByShopperId_None_ThrowsTokenNotFoundException() {
-        Shopper shopper1 = new Shopper();
-        Token token1 = new Token("jwt1", shopper1);
-        Token token2 = new Token("jwt2", shopper1, TokenType.REFRESH);
-        Token token3 = new Token("jwt3", shopper1);
+        User user1 = new User();
+        Token token1 = new Token("jwt1", user1);
+        Token token2 = new Token("jwt2", user1, TokenType.REFRESH);
+        Token token3 = new Token("jwt3", user1);
         token3.setRevoked(true);
         token3.setExpired(true);
-        Token token4 = new Token("jwt4", shopper1);
-        when(mockTokenRepository.findRefreshTokenByShopper_Id(shopper1.getId())).thenReturn(Optional.empty());
+        Token token4 = new Token("jwt4", user1);
+        when(mockTokenRepository.findRefreshTokenByUser_Id(user1.getId())).thenReturn(Optional.empty());
 
-        var exception = assertThrows(TokenNotFoundException.class, () -> tokenService.readRefreshByShopperId(shopper1.getId()));
-        assertEquals("User - " + shopper1.getId() + " does not have valid refresh token",exception.getMessage());
+        var exception = assertThrows(TokenNotFoundException.class, () -> tokenService.readRefreshByShopperId(user1.getId()));
+        assertEquals("User - " + user1.getId() + " does not have valid refresh token",exception.getMessage());
     }
 
     @Test
     void readByToken_NotValid_ThrowsTokenNotFoundException() {
-        Shopper shopper1 = new Shopper();
-        Token token1 = new Token("jwt1", shopper1);
+        User user1 = new User();
+        Token token1 = new Token("jwt1", user1);
         when(mockTokenRepository.findByToken(token1.getToken())).thenReturn(Optional.empty());
 
         var exception = assertThrows(TokenNotFoundException.class, () -> tokenService.readByToken(token1.getToken()));
@@ -149,8 +149,8 @@ class TokenServiceTest {
 
     @Test
     void readByToken_Valid_ReturnsToken() {
-        Shopper shopper1 = new Shopper();
-        Token token1 = new Token("jwt1", shopper1);
+        User user1 = new User();
+        Token token1 = new Token("jwt1", user1);
         when(mockTokenRepository.findByToken(token1.getToken())).thenReturn(Optional.of(token1));
 
         var result = tokenService.readByToken(token1.getToken());
@@ -159,8 +159,8 @@ class TokenServiceTest {
 
     @Test
     void revokeAccessToken_NotValid_ThrowsTokenNotFoundException() {
-        Shopper shopper1 = new Shopper();
-        Token token1 = new Token("jwt1", shopper1);
+        User user1 = new User();
+        Token token1 = new Token("jwt1", user1);
         when(mockTokenRepository.findByToken(token1.getToken())).thenReturn(Optional.empty());
 
         var exception = assertThrows(TokenNotFoundException.class, () -> tokenService.revokeAccessToken(token1.getToken()));
@@ -169,8 +169,8 @@ class TokenServiceTest {
 
     @Test
     void revokeAccessToken_Valid_InvalidatesAccessToken() {
-        Shopper shopper1 = new Shopper();
-        Token token1 = new Token("jwt1", shopper1);
+        User user1 = new User();
+        Token token1 = new Token("jwt1", user1);
         when(mockTokenRepository.findByToken(token1.getToken())).thenReturn(Optional.of(token1));
 
         tokenService.revokeAccessToken(token1.getToken());
@@ -181,14 +181,14 @@ class TokenServiceTest {
 
     @Test
     void revokeAllTokens() {
-        Shopper shopper1 = new Shopper();
-        Token token1 = new Token("jwt1", shopper1);
-        Token token2 = new Token("jwt2", shopper1, TokenType.REFRESH);
-        Token token3 = new Token("jwt3", shopper1, TokenType.REFRESH);
-        Token token4 = new Token("jwt4", shopper1);
-        when(mockTokenRepository.findAllByShopper_Id(shopper1.getId())).thenReturn(Arrays.asList(token1, token2, token3, token4));
+        User user1 = new User();
+        Token token1 = new Token("jwt1", user1);
+        Token token2 = new Token("jwt2", user1, TokenType.REFRESH);
+        Token token3 = new Token("jwt3", user1, TokenType.REFRESH);
+        Token token4 = new Token("jwt4", user1);
+        when(mockTokenRepository.findAllByUser_Id(user1.getId())).thenReturn(Arrays.asList(token1, token2, token3, token4));
 
-        tokenService.revokeAllUserTokens(shopper1.getId());
+        tokenService.revokeAllUserTokens(user1.getId());
 
         assertAll(
                 () -> assertTrue(token1.isExpired() && token1.isRevoked()),

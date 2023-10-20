@@ -3,7 +3,7 @@ package com.sp5blue.shopshare.serializers;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import org.slf4j.Logger;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class ShopperGroupSerializer extends StdSerializer<ShopperGroup> {
 
-    private final Logger logger = LoggerFactory.getLogger(ShopperSerializer.class);
+    private final Logger logger = LoggerFactory.getLogger(UserSerializer.class);
 
     public ShopperGroupSerializer() {
         this(null);
@@ -27,12 +27,12 @@ public class ShopperGroupSerializer extends StdSerializer<ShopperGroup> {
         jsonGenerator.writeStartObject();
         jsonGenerator.writeStringField("id", shopperGroup.getId().toString());
         jsonGenerator.writeStringField("name", shopperGroup.getName());
-        jsonGenerator.writeFieldName("shoppers");
+        jsonGenerator.writeFieldName("users");
         jsonGenerator.writeStartArray();
-        for (Shopper shopper : shopperGroup.getShoppers()) {
+        for (User user : shopperGroup.getUsers()) {
             jsonGenerator.writeStartObject();
-            jsonGenerator.writeStringField("id", shopper.getId().toString());
-            jsonGenerator.writeStringField("username", shopper.getUsername());
+            jsonGenerator.writeStringField("id", user.getId().toString());
+            jsonGenerator.writeStringField("username", user.getUsername());
             jsonGenerator.writeEndObject();
         }
         jsonGenerator.writeEndArray();

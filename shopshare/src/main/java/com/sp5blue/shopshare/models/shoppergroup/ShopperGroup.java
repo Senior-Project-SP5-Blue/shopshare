@@ -2,9 +2,9 @@ package com.sp5blue.shopshare.models.shoppergroup;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.sp5blue.shopshare.models.shopper.Role;
-import com.sp5blue.shopshare.models.shopper.RoleType;
-import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.user.Role;
+import com.sp5blue.shopshare.models.user.RoleType;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.serializers.ShopperGroupSerializer;
 import jakarta.persistence.*;
@@ -26,36 +26,36 @@ public class ShopperGroup {
     private String name;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinTable(name = "shoppers_shopper_groups",
+    @JoinTable(name = "users_shopper_groups",
     joinColumns = @JoinColumn(name = "shopper_group_id"),
-    inverseJoinColumns = @JoinColumn(name = "shopper_id"))
-    private List<Shopper> shoppers = new ArrayList<>();
+    inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<ShoppingList> lists = new ArrayList<>();
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "admin_id")
-    private Shopper admin;
+    private User admin;
 
     public ShopperGroup() {
     }
 
-    public ShopperGroup(String name, Shopper createdBy) {
+    public ShopperGroup(String name, User createdBy) {
         this.name = name;
         Role role = new Role("ROLE_GROUP_ADMIN-"+ getId(), RoleType.ROLE_GROUP_ADMIN);
         createdBy.addRole(role);
         this.admin = createdBy;
-        this.shoppers = new ArrayList<>();
-        this.shoppers.add(createdBy);
+        this.users = new ArrayList<>();
+        this.users.add(createdBy);
         this.lists = new ArrayList<>();
     }
 
-    public Shopper getAdmin() {
+    public User getAdmin() {
         return admin;
     }
 
-    public void setAdmin(Shopper createdBy) {
+    public void setAdmin(User createdBy) {
         this.admin = createdBy;
     }
     public UUID getId() {
@@ -70,12 +70,12 @@ public class ShopperGroup {
         this.name = name;
     }
 
-    public List<Shopper> getShoppers() {
-        return shoppers;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setShoppers(List<Shopper> shoppers) {
-        this.shoppers = shoppers;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     public List<ShoppingList> getLists() {
@@ -86,22 +86,22 @@ public class ShopperGroup {
         this.lists = lists;
     }
 
-    public boolean addShopper(Shopper shopper) {
+    public boolean addUser(User user) {
         Role role = new Role("ROLE_GROUP_MEMBER-" + getId(), RoleType.ROLE_GROUP_MEMBER);
-        shopper.addRole(role);
-        return shoppers.add(shopper);
+        user.addRole(role);
+        return users.add(user);
     }
 
-    public boolean removeShopper(Shopper shopper) {
-        shopper.removeRole("ROLE_GROUP_MEMBER-" + getId());
-        return shoppers.remove(shopper);
+    public boolean removeUser(User user) {
+        user.removeRole("ROLE_GROUP_MEMBER-" + getId());
+        return users.remove(user);
     }
 
-    public boolean removeShopper(UUID shopperId) {
-        Shopper shopper = shoppers.stream().filter(s -> s.getId().equals(shopperId)).findFirst().orElse(null);
-        if (shopper == null) return false;
-        shopper.removeRole("ROLE_GROUP_MEMBER-" + getId());
-        return shoppers.removeIf(x -> x.getId().equals(shopperId));
+    public boolean removeUser(UUID userId) {
+        User user = users.stream().filter(s -> s.getId().equals(userId)).findFirst().orElse(null);
+        if (user == null) return false;
+        user.removeRole("ROLE_GROUP_MEMBER-" + getId());
+        return users.removeIf(x -> x.getId().equals(userId));
     }
 
     public boolean addList(ShoppingList shoppingList) {

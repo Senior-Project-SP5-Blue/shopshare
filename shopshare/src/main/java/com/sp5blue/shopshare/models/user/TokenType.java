@@ -1,4 +1,4 @@
-package com.sp5blue.shopshare.models.shopper;
+package com.sp5blue.shopshare.models.user;
 
 public enum TokenType {
     ACCESS,

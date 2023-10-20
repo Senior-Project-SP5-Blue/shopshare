@@ -1,4 +1,4 @@
-package com.sp5blue.shopshare.models.shopper;
+package com.sp5blue.shopshare.models.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
@@ -29,29 +29,29 @@ public class Token {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "shopper_id")
-    private Shopper shopper;
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public Token(String token, Shopper shopper) {
+    public Token(String token, User user) {
         this.token = token;
-        this.shopper = shopper;
+        this.user = user;
         this.type = TokenType.ACCESS;
         isRevoked = false;
         isExpired = false;
     }
 
-    public Token(String token, TokenType type, boolean isExpired, boolean isRevoked, Shopper shopper) {
+    public Token(String token, TokenType type, boolean isExpired, boolean isRevoked, User user) {
         this.token = token;
         this.type = type;
         this.isExpired = isExpired;
         this.isRevoked = isRevoked;
-        this.shopper = shopper;
+        this.user = user;
     }
 
-    public Token(String token, Shopper shopper, TokenType type) {
+    public Token(String token, User user, TokenType type) {
         this.token = token;
         this.type = type;
-        this.shopper = shopper;
+        this.user = user;
     }
 
     public Token() {
@@ -85,12 +85,12 @@ public class Token {
         isRevoked = revoked;
     }
 
-    public Shopper getShopper() {
-        return shopper;
+    public User getUser() {
+        return user;
     }
 
-    public void setShopper(Shopper shopper) {
-        this.shopper = shopper;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public TokenType getType() {

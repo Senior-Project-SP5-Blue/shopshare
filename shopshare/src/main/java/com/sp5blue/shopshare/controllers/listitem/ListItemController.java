@@ -3,9 +3,6 @@ package com.sp5blue.shopshare.controllers.listitem;
 import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
 import com.sp5blue.shopshare.models.listitem.EditListItemDto;
 import com.sp5blue.shopshare.services.listitem.IListItemService;
-import com.sp5blue.shopshare.services.shopper.IShopperService;
-import com.sp5blue.shopshare.services.shoppergroup.ShopperGroupService;
-import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

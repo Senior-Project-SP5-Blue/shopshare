@@ -1,4 +1,4 @@
-package com.sp5blue.shopshare.models.shopper;
+package com.sp5blue.shopshare.models.user;
 
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;

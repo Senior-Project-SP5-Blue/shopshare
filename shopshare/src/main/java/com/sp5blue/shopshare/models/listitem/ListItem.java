@@ -3,7 +3,7 @@ package com.sp5blue.shopshare.models.listitem;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.sp5blue.shopshare.models.shopper.Shopper;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
@@ -36,7 +36,7 @@ public class ListItem {
     @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne(optional = false)
     @JoinColumn(name = "created_by")
-    private Shopper createdBy;
+    private User createdBy;
 
     @ManyToOne
     @JoinColumn(name = "shopping_list_id")
@@ -48,7 +48,7 @@ public class ListItem {
     public ListItem() {
     }
 
-    public ListItem(String name, Shopper createdBy) {
+    public ListItem(String name, User createdBy) {
         this.name = name;
         this.createdBy = createdBy;
     }
@@ -60,7 +60,7 @@ public class ListItem {
         createdOn = LocalDateTime.now();
     }
 
-    public ListItem(String name, ItemStatus status, Shopper createdBy, boolean locked) {
+    public ListItem(String name, ItemStatus status, User createdBy, boolean locked) {
         this.name = name;
         this.status = status;
         this.createdBy = createdBy;
@@ -68,13 +68,13 @@ public class ListItem {
         createdOn = LocalDateTime.now();
     }
 
-    public ListItem(String name, Shopper createdBy, boolean locked) {
+    public ListItem(String name, User createdBy, boolean locked) {
         this.name = name;
         this.createdBy = createdBy;
         this.locked = locked;
     }
 
-    public ListItem(String name, Shopper createdBy, ShoppingList list, boolean locked) {
+    public ListItem(String name, User createdBy, ShoppingList list, boolean locked) {
         this.name = name;
         this.createdBy = createdBy;
         this.list = list;
@@ -117,11 +117,11 @@ public class ListItem {
         return list;
     }
 
-    public Shopper getCreatedBy() {
+    public User getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Shopper createdBy) {
+    public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
     }
 
