@@ -5,18 +5,19 @@ import com.sp5blue.shopshare.models.user.Token;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface ITokenService {
-    Token create(Token token);
+    CompletableFuture<Token> create(Token token);
 
-    List<Token> create(List<Token> tokens);
-    List<Token> readAllByShopperId(UUID shopperId, boolean validOnly);
+    CompletableFuture<List<Token>> create(List<Token> tokens);
+    CompletableFuture<List<Token>> readAllByUserId(UUID shopperId, boolean validOnly);
 
-    List<Token> readAllAccessByShopperId(UUID shopperId, boolean validOnly);
+    CompletableFuture<List<Token>> readAllAccessByUserId(UUID shopperId, boolean validOnly);
 
-    Token readRefreshByShopperId(UUID shopperId) throws TokenNotFoundException ;
+    CompletableFuture<Token> readRefreshByUserId(UUID shopperId) throws TokenNotFoundException ;
 
-    Token readByToken(String token) throws TokenNotFoundException;
+    CompletableFuture<Token> readByToken(String token) throws TokenNotFoundException;
 
     void revokeAccessToken(String jwt) throws TokenNotFoundException;
 

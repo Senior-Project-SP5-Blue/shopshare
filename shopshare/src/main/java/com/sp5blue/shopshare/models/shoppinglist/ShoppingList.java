@@ -33,7 +33,7 @@ public class ShoppingList {
     @JoinColumn(name = "modified_by")
     private User modifiedBy;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "list")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "list", fetch = FetchType.EAGER)
     private List<ListItem> items;
 
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")

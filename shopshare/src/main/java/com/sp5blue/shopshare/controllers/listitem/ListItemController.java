@@ -19,12 +19,12 @@ public class ListItemController {
 
     @GetMapping
     public ResponseEntity<?> getListItems(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId) {
-        return ResponseEntity.ok().body(listItemService.getListItemsByShoppingList(userId, groupId, listId));
+        return ResponseEntity.ok().body(listItemService.getListItemsByShoppingList(userId, groupId, listId).join());
     }
 
     @PostMapping
     public ResponseEntity<?> addListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody CreateListItemDto createListItemDto) {
-        return ResponseEntity.ok().body(listItemService.addListItemToList(userId, groupId, listId, createListItemDto));
+        return ResponseEntity.ok().body(listItemService.addListItemToList(userId, groupId, listId, createListItemDto).join());
     }
 
     @DeleteMapping
@@ -35,7 +35,7 @@ public class ListItemController {
 
     @GetMapping("/{list-item_id}")
     public ResponseEntity<?> getListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId) {
-        return ResponseEntity.ok().body(listItemService.getListItemById(userId, groupId, listId, itemId));
+        return ResponseEntity.ok().body(listItemService.getListItemById(userId, groupId, listId, itemId).join());
     }
 
     @PatchMapping("/{list-item_id}")
@@ -46,6 +46,6 @@ public class ListItemController {
 
     @DeleteMapping("/{list-item_id}")
     public ResponseEntity<?> deleteListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId) {
-        return ResponseEntity.ok().body(listItemService.getListItemById(userId, groupId, listId, itemId));
+        return ResponseEntity.ok().body(listItemService.getListItemById(userId, groupId, listId, itemId).join());
     }
 }

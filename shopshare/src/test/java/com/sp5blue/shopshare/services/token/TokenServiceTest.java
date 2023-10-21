@@ -49,7 +49,7 @@ class TokenServiceTest {
         Token token4 = new Token("jwt", user1);
         when(mockTokenRepository.findAllValidTokensByUser_Id(user1.getId())).thenReturn(List.of(token1, token2, token4));
 
-        var results = tokenService.readAllByShopperId(user1.getId(), true);
+        var results = tokenService.readAllByUserId(user1.getId(), true);
 
         assertEquals(3, results.size());
         assertAll(
@@ -70,7 +70,7 @@ class TokenServiceTest {
         Token token4 = new Token("jwt", user1);
         when(mockTokenRepository.findAllByUser_Id(user1.getId())).thenReturn(List.of(token1, token2, token3, token4));
 
-        var results = tokenService.readAllByShopperId(user1.getId(), false);
+        var results = tokenService.readAllByUserId(user1.getId(), false);
 
         assertEquals(4, results.size());
         assertAll(
@@ -92,7 +92,7 @@ class TokenServiceTest {
         Token token4 = new Token("jwt", user1);
         when(mockTokenRepository.findAllValidAccessTokensByUser_Id(user1.getId())).thenReturn(List.of(token1, token4));
 
-        var results = tokenService.readAllAccessByShopperId(user1.getId(), true);
+        var results = tokenService.readAllAccessByUserId(user1.getId(), true);
 
         assertEquals(2, results.size());
         assertAll(
@@ -112,7 +112,7 @@ class TokenServiceTest {
         Token token4 = new Token("jwt", user1);
         when(mockTokenRepository.findAllAccessTokensByUser_Id(user1.getId())).thenReturn(List.of(token1, token3, token4));
 
-        var results = tokenService.readAllAccessByShopperId(user1.getId(), false);
+        var results = tokenService.readAllAccessByUserId(user1.getId(), false);
 
         assertEquals(3, results.size());
         assertAll(
@@ -133,7 +133,7 @@ class TokenServiceTest {
         Token token4 = new Token("jwt4", user1);
         when(mockTokenRepository.findRefreshTokenByUser_Id(user1.getId())).thenReturn(Optional.empty());
 
-        var exception = assertThrows(TokenNotFoundException.class, () -> tokenService.readRefreshByShopperId(user1.getId()));
+        var exception = assertThrows(TokenNotFoundException.class, () -> tokenService.readRefreshByUserId(user1.getId()));
         assertEquals("User - " + user1.getId() + " does not have valid refresh token",exception.getMessage());
     }
 

@@ -28,15 +28,13 @@ public class AuthController {
     }
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateAndGetToken(@RequestBody SignInRequest authRequest) {
-        return ResponseEntity.ok(authenticationService.signIn(authRequest));
+        logger.warn("Inside signup controller");
+        return ResponseEntity.ok(authenticationService.signIn(authRequest).join());
     }
     @PostMapping("/signup")
     public ResponseEntity<?> authenticateAndGetToken(@RequestBody SignUpRequest authRequest) {
-        return ResponseEntity.ok(authenticationService.signUp(authRequest));
+        return ResponseEntity.ok(authenticationService.signUp(authRequest).join());
     }
-
-//    @PatchMapping("/password")
-
     @PostMapping("/refresh-signin")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
         authenticationService.refreshToken(request, response);

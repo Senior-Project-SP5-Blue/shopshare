@@ -12,6 +12,7 @@ import com.sp5blue.shopshare.services.user.IUserService;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ListItemService implements IListItemService {
@@ -42,21 +44,29 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Transactional
-    public ListItem addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemDto createListItemDto) {
-        User creator = userService.getUserById(userId);
-        ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
+    @Async
+    public CompletableFuture<ListItem> addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemDto createListItemDto) {
+        CompletableFuture<User> getCreator = userService.getUserById(userId);
+        CompletableFuture<ShoppingList> getShoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
+        CompletableFuture.allOf(getCreator, getShoppingList).join();
+        User creator = getCreator.join();
+        ShoppingList shoppingList = getShoppingList.join();
         ListItem listItem = new ListItem(createListItemDto.name(), creator, shoppingList, createListItemDto.locked());
         shoppingList.setModifiedOn(LocalDateTime.now());
         shoppingList.setModifiedBy(creator);
-        return listItemRepository.save(listItem);
+        return CompletableFuture.completedFuture(listItemRepository.save(listItem));
     }
 
     @Override
     @Transactional
+    @Async
     public void removeListItemFromList(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
-        User user = userService.getUserById(userId);
-        ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
+        CompletableFuture<User> getUser = userService.getUserById(userId);
+        CompletableFuture<ShoppingList> getShoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
         ListItem listItem = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
+        CompletableFuture.allOf(getUser, getShoppingList).join();
+        User user = getUser.join();
+        ShoppingList shoppingList = getShoppingList.join();
         shoppingList.setModifiedOn(LocalDateTime.now());
         shoppingList.setModifiedBy(user);
         listItemRepository.delete(listItem);
@@ -64,6 +74,7 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Transactional
+    @Async
     public void lockListItem(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
@@ -73,6 +84,7 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Transactional
+    @Async
     public void unlockListItem(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
@@ -82,6 +94,7 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Transactional
+    @Async
     public void markListItemAsComplete(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
@@ -91,6 +104,7 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Transactional
+    @Async
     public void markListItemAsActive(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
@@ -100,6 +114,7 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Transactional
+    @Async
     public void markListItemAsArchived(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
@@ -108,33 +123,38 @@ public class ListItemService implements IListItemService {
     }
 
     @Override
-    public ListItem getListItemById(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
+    @Async
+    public CompletableFuture<ListItem> getListItemById(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
-        return listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
+        return CompletableFuture.completedFuture(listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId)));
     }
 
     @Override
-    public List<ListItem> getListItemsByCreator(UUID userId) {
-        return listItemRepository.findAllByCreatedBy_Id(userId);
+    @Async
+    public CompletableFuture<List<ListItem>> getListItemsByCreator(UUID userId) {
+        return CompletableFuture.completedFuture(listItemRepository.findAllByCreatedBy_Id(userId));
     }
 
     @Override
-    public List<ListItem> getListItemsByShoppingList(UUID userId, UUID groupId, UUID listId) {
+    @Async
+    public CompletableFuture<List<ListItem>> getListItemsByShoppingList(UUID userId, UUID groupId, UUID listId) {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
-        return listItemRepository.findAllByList_Id(listId);
+        return CompletableFuture.completedFuture(listItemRepository.findAllByList_Id(listId));
     }
 
     @Override
     @Transactional
+    @Async
     public void removeListItemsFromList(UUID userId, UUID groupId, UUID listId) {
-        ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
+        ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId).join();
         shoppingList.setItems(new ArrayList<>());
     }
 
     @Override
     @Transactional
+    @Async
     public void editListItem(UUID userId, UUID groupId, UUID listId, UUID itemId, EditListItemDto editListItemDto) throws ListItemNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);

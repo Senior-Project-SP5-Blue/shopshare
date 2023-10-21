@@ -2,6 +2,7 @@ package com.sp5blue.shopshare.filters;
 
 
 import com.sp5blue.shopshare.models.user.Token;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.services.security.JwtService;
 import com.sp5blue.shopshare.services.user.UserService;
 import com.sp5blue.shopshare.services.token.ITokenService;
@@ -24,6 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -42,12 +44,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
-        String token = null;
+        String jwt = null;
         UUID id = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            Optional<UUID> _id = jwtService.extractId(token);
+            jwt = authHeader.substring(7);
+            Optional<UUID> _id = jwtService.extractId(jwt);
             if (_id.isPresent()) id = _id.get();
         }
 
@@ -55,12 +57,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             logger.warn("inside if");
-            UserDetails userDetails = ((UserService)userDetailsService).getUserById(id);
+            CompletableFuture<User> getUserDetails = ((UserService)userDetailsService).getUserById(id);
+            CompletableFuture<Token> getToken = tokenService.readByToken(jwt);
+            CompletableFuture.allOf(getUserDetails, getToken).join();
+            User userDetails = getUserDetails.join();
             logger.warn("User deets: {}", userDetails);
-            Token _token = tokenService.readByToken(token);
-            boolean isTokenValid = !_token.isExpired() && !_token.isRevoked();
+            Token token = getToken.join();
+            boolean isTokenValid = !token.isExpired() && !token.isRevoked();
 
-            if (jwtService.validateToken(token, userDetails) && isTokenValid) {
+            if (jwtService.validateToken(jwt, userDetails) && isTokenValid) {
                 logger.warn("Inside token valid if statement");
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

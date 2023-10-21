@@ -6,11 +6,13 @@ import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.repositories.ShoppingListRepository;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ShoppingListService implements IShoppingListService {
@@ -26,14 +28,16 @@ public class ShoppingListService implements IShoppingListService {
 
     @Override
     @Transactional
-    public ShoppingList createShoppingList(UUID userId, UUID groupId, String name) {
-        ShopperGroup group = shopperGroupService.getShopperGroupById(userId, groupId);
+    @Async
+    public CompletableFuture<ShoppingList> createShoppingList(UUID userId, UUID groupId, String name) {
+        ShopperGroup group = shopperGroupService.getShopperGroupById(userId, groupId).join();
         ShoppingList shoppingList = new ShoppingList(name, group);
-        return shoppingListRepository.save(shoppingList);
+        return CompletableFuture.completedFuture(shoppingListRepository.save(shoppingList));
     }
 
     @Override
     @Transactional
+    @Async
     public void changeShoppingListName(UUID userId, UUID groupId, UUID listId, String newName) {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         ShoppingList shoppingList = shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
@@ -41,30 +45,35 @@ public class ShoppingListService implements IShoppingListService {
     }
 
     @Override
-    public ShoppingList getShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException {
+    @Async
+    public CompletableFuture<ShoppingList> getShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
-        return shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+        return CompletableFuture.completedFuture(shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId)));
     }
 
     @Override
-    public List<ShoppingList> getShoppingLists(UUID userId, UUID groupId) {
+    @Async
+    public CompletableFuture<List<ShoppingList>> getShoppingLists(UUID userId, UUID groupId) {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
-        return shoppingListRepository.findAllByGroup_Id(groupId);
+        return CompletableFuture.completedFuture(shoppingListRepository.findAllByGroup_Id(groupId));
     }
 
     @Override
-    public boolean shoppingListExistsById(UUID listId) {
-        return shoppingListRepository.existsById(listId);
+    @Async
+    public CompletableFuture<Boolean> shoppingListExistsById(UUID listId) {
+        return CompletableFuture.completedFuture(shoppingListRepository.existsById(listId));
     }
 
 
     @Override
+    @Async
     public void verifyGroupHasList(UUID groupId, UUID listId) {
         shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
     }
 
     @Override
     @Transactional
+    @Async
     public void deleteShoppingList(UUID userId, UUID groupId, UUID listId) {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         ShoppingList shoppingList = shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));

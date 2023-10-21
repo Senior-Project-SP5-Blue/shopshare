@@ -9,10 +9,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface IAuthenticationService {
-    AuthenticationResponse signUp(SignUpRequest request);
+import java.util.concurrent.CompletableFuture;
 
-    AuthenticationResponse signIn(SignInRequest request);
+public interface IAuthenticationService {
+    CompletableFuture<AuthenticationResponse> signUp(SignUpRequest request);
+
+    CompletableFuture<AuthenticationResponse> signIn(SignInRequest request);
 
     @Transactional
     void saveUserToken(User user, String token, TokenType tokenType);

@@ -2,6 +2,7 @@ package com.sp5blue.shopshare.models.listitem;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
@@ -40,6 +41,7 @@ public class ListItem {
 
     @ManyToOne
     @JoinColumn(name = "shopping_list_id")
+    @JsonIgnore
     private ShoppingList list;
 
     @Column(name = "locked")
