@@ -18,6 +18,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -53,7 +56,8 @@ class AuthenticationServiceTest {
 
     @Test
     void signUp_DuplicateUsername_ThrowsUserAlreadyExistsException() {
-        when(userService.userExistsByUsername(anyString())).thenReturn(true);
+        when(userService.userExistsByUsername(anyString())).thenReturn(CompletableFuture.completedFuture(true));
+        when(userService.userExistsByEmail(anyString())).thenReturn(CompletableFuture.completedFuture(false));
 
         var exception = assertThrows(UserAlreadyExistsException.class, () -> authenticationService.signUp(signUpRequest));
         assertEquals("An account with entered username already exists - usertest", exception.getMessage());
@@ -61,18 +65,23 @@ class AuthenticationServiceTest {
 
     @Test
     void signUp_DuplicateEmail_ThrowsUserAlreadyExistsException() {
-        when(userService.userExistsByUsername(anyString())).thenReturn(false);
-        when(userService.userExistsByEmail(anyString())).thenReturn(true);
+        when(userService.userExistsByUsername(anyString())).thenReturn(CompletableFuture.completedFuture(false));
+        when(userService.userExistsByEmail(anyString())).thenReturn(CompletableFuture.completedFuture(true));
 
         var exception = assertThrows(UserAlreadyExistsException.class, () -> authenticationService.signUp(signUpRequest));
         assertEquals("An account with entered email already exists - userlast@email.com", exception.getMessage());
     }
 
     @Test
-    void signUp_Valid_CreatesNewShopper() {
+    void signUp_Valid_CreatesNewShopper() throws ExecutionException, InterruptedException {
         final ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        User user = new User("usertest", "user", "last", "userlast@email.com", "yes");
+        when(userService.userExistsByUsername(anyString())).thenReturn(CompletableFuture.completedFuture(false));
+        when(userService.userExistsByEmail(anyString())).thenReturn(CompletableFuture.completedFuture(false));
+        when(userService.createUser(any(User.class))).thenReturn(CompletableFuture.completedFuture(user));
 
-        var result = authenticationService.signUp(signUpRequest);
+        var _result = authenticationService.signUp(signUpRequest);
+        var result = _result.get();
 
         verify(userService).createUser(captor.capture());
         verify(jwtService).generateToken(captor.getValue());
@@ -88,7 +97,7 @@ class AuthenticationServiceTest {
 
     @Test
     void signIn_Valid_ReturnsJwt() {
-        when(userService.getUserByEmail(anyString())).thenReturn(new User("hey", "last", "heyLast", "hey@email.com", "password"));
+        when(userService.getUserByEmail(anyString())).thenReturn(CompletableFuture.completedFuture(new User("hey", "last", "heyLast", "hey@email.com", "password")));
 
         var result = authenticationService.signIn(signInRequest);
 

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -55,11 +56,12 @@ class UserServiceTest {
     }
 
     @Test
-    void create_Valid_Success() {
+    void create_Valid_Success() throws ExecutionException, InterruptedException {
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         when(mockShopperRepo.save(user)).thenReturn(user);
 
-        var result = userService.createUser(user);
+        var _result = userService.createUser(user);
+        var result = _result.get();
 
         verify(mockShopperRepo).existsByEmail("tom@email.com");
         verify(mockShopperRepo).existsByUsername("tomUserName");
@@ -95,12 +97,13 @@ class UserServiceTest {
     }
 
     @Test
-    void readById_Valid_ReturnsShopper() {
+    void readById_Valid_ReturnsShopper() throws ExecutionException, InterruptedException {
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         UUID shopperId = user.getId();
         when(mockShopperRepo.findById(shopperId)).thenReturn(Optional.of(user));
 
-        var result = userService.getUserById(shopperId);
+        var _result = userService.getUserById(shopperId);
+        var result = _result.get();
 
         assertEquals(user, result);
     }
@@ -115,39 +118,43 @@ class UserServiceTest {
     }
 
     @Test
-    void readByEmail_Valid_ReturnsShopper() {
+    void readByEmail_Valid_ReturnsShopper() throws ExecutionException, InterruptedException {
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         when(mockShopperRepo.findByEmail("tom@email.com")).thenReturn(Optional.of(user));
 
-        var result = userService.getUserByEmail("tom@email.com");
+        var _result = userService.getUserByEmail("tom@email.com");
+        var result = _result.get();
 
         assertEquals(user, result);
     }
 
     @Test
-    void read_NoShoppers_ReturnsEmptyList() {
-        var result = userService.getUsers();
+    void read_NoShoppers_ReturnsEmptyList() throws ExecutionException, InterruptedException {
+        var _result = userService.getUsers();
+        var result = _result.get();
         assertEquals(0, result.size());
     }
 
     @Test
-    void read_OneShopper_ReturnsShopper() {
+    void read_OneShopper_ReturnsShopper() throws ExecutionException, InterruptedException {
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         when(mockShopperRepo.findAll()).thenReturn(List.of(user));
 
-        var results = userService.getUsers();
+        var _results = userService.getUsers();
+        var results = _results.get();
 
         assertEquals(1, results.size());
         assertEquals(user, results.get(0));
     }
     @Test
-    void read_MultipleShoppers_ReturnsShoppers() {
+    void read_MultipleShoppers_ReturnsShoppers() throws ExecutionException, InterruptedException {
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         User user1 = new User("Betty", "Crocker", "bettyC", "betty@email.com", "bettyPass");
         User user2 = new User("Steve", "Henry", "steveH", "steve@email.com", "steveass");
         when(mockShopperRepo.findAll()).thenReturn(Arrays.asList(user, user1, user2));
 
-        var results = userService.getUsers();
+        var _results = userService.getUsers();
+        var results = _results.get();
 
         assertEquals(3, results.size());
         assertAll(
@@ -158,19 +165,23 @@ class UserServiceTest {
     }
 
     @Test
-    void shopperExists_InvalidId_ReturnsFalse() {
+    void shopperExists_InvalidId_ReturnsFalse() throws ExecutionException, InterruptedException {
         UUID shopperId = UUID.randomUUID();
         when(mockShopperRepo.existsById(shopperId)).thenReturn(false);
 
-        var result = userService.userExists(shopperId);
+        var _result = userService.userExists(shopperId);
+        var result = _result.get();
+
         assertFalse(result);
     }
     @Test
-    void shopperExists_Valid_ReturnsTrue() {
+    void shopperExists_Valid_ReturnsTrue() throws ExecutionException, InterruptedException {
         UUID shopperId = UUID.randomUUID();
         when(mockShopperRepo.existsById(shopperId)).thenReturn(true);
 
-        var result = userService.userExists(shopperId);
+        var _result = userService.userExists(shopperId);
+        var result = _result.get();
+
         assertTrue(result);
     }
 }

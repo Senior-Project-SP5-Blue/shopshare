@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,28 +36,30 @@ class UserGroupServiceTest {
     ShopperGroupService shopperGroupService1;
 
     @Test
-    void createShopperGroup_CreatesShopperGroup() {
+    void createShopperGroup_CreatesShopperGroup() throws ExecutionException, InterruptedException {
         User user = new User();
         ArgumentCaptor<ShopperGroup> groupCaptor = ArgumentCaptor.forClass(ShopperGroup.class);
-        when(userService.getUserById(user.getId())).thenReturn(user);
+        when(userService.getUserById(user.getId())).thenReturn(CompletableFuture.completedFuture(user));
         when(shopperGroupRepository.save(any(ShopperGroup.class))).thenAnswer(i -> i.getArguments()[0]);
 
         var result = shopperGroupService1.createShopperGroup(user.getId(), "Group 1");
 
         verify(shopperGroupRepository).save(groupCaptor.capture());
-        assertEquals(groupCaptor.getValue(), result);
+        assertEquals(groupCaptor.getValue(), result.get());
         assertTrue(user.getRoles().stream().anyMatch(g -> g.getAuthority().equals("ROLE_GROUP_ADMIN-" + groupCaptor.getValue().getId())));
     }
 
     @Test
-    void getShopperGroups_NoMatches_ReturnsEmptyList() {
+    void getShopperGroups_NoMatches_ReturnsEmptyList() throws ExecutionException, InterruptedException {
         UUID shopperId = UUID.randomUUID();
-        var results = shopperGroupService1.getShopperGroups(shopperId);
+        var _results = shopperGroupService1.getShopperGroups(shopperId);
+        var results = _results.get();
+
         assertTrue(results.isEmpty());
     }
 
     @Test
-    void getShopperGroups_Matches_ReturnsMatches() {
+    void getShopperGroups_Matches_ReturnsMatches() throws ExecutionException, InterruptedException {
         User admin = new User();
         ShopperGroup shopperGroup1 = new ShopperGroup("Group1", admin);
         ShopperGroup shopperGroup2 = new ShopperGroup("Group2", admin);
@@ -65,7 +69,9 @@ class UserGroupServiceTest {
 
         when(shopperGroupRepository.findAllByUserId(user1.getId())).thenReturn(Arrays.asList(shopperGroup1, shopperGroup2));
 
-        var results = shopperGroupService1.getShopperGroups(user1.getId());
+        var _results = shopperGroupService1.getShopperGroups(user1.getId());
+        var results = _results.get();
+
         assertEquals(2, results.size());
         assertAll(
                 () -> assertEquals(shopperGroup1, results.get(0)),
@@ -84,14 +90,16 @@ class UserGroupServiceTest {
     }
 
     @Test
-    void getShopperGroupById_Member_ReturnsShopperGroup() {
+    void getShopperGroupById_Member_ReturnsShopperGroup() throws ExecutionException, InterruptedException {
         User admin = new User();
         ShopperGroup shopperGroup1 = new ShopperGroup("Group1", admin);
         User user1 = new User();
         shopperGroup1.addUser(user1);
         when(shopperGroupRepository.findByUserIdAndId(user1.getId(), shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
 
-        var result = shopperGroupService1.getShopperGroupById(user1.getId(), shopperGroup1.getId());
+        var _result = shopperGroupService1.getShopperGroupById(user1.getId(), shopperGroup1.getId());
+        var result = _result.get();
+
         assertEquals(shopperGroup1, result);
     }
 
@@ -113,8 +121,8 @@ class UserGroupServiceTest {
         User user1 = new User();
         shopperGroup1.addUser(user1);
         when(shopperGroupRepository.findByUserIdAndId(user1.getId(), shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
-        when(userService.userExistsAsAdminByGroup(user1.getId(), shopperGroup1.getId())).thenReturn(false);
-        when(userService.getUserById(user1.getId())).thenReturn(user1);
+        when(userService.userExistsAsAdminByGroup(user1.getId(), shopperGroup1.getId())).thenReturn(CompletableFuture.completedFuture(false));
+        when(userService.getUserById(user1.getId())).thenReturn(CompletableFuture.completedFuture(user1));
 
         shopperGroupService1.deleteShopperGroup(user1.getId(), shopperGroup1.getId());
         verify(shopperGroup1).removeUser(removedShopper.capture());
@@ -127,7 +135,7 @@ class UserGroupServiceTest {
         ShopperGroup shopperGroup1 = new ShopperGroup("Group1", admin);
         ArgumentCaptor<ShopperGroup> deletedGroup = ArgumentCaptor.forClass(ShopperGroup.class);
         when(shopperGroupRepository.findByUserIdAndId(admin.getId(), shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
-        when(userService.userExistsAsAdminByGroup(admin.getId(), shopperGroup1.getId())).thenReturn(true);
+        when(userService.userExistsAsAdminByGroup(admin.getId(), shopperGroup1.getId())).thenReturn(CompletableFuture.completedFuture(true));
 
         shopperGroupService1.deleteShopperGroup(admin.getId(), shopperGroup1.getId());
         verify(shopperGroupRepository).delete(deletedGroup.capture());
@@ -151,7 +159,7 @@ class UserGroupServiceTest {
         User user1 = new User();
         shopperGroup1.addUser(user1);
         when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
-        when(userService.userExistsAsAdminByGroup(user1.getId(), shopperGroup1.getId())).thenReturn(false);
+        when(userService.userExistsAsAdminByGroup(user1.getId(), shopperGroup1.getId())).thenReturn(CompletableFuture.completedFuture(false));
 
         var exception = assertThrows(InvalidUserPermissionsException.class, () -> shopperGroupService1.changeShopperGroupName(user1.getId(), shopperGroup1.getId(), "New Name"));
         assertEquals("User - " + user1.getId() + " does not have permission to modify group", exception.getMessage());
@@ -164,7 +172,7 @@ class UserGroupServiceTest {
         ArgumentCaptor<String> newName = ArgumentCaptor.forClass(String.class);
 
         when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
-        when(userService.userExistsAsAdminByGroup(admin.getId(), shopperGroup1.getId())).thenReturn(true);
+        when(userService.userExistsAsAdminByGroup(admin.getId(), shopperGroup1.getId())).thenReturn(CompletableFuture.completedFuture(true));
 
         shopperGroupService1.changeShopperGroupName(admin.getId(), shopperGroup1.getId(), "New Name");
         verify(shopperGroup1).setName(newName.capture());
@@ -188,7 +196,7 @@ class UserGroupServiceTest {
         User user = new User();
         ArgumentCaptor<User> addedShopper = ArgumentCaptor.forClass(User.class);
         when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
-        when(userService.getUserById(user.getId())).thenReturn(user);
+        when(userService.getUserById(user.getId())).thenReturn(CompletableFuture.completedFuture(user));
 
         shopperGroupService1.addUserToShopperGroup(shopperGroup1.getId(), user.getId());
 
@@ -200,7 +208,7 @@ class UserGroupServiceTest {
     void removeShopperFromShopperGroup_RemoveAdmin_ThrowsRemoveGroupAdminException() {
         User admin = new User();
         ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
-        when(userService.userExistsAsAdminByGroup(admin.getId(), shopperGroup1.getId())).thenReturn(true);
+        when(userService.userExistsAsAdminByGroup(admin.getId(), shopperGroup1.getId())).thenReturn(CompletableFuture.completedFuture(true));
 
         var exception = assertThrows(RemoveGroupAdminException.class, () -> shopperGroupService1.removeUserFromShopperGroup(admin.getId(), shopperGroup1.getId(), admin.getId()));
         assertEquals("Cannot remove group admin.", exception.getMessage());
@@ -210,21 +218,23 @@ class UserGroupServiceTest {
     void removeShopperFromShopperGroup_RemoveSelf_InvalidId_ThrowsGroupNotFoundException() {
         UUID shopperId = UUID.randomUUID();
         UUID groupId = UUID.randomUUID();
-        when(userService.userExistsAsAdminByGroup(shopperId, groupId)).thenReturn(false);
+        when(userService.userExistsAsAdminByGroup(shopperId, groupId)).thenReturn(CompletableFuture.completedFuture(false));
 
         var exception = assertThrows(GroupNotFoundException.class, () -> shopperGroupService1.removeUserFromShopperGroup(shopperId, groupId, shopperId));
         assertEquals("Shopper group does not exist - " + groupId, exception.getMessage());
     }
     @Test
-    void removeShopperFromShopperGroup_RemoveSelf_RemovesSelfFromGroup() {
+    void removeShopperFromShopperGroup_RemoveSelf_RemovesSelfFromGroup() throws ExecutionException, InterruptedException {
         User admin = new User();
         User user = new User();
         ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
         shopperGroup1.addUser(user);
-        when(userService.userExistsAsAdminByGroup(user.getId(), shopperGroup1.getId())).thenReturn(false);
+        when(userService.userExistsAsAdminByGroup(user.getId(), shopperGroup1.getId())).thenReturn(CompletableFuture.completedFuture(false));
         when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
 
-        var result = shopperGroupService1.removeUserFromShopperGroup(user.getId(), shopperGroup1.getId(), user.getId());
+        var _result = shopperGroupService1.removeUserFromShopperGroup(user.getId(), shopperGroup1.getId(), user.getId());
+        var result = _result.get();
+
         verify(shopperGroup1).removeUser(user.getId());
         assertTrue(result);
     }
@@ -236,7 +246,7 @@ class UserGroupServiceTest {
         UUID removeShopperId = UUID.randomUUID();
         ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
         shopperGroup1.addUser(user);
-        when(userService.userExistsAsAdminByGroup(removeShopperId, shopperGroup1.getId())).thenReturn(false);
+        when(userService.userExistsAsAdminByGroup(removeShopperId, shopperGroup1.getId())).thenReturn(CompletableFuture.completedFuture(false));
         when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
 
         var exception = assertThrows(InvalidUserPermissionsException.class, () -> shopperGroupService1.removeUserFromShopperGroup(user.getId(), shopperGroup1.getId(), removeShopperId));
@@ -244,17 +254,19 @@ class UserGroupServiceTest {
     }
 
     @Test
-    void removeShopperFromShopperGroup_RemoveOther_Admin_RemovesOtherFromGroup() {
+    void removeShopperFromShopperGroup_RemoveOther_Admin_RemovesOtherFromGroup() throws ExecutionException, InterruptedException {
         User admin = new User();
         User user = new User();
         User removeUser = new User();
         ShopperGroup shopperGroup1 = spy(new ShopperGroup("Group1", admin));
         shopperGroup1.addUser(user);
         shopperGroup1.addUser(removeUser);
-        when(userService.userExistsAsAdminByGroup(removeUser.getId(), shopperGroup1.getId())).thenReturn(false);
+        when(userService.userExistsAsAdminByGroup(removeUser.getId(), shopperGroup1.getId())).thenReturn(CompletableFuture.completedFuture(false));
         when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
 
-        var result = shopperGroupService1.removeUserFromShopperGroup(admin.getId(), shopperGroup1.getId(), removeUser.getId());
+        var _result = shopperGroupService1.removeUserFromShopperGroup(admin.getId(), shopperGroup1.getId(), removeUser.getId());
+        var result = _result.get();
+
         assertTrue(result);
     }
 }
