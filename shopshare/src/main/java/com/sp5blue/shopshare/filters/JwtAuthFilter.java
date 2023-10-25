@@ -51,23 +51,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (_id.isPresent()) id = _id.get();
         }
 
-        logger.warn("AFTER authheader check");
-
         if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            logger.warn("inside if");
             UserDetails userDetails = ((UserService)userDetailsService).getUserById(id);
-            logger.warn("User deets: {}", userDetails);
             Token _token = tokenService.readByToken(token);
             boolean isTokenValid = !_token.isExpired() && !_token.isRevoked();
 
             if (jwtService.validateToken(token, userDetails) && isTokenValid) {
-                logger.warn("Inside token valid if statement");
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        logger.warn("Finished validating");
         filterChain.doFilter(request, response);
     }
 }

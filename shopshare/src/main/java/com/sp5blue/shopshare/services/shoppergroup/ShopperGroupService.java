@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,10 +53,14 @@ public class ShopperGroupService implements IShopperGroupService {
     @Transactional
     public void deleteShopperGroup(UUID userId, UUID groupId) throws GroupNotFoundException, InvalidUserPermissionsException {
         ShopperGroup shopperGroup = shopperGroupRepository.findByUserIdAndId(userId, groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        logger.warn("Group is: {}", shopperGroup.getId());
         if (userIsAdmin(userId, groupId)) {
+            logger.warn("User is admin");
+            shopperGroup.setUsers(new ArrayList<>());
             shopperGroupRepository.delete(shopperGroup);
             return;
         }
+        logger.warn("User is not admin");
         User user = userService.getUserById(userId);
         shopperGroup.removeUser(user);
     }
@@ -81,6 +86,18 @@ public class ShopperGroupService implements IShopperGroupService {
     public boolean addUserToShopperGroup(UUID groupId, User user) throws GroupNotFoundException {
         ShopperGroup group = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
         return group.addUser(user);
+    }
+
+    @Override
+    public List<User> getShopperGroupUsers(UUID userId, UUID groupId) {
+        verifyUserHasGroup(userId, groupId);
+        return userService.getUsersByShopperGroup(groupId);
+    }
+
+    @Override
+    public User getShopperGroupUser(UUID userId, UUID groupId, UUID memberId) {
+        verifyUserHasGroup(userId, groupId);
+        return userService.getUserByShopperGroup(groupId, memberId);
     }
 
     @Override

@@ -74,7 +74,12 @@ public class UserService implements UserDetailsService, IUserService {
 
     @Override
     public List<User> getUsersByShopperGroup(UUID groupId) {
-        return userRepository.findByShopperGroup(groupId);
+        return userRepository.findAllByShopperGroup(groupId);
+    }
+
+    @Override
+    public User getUserByShopperGroup(UUID groupId, UUID userId) {
+        return userRepository.findByShopperGroup(groupId, userId).orElseThrow(() -> new UserNotFoundException("User does not exist - " + userId));
     }
 
     @Override

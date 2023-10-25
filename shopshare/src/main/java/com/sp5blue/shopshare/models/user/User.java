@@ -39,8 +39,8 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
-    private List<ShopperGroup> groups = new ArrayList<>();
+//    @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+//    private List<ShopperGroup> groups = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
@@ -103,11 +103,21 @@ public class User implements UserDetails {
                 ", profilePicture='" + profilePicture + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", groups=" + groups +
+//                ", groups=" + groups +
                 ", roles=" + roles +
                 ", active=" + active +
                 '}';
     }
+
+//    public boolean addGroup(ShopperGroup group) {
+//        this.groups.add(group);
+//        return group.addUser(this);
+//    }
+//
+//    public boolean removeGroup(ShopperGroup group) {
+//        this.groups.remove(group);
+//        return group.removeUser(this);
+//    }
 
     public UUID getId() {
         return id;
@@ -186,13 +196,13 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public List<ShopperGroup> getGroups() {
-        return groups;
-    }
+//    public List<ShopperGroup> getGroups() {
+//        return groups;
+//    }
 
-    public void setGroups(List<ShopperGroup> groups) {
-        this.groups = groups;
-    }
+//    public void setGroups(List<ShopperGroup> groups) {
+//        this.groups = groups;
+//    }
 
     public List<Role> getRoles() {
         return roles;

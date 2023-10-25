@@ -22,6 +22,8 @@ public interface IUserService {
 
     List<User> getUsersByShopperGroup(UUID groupId);
 
+    User getUserByShopperGroup(UUID groupId, UUID userId);
+
     List<User> getUsers();
 
     boolean userExists(UUID id);

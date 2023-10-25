@@ -58,7 +58,13 @@ public class ShopperGroupController {
     @GetMapping("/{group_id}/members")
     @PreAuthorize("hasRole('ADMIN') or (authentication.principal.getId() == #userId and hasRole('GROUP_MEMBER-' + #groupId))")
     public ResponseEntity<?> getShopperGroupMembers(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId) {
-        return ResponseEntity.ok().body(userService.getUsersByShopperGroup(groupId));
+        return ResponseEntity.ok().body(shopperGroupService.getShopperGroupUsers(userId, groupId));
+    }
+
+    @GetMapping("/{group_id}/members/{member_id}")
+    @PreAuthorize("hasRole('ADMIN') or (authentication.principal.getId() == #userId and hasRole('GROUP_MEMBER-' + #groupId))")
+    public ResponseEntity<?> getShopperGroupMember(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("member_id") UUID memberId) {
+        return ResponseEntity.ok().body(shopperGroupService.getShopperGroupUser(userId, groupId, memberId));
     }
 
     @PostMapping("/{group_id}/invitations/{member_id}")
