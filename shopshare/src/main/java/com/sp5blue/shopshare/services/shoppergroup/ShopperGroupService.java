@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -59,6 +60,7 @@ public class ShopperGroupService implements IShopperGroupService {
     public void deleteShopperGroup(UUID userId, UUID groupId) throws GroupNotFoundException, InvalidUserPermissionsException {
         ShopperGroup shopperGroup = shopperGroupRepository.findByUserIdAndId(userId, groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
         if (userIsAdmin(userId, groupId)) {
+            shopperGroup.setUsers(new ArrayList<>());
             shopperGroupRepository.delete(shopperGroup);
             return;
         }
@@ -93,6 +95,19 @@ public class ShopperGroupService implements IShopperGroupService {
     }
 
     @Override
+    public CompletableFuture<List<User>> getShopperGroupUsers(UUID userId, UUID groupId) {
+        verifyUserHasGroup(userId, groupId);
+        return userService.getUsersByShopperGroup(groupId);
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<User> getShopperGroupUser(UUID userId, UUID groupId, UUID memberId) {
+        verifyUserHasGroup(userId, groupId);
+        return userService.getUserByShopperGroup(groupId, memberId);
+    }
+
+    @Override
     @Transactional
     @Async
     public CompletableFuture<Boolean> removeUserFromShopperGroup(UUID userId, UUID groupId, UUID shopperId) throws GroupNotFoundException, RemoveGroupAdminException {
@@ -107,6 +122,7 @@ public class ShopperGroupService implements IShopperGroupService {
         if (!shopperGroup.getAdmin().getId().equals(userId)) throw new InvalidUserPermissionsException("User - " + userId + " does not have permission to remove from group");
         return CompletableFuture.completedFuture(shopperGroup.removeUser(shopperId));
     }
+
 
     private boolean userIsAdmin(UUID userId, UUID groupId) throws InvalidUserPermissionsException {
         return userService.userExistsAsAdminByGroup(userId, groupId).join();

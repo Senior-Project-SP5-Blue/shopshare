@@ -90,11 +90,13 @@ public class ShopperGroup {
         Role role = new Role("ROLE_GROUP_MEMBER-" + getId(), RoleType.ROLE_GROUP_MEMBER);
         user.addRole(role);
         return users.add(user);
+//        return user.getGroups().add(this);
     }
 
     public boolean removeUser(User user) {
         user.removeRole("ROLE_GROUP_MEMBER-" + getId());
         return users.remove(user);
+//        return user.getGroups().remove(this);
     }
 
     public boolean removeUser(UUID userId) {
@@ -105,10 +107,12 @@ public class ShopperGroup {
     }
 
     public boolean addList(ShoppingList shoppingList) {
+        shoppingList.setGroup(this);
         return lists.add(shoppingList);
     }
 
     public boolean removeList(ShoppingList shoppingList) {
+        shoppingList.setGroup(null);
         return lists.remove(shoppingList);
     }
     public boolean removeList(UUID listId) {

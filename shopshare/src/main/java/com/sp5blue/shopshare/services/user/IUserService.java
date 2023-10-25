@@ -23,7 +23,9 @@ public interface IUserService {
 
     CompletableFuture<List<User>> getUsersByShopperGroup(UUID groupId);
 
-    CompletableFuture<List<User>> getUsers();
+    CompletableFuture<User> getUserByShopperGroup(UUID groupId, UUID userId);
+
+    List<User> getUsers();
 
     CompletableFuture<Boolean> userExists(UUID id);
 

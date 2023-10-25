@@ -81,9 +81,13 @@ public class UserService implements UserDetailsService, IUserService {
     }
 
     @Override
-    @Async
     public CompletableFuture<List<User>> getUsersByShopperGroup(UUID groupId) {
-        return CompletableFuture.completedFuture(userRepository.findByShopperGroup(groupId));
+        return CompletableFuture.completedFuture(userRepository.findAllByShopperGroup(groupId));
+    }
+
+    @Override
+    public CompletableFuture<User> getUserByShopperGroup(UUID groupId, UUID userId) {
+        return userRepository.findByShopperGroup(groupId, userId).orElseThrow(() -> new UserNotFoundException("User does not exist - " + userId));
     }
 
     @Override

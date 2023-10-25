@@ -25,6 +25,10 @@ public interface IShopperGroupService {
 
     CompletableFuture<Boolean> addUserToShopperGroup(UUID groupId, User user) throws GroupNotFoundException;
 
+    CompletableFuture<List<User>> getShopperGroupUsers(UUID userId, UUID groupId);
+
+    CompletableFuture<User> getShopperGroupUser(UUID userId, UUID groupId, UUID memberId);
+
     CompletableFuture<Boolean> removeUserFromShopperGroup(UUID userId, UUID groupId, UUID shopperId) throws GroupNotFoundException, RemoveGroupAdminException;
 
     void verifyUserHasGroup(UUID userId, UUID groupId);

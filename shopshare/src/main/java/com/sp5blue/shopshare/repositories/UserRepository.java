@@ -25,7 +25,12 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query(nativeQuery = true, value = """
 SELECT u.* FROM users u JOIN users_shopper_groups usg on u.id = usg.user_id WHERE usg.shopper_group_id = :group_id
 """)
-    List<User> findByShopperGroup(@Param("group_id") UUID groupId);
+    List<User> findAllByShopperGroup(@Param("group_id") UUID groupId);
+
+    @Query(nativeQuery = true, value = """
+SELECT u.* FROM users u JOIN users_shopper_groups usg on u.id = usg.user_id WHERE usg.shopper_group_id = :group_id AND u.id = :user_id
+""")
+    Optional<User> findByShopperGroup(@Param("group_id") UUID groupId, @Param("user_id") UUID userId);
 
     boolean existsByEmail(String email);
 

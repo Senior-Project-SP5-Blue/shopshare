@@ -53,8 +53,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (_id.isPresent()) id = _id.get();
         }
 
-        logger.warn("AFTER authheader check");
-
         if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             logger.warn("inside if");
             CompletableFuture<User> getUserDetails = ((UserService)userDetailsService).getUserById(id);
@@ -72,7 +70,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        logger.warn("Finished validating");
         filterChain.doFilter(request, response);
     }
 }
