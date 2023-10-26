@@ -19,14 +19,11 @@ public class ShopperGroupController {
 
     private final IShopperGroupService shopperGroupService;
 
-    private final IUserService userService;
-
     private final IInvitationService invitationService;
 
     @Autowired
     public ShopperGroupController(IShopperGroupService shopperGroupService, IUserService userService, IInvitationService invitationService) {
         this.shopperGroupService = shopperGroupService;
-        this.userService = userService;
         this.invitationService = invitationService;
     }
 

@@ -76,7 +76,6 @@ public class AuthenticationService implements IAuthenticationService {
     @Transactional
     @Async
     public CompletableFuture<AuthenticationResponse> signIn(SignInRequest request) {
-        logger.warn("Thread count: {}", Thread.activeCount());
         CompletableFuture<User> getUser = userService.getUserByEmail(request.email());
         User user = getUser.join();
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));

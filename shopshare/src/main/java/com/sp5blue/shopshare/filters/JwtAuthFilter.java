@@ -54,17 +54,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            logger.warn("inside if");
             CompletableFuture<User> getUserDetails = ((UserService)userDetailsService).getUserById(id);
             CompletableFuture<Token> getToken = tokenService.readByToken(jwt);
             CompletableFuture.allOf(getUserDetails, getToken).join();
             User userDetails = getUserDetails.join();
-            logger.warn("User deets: {}", userDetails);
             Token token = getToken.join();
             boolean isTokenValid = !token.isExpired() && !token.isRevoked();
 
             if (jwtService.validateToken(jwt, userDetails) && isTokenValid) {
-                logger.warn("Inside token valid if statement");
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);

@@ -70,7 +70,6 @@ public class UserService implements UserDetailsService, IUserService {
     @Override
     @Async
     public CompletableFuture<User> getUserByEmail(String email) throws UserNotFoundException {
-        logger.warn("Right before getting by user");
         return CompletableFuture.completedFuture(userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User does not exist - " + email)));
     }
 
@@ -81,13 +80,16 @@ public class UserService implements UserDetailsService, IUserService {
     }
 
     @Override
+    @Async
     public CompletableFuture<List<User>> getUsersByShopperGroup(UUID groupId) {
         return CompletableFuture.completedFuture(userRepository.findAllByShopperGroup(groupId));
     }
 
     @Override
+    @Async
     public CompletableFuture<User> getUserByShopperGroup(UUID groupId, UUID userId) {
-        return userRepository.findByShopperGroup(groupId, userId).orElseThrow(() -> new UserNotFoundException("User does not exist - " + userId));
+        User user = userRepository.findByShopperGroup(groupId, userId).orElseThrow(() -> new UserNotFoundException("User does not exist - " + userId));
+        return CompletableFuture.completedFuture(user);
     }
 
     @Override

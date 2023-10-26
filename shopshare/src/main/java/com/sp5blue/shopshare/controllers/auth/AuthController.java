@@ -28,7 +28,6 @@ public class AuthController {
     }
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateAndGetToken(@RequestBody SignInRequest authRequest) {
-        logger.warn("Inside signup controller");
         return ResponseEntity.ok(authenticationService.signIn(authRequest).join());
     }
     @PostMapping("/signup")
