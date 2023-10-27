@@ -110,7 +110,6 @@ public class UserService implements UserDetailsService, IUserService {
         return CompletableFuture.completedFuture(userRepository.existsByGroup(shopperId, groupId));
     }
 
-
     @Override
     @Async
     public CompletableFuture<Boolean> userExistsByEmail(String email) {

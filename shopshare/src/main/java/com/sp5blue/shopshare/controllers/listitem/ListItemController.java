@@ -2,6 +2,7 @@ package com.sp5blue.shopshare.controllers.listitem;
 
 import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
 import com.sp5blue.shopshare.models.listitem.EditListItemDto;
+import com.sp5blue.shopshare.models.listitem.ListItem;
 import com.sp5blue.shopshare.services.listitem.IListItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +18,7 @@ public class ListItemController {
         this.listItemService = listItemService;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getListItems(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId) {
-        return ResponseEntity.ok().body(listItemService.getListItemsByShoppingList(userId, groupId, listId).join());
-    }
+
 
     @PostMapping
     public ResponseEntity<?> addListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody CreateListItemDto createListItemDto) {
@@ -46,6 +44,7 @@ public class ListItemController {
 
     @DeleteMapping("/{list-item_id}")
     public ResponseEntity<?> deleteListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId) {
-        return ResponseEntity.ok().body(listItemService.getListItemById(userId, groupId, listId, itemId).join());
+        listItemService.removeListItemFromList(userId, groupId, listId, itemId);
+        return ResponseEntity.ok().body("Item Removed Successfully");
     }
 }

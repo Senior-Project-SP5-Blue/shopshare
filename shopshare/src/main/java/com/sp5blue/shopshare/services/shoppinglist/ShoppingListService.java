@@ -1,8 +1,10 @@
 package com.sp5blue.shopshare.services.shoppinglist;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
+import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingListDto;
 import com.sp5blue.shopshare.repositories.ShoppingListRepository;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +31,10 @@ public class ShoppingListService implements IShoppingListService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<ShoppingList> createShoppingList(UUID userId, UUID groupId, String name) {
+    public CompletableFuture<ShoppingListDto> createShoppingList(UUID userId, UUID groupId, String name) {
         ShopperGroup group = shopperGroupService.getShopperGroupById(userId, groupId).join();
         ShoppingList shoppingList = new ShoppingList(name, group);
-        return CompletableFuture.completedFuture(shoppingListRepository.save(shoppingList));
+        return CompletableFuture.completedFuture(createShoppingListDto(shoppingListRepository.save(shoppingList)));
     }
 
     @Override
@@ -53,9 +55,10 @@ public class ShoppingListService implements IShoppingListService {
 
     @Override
     @Async
-    public CompletableFuture<List<ShoppingList>> getShoppingLists(UUID userId, UUID groupId) {
+    public CompletableFuture<List<ShoppingListDto>> getShoppingLists(UUID userId, UUID groupId) {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
-        return CompletableFuture.completedFuture(shoppingListRepository.findAllByGroup_Id(groupId));
+        List<ShoppingList> _shoppingLists = shoppingListRepository.findAllByGroup_Id(groupId);
+        return CompletableFuture.completedFuture(_shoppingLists.stream().map(this::createShoppingListDto).toList());
     }
 
     @Override
@@ -75,8 +78,14 @@ public class ShoppingListService implements IShoppingListService {
     @Transactional
     @Async
     public void deleteShoppingList(UUID userId, UUID groupId, UUID listId) {
-        shopperGroupService.verifyUserHasGroup(userId, groupId);
+        ShopperGroup shopperGroup = shopperGroupService.verifyUserHasGroup(userId, groupId);
         ShoppingList shoppingList = shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+
+        shopperGroup.removeList(listId);
         shoppingListRepository.delete(shoppingList);
+    }
+
+    private ShoppingListDto createShoppingListDto(ShoppingList list) {
+        return new ShoppingListDto(list.getId(), list.getName(), list.getModifiedOn(), list.getItems().stream().filter(i -> i.getStatus() == ItemStatus.COMPLETED).count(), list.getItems().size());
     }
 }

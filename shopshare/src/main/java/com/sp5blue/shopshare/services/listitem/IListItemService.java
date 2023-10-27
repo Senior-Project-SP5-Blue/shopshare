@@ -31,9 +31,8 @@ public interface IListItemService {
 
     CompletableFuture<List<ListItem>> getListItemsByCreator(UUID userId);
 
-    CompletableFuture<List<ListItem>> getListItemsByShoppingList(UUID userId, UUID groupId, UUID listId);
-
     void removeListItemsFromList(UUID userId, UUID groupId, UUID listId);
 
+    @Transactional
     void editListItem(UUID userId, UUID groupId, UUID listId, UUID itemId, EditListItemDto editListItemDto) throws ListItemNotFoundException;
 }

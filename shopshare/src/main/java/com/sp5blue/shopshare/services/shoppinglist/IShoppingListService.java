@@ -2,6 +2,7 @@ package com.sp5blue.shopshare.services.shoppinglist;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingListDto;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,13 +10,13 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IShoppingListService {
 
-    CompletableFuture<ShoppingList> createShoppingList(UUID userId, UUID groupId, String name);
+    CompletableFuture<ShoppingListDto> createShoppingList(UUID userId, UUID groupId, String name);
 
     void changeShoppingListName(UUID userId, UUID groupId, UUID listId, String newName);
 
     CompletableFuture<ShoppingList> getShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException;
 
-    CompletableFuture<List<ShoppingList>> getShoppingLists(UUID userId, UUID groupId);
+    CompletableFuture<List<ShoppingListDto>> getShoppingLists(UUID userId, UUID groupId);
 
     CompletableFuture<Boolean> shoppingListExistsById(UUID listId);
 

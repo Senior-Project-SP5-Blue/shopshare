@@ -1,6 +1,9 @@
 package com.sp5blue.shopshare.controllers.shoppinglist;
 
 import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
+import io.micrometer.common.util.internal.logging.AbstractInternalLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +14,9 @@ import java.util.UUID;
 @RequestMapping("${api-prefix}/users/{user_id}/groups/{group_id}/shopping-lists")
 public class ShoppingListController {
     private final IShoppingListService shoppingListService;
+    private final Logger logger = LoggerFactory.getLogger(ShoppingListController.class);
+
+    private record ShoppingListName (String name) { }
 
     @Autowired
     public ShoppingListController(IShoppingListService shoppingListService) {
@@ -33,8 +39,8 @@ public class ShoppingListController {
     }
 
     @PatchMapping("/{shopping-list_id}")
-    public ResponseEntity<?> editShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody String name) {
-        shoppingListService.changeShoppingListName(userId, groupId, listId, name);
+    public ResponseEntity<?> editShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody ShoppingListName name) {
+        shoppingListService.changeShoppingListName(userId, groupId, listId, name.name);
         return ResponseEntity.ok().body("Shopping list name changed successfully.");
     }
 
