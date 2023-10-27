@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -19,17 +20,14 @@ public class ShopperGroupController {
 
     private final IShopperGroupService shopperGroupService;
 
-    private final IUserService userService;
-
     private final IInvitationService invitationService;
 
     @Autowired
     public ShopperGroupController(IShopperGroupService shopperGroupService, IUserService userService, IInvitationService invitationService) {
         this.shopperGroupService = shopperGroupService;
-        this.userService = userService;
         this.invitationService = invitationService;
     }
-
+    
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.getId() == #userId")
     public ResponseEntity<?> getShopperGroups(@PathVariable("user_id") UUID userId) {

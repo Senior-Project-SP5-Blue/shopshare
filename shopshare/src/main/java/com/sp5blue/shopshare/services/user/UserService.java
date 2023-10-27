@@ -97,7 +97,6 @@ public class UserService implements UserDetailsService, IUserService {
         return userRepository.existsByGroup(shopperId, groupId);
     }
 
-
     @Override
     public boolean userExistsByEmail(String email) {
         return userRepository.existsByEmail(email);

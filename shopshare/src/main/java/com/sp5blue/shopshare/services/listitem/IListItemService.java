@@ -30,10 +30,7 @@ public interface IListItemService {
 
     List<ListItem> getListItemsByCreator(UUID userId);
 
-    List<ListItem> getListItemsByShoppingList(UUID userId, UUID groupId, UUID listId);
-
     void removeListItemsFromList(UUID userId, UUID groupId, UUID listId);
 
-    @Transactional
     void editListItem(UUID userId, UUID groupId, UUID listId, UUID itemId, EditListItemDto editListItemDto) throws ListItemNotFoundException;
 }

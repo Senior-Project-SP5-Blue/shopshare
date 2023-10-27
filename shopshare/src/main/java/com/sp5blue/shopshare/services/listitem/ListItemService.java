@@ -11,6 +11,8 @@ import com.sp5blue.shopshare.repositories.ListItemRepository;
 import com.sp5blue.shopshare.services.user.IUserService;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,8 @@ public class ListItemService implements IListItemService {
 
     private final IUserService userService;
 
+    private final Logger logger = LoggerFactory.getLogger(IListItemService.class);
+
 
     @Autowired
     public ListItemService(ListItemRepository listItemRepository, IShopperGroupService shopperGroupService, IShoppingListService shoppingListService, IUserService userService) {
@@ -45,7 +49,7 @@ public class ListItemService implements IListItemService {
     public ListItem addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemDto createListItemDto) {
         User creator = userService.getUserById(userId);
         ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
-        ListItem listItem = new ListItem(createListItemDto.name(), creator, shoppingList, createListItemDto.locked());
+        ListItem listItem = new ListItem(createListItemDto.name(), creator, createListItemDto.locked(), shoppingList);
         shoppingList.setModifiedOn(LocalDateTime.now());
         shoppingList.setModifiedBy(creator);
         return listItemRepository.save(listItem);
@@ -59,6 +63,7 @@ public class ListItemService implements IListItemService {
         ListItem listItem = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
         shoppingList.setModifiedOn(LocalDateTime.now());
         shoppingList.setModifiedBy(user);
+        shoppingList.removeItem(listItem);
         listItemRepository.delete(listItem);
     }
 
@@ -120,17 +125,12 @@ public class ListItemService implements IListItemService {
     }
 
     @Override
-    public List<ListItem> getListItemsByShoppingList(UUID userId, UUID groupId, UUID listId) {
-        shopperGroupService.verifyUserHasGroup(userId, groupId);
-        shoppingListService.verifyGroupHasList(groupId, listId);
-        return listItemRepository.findAllByList_Id(listId);
-    }
-
-    @Override
     @Transactional
     public void removeListItemsFromList(UUID userId, UUID groupId, UUID listId) {
         ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
+        List<ListItem> items = shoppingList.getItems();
         shoppingList.setItems(new ArrayList<>());
+        listItemRepository.deleteAll(items);
     }
 
     @Override
@@ -139,7 +139,6 @@ public class ListItemService implements IListItemService {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
         ListItem listItem = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
-        if (!itemId.equals(editListItemDto.id())) return;
         listItem.setName(editListItemDto.name());
         listItem.setStatus(editListItemDto.status());
         listItem.setLocked(editListItemDto.locked());

@@ -3,10 +3,13 @@ package com.sp5blue.shopshare.models.shoppinglist;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sp5blue.shopshare.models.listitem.ListItem;
 import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
+import com.sp5blue.shopshare.serializers.ShoppingListSerializer;
 import jakarta.persistence.*;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@JsonSerialize(using = ShoppingListSerializer.class)
 @Entity
 @Table(name = "shopping_lists")
 public class ShoppingList {
@@ -24,33 +28,33 @@ public class ShoppingList {
     @Column(name = "name")
     private String name;
 
+    @NonNull
     @Column(name = "modified_on")
     private LocalDateTime modifiedOn;
 
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne
     @JoinColumn(name = "modified_by")
     private User modifiedBy;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "list")
-    private List<ListItem> items;
+    @OneToMany( mappedBy = "list", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<ListItem> items = new ArrayList<>();
 
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne
     @JoinColumn(name = "group_id")
     private ShopperGroup group;
 
     public ShoppingList() {
+        modifiedOn = LocalDateTime.now();
     }
 
     public ShoppingList(String name) {
+        modifiedOn = LocalDateTime.now();
         this.name = name;
     }
 
 
     public ShoppingList(String name, ShopperGroup group) {
+        modifiedOn = LocalDateTime.now();
         this.name = name;
         this.group = group;
     }

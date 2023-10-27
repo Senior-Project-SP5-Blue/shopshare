@@ -30,5 +30,5 @@ public interface IShopperGroupService {
 
     boolean removeUserFromShopperGroup(UUID userId, UUID groupId, UUID shopperId) throws GroupNotFoundException, RemoveGroupAdminException;
 
-    void verifyUserHasGroup(UUID userId, UUID groupId);
+    ShopperGroup verifyUserHasGroup(UUID userId, UUID groupId);
 }

@@ -3,8 +3,10 @@ package com.sp5blue.shopshare.models.listitem;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
+import com.sp5blue.shopshare.serializers.ListItemSerializer;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+@JsonSerialize(using = ListItemSerializer.class)
 @Entity
 @Table(name = "list_items")
 public class ListItem {
@@ -32,18 +35,16 @@ public class ListItem {
     @Column(name = "created_on")
     private LocalDateTime createdOn = LocalDateTime.now();
 
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne(optional = false)
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    @ManyToOne
-    @JoinColumn(name = "shopping_list_id")
-    private ShoppingList list;
-
     @Column(name = "locked")
     private boolean locked = false;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @JoinColumn(name = "shopping_list_id")
+    private ShoppingList list;
 
     public ListItem() {
     }
@@ -72,18 +73,22 @@ public class ListItem {
         this.name = name;
         this.createdBy = createdBy;
         this.locked = locked;
+        createdOn = LocalDateTime.now();
     }
 
-    public ListItem(String name, User createdBy, ShoppingList list, boolean locked) {
+    public ListItem(String name, User createdBy, boolean locked, ShoppingList list) {
         this.name = name;
         this.createdBy = createdBy;
-        this.list = list;
         this.locked = locked;
+        this.list = list;
+        createdOn = LocalDateTime.now();
     }
 
     public ListItem(String name) {
         this.name = name;
     }
+
+
 
     public UUID getId() {
         return id;
@@ -113,10 +118,6 @@ public class ListItem {
         this.createdOn = createdOn;
     }
 
-    public ShoppingList getList() {
-        return list;
-    }
-
     public User getCreatedBy() {
         return createdBy;
     }
@@ -133,6 +134,14 @@ public class ListItem {
         this.locked = locked;
     }
 
+    public ShoppingList getList() {
+        return list;
+    }
+
+    public void setList(ShoppingList list) {
+        this.list = list;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -143,5 +152,16 @@ public class ListItem {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getName(), getCreatedOn());
+    }
+
+    @Override
+    public String toString() {
+        return "ListItem{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                ", createdOn=" + createdOn +
+                ", locked=" + locked +
+                '}';
     }
 }

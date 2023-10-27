@@ -121,7 +121,7 @@ public class ShopperGroupService implements IShopperGroupService {
     }
 
     @Override
-    public void verifyUserHasGroup(UUID userId, UUID groupId) {
-        shopperGroupRepository.findByUserIdAndId(userId, groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+    public ShopperGroup verifyUserHasGroup(UUID userId, UUID groupId) {
+        return shopperGroupRepository.findByUserIdAndId(userId, groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
     }
 }

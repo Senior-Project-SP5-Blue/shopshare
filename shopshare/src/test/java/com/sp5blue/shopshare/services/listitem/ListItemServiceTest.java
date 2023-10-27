@@ -62,9 +62,7 @@ class ListItemServiceTest {
         assertInstanceOf(ListItem.class, result);
         assertAll(
                 () -> assertEquals("List item one", result.getName()),
-                () -> assertEquals(user, result.getCreatedBy()),
-                () -> assertEquals(shoppingList, result.getList())
-        );
+                () -> assertEquals(user, result.getCreatedBy()));
     }
 
     @Test
@@ -269,36 +267,6 @@ class ListItemServiceTest {
         when(listItemRepository.findAllByCreatedBy_Id(user.getId())).thenReturn(List.of(listItem1, listItem2));
 
         var results = listItemService.getListItemsByCreator(user.getId());
-        assertEquals(2, results.size());
-        assertAll(
-                () -> assertEquals(listItem1, results.get(0)),
-                () -> assertEquals(listItem2, results.get(1))
-        );
-    }
-
-    @Test
-    void getListItemsByShoppingList_NoMatches_ReturnsEmptyList() {
-        UUID userId = UUID.randomUUID();
-        UUID groupId = UUID.randomUUID();
-        UUID listId = UUID.randomUUID();
-
-        var results = listItemService.getListItemsByShoppingList(userId, groupId, listId);
-        assertTrue(results.isEmpty());
-    }
-
-    @Test
-    void getListItemsByShoppingList_Matches_ReturnsListItems() {
-        ShopperGroup shopperGroup = new ShopperGroup();
-        ShoppingList shoppingList = new ShoppingList();
-        User user = new User();
-        ListItem listItem1 = new ListItem("Item 1", user);
-        ListItem listItem2 = new ListItem("Item 2", user);
-        shoppingList.addItem(listItem1);
-        shoppingList.addItem(listItem2);
-
-        when(listItemRepository.findAllByList_Id(shoppingList.getId())).thenReturn(shoppingList.getItems());
-
-        var results = listItemService.getListItemsByShoppingList(user.getId(), shopperGroup.getId(), shoppingList.getId());
         assertEquals(2, results.size());
         assertAll(
                 () -> assertEquals(listItem1, results.get(0)),
