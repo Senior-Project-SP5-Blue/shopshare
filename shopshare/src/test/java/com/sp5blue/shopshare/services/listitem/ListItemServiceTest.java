@@ -3,7 +3,7 @@ package com.sp5blue.shopshare.services.listitem;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
+import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
 import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
@@ -53,12 +53,12 @@ class ListItemServiceTest {
         User user = new User();
         ShopperGroup shopperGroup = new ShopperGroup("Group 1", user);
         ShoppingList shoppingList = spy(new ShoppingList("Group 1's List", shopperGroup));
-        CreateListItemDto createListItemDto = new CreateListItemDto("List item one", false);
+        CreateListItemRequest createListItemRequest = new CreateListItemRequest("List item one", false);
         when(userService.getUserById(user.getId())).thenReturn(CompletableFuture.completedFuture(user));
         when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(CompletableFuture.completedFuture(shoppingList));
         when(listItemRepository.save(any(ListItem.class))).thenAnswer(l -> l.getArguments()[0]);
 
-        var _result = listItemService.addListItemToList(user.getId(), shopperGroup.getId(), shoppingList.getId(), createListItemDto);
+        var _result = listItemService.addListItemToList(user.getId(), shopperGroup.getId(), shoppingList.getId(), createListItemRequest);
         var result = _result.get();
 
         verify(shoppingList).setModifiedOn(any(LocalDateTime.class));

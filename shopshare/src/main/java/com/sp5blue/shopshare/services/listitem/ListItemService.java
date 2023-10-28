@@ -1,10 +1,10 @@
 package com.sp5blue.shopshare.services.listitem;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
-import com.sp5blue.shopshare.models.listitem.EditListItemDto;
+import com.sp5blue.shopshare.models.listitem.EditListItemRequest;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
+import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
 import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.repositories.ListItemRepository;
@@ -48,13 +48,13 @@ public class ListItemService implements IListItemService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<ListItem> addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemDto createListItemDto) {
+    public CompletableFuture<ListItem> addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemRequest createListItemRequest) {
         CompletableFuture<User> getCreator = userService.getUserById(userId);
         CompletableFuture<ShoppingList> getShoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
         CompletableFuture.allOf(getCreator, getShoppingList).join();
         ShoppingList shoppingList = getShoppingList.join();
         User creator = getCreator.join();
-        ListItem listItem = new ListItem(createListItemDto.name(), creator, createListItemDto.locked(), shoppingList);
+        ListItem listItem = new ListItem(createListItemRequest.name(), creator, createListItemRequest.locked(), shoppingList);
         shoppingList.setModifiedOn(LocalDateTime.now());
         shoppingList.setModifiedBy(creator);
         return CompletableFuture.completedFuture(listItemRepository.save(listItem));
@@ -62,18 +62,32 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Transactional
-    @Async
+//    @Async
     public void removeListItemFromList(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
         CompletableFuture<User> getUser = userService.getUserById(userId);
         CompletableFuture<ShoppingList> getShoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
-        ListItem listItem = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
         CompletableFuture.allOf(getUser, getShoppingList).join();
         User user = getUser.join();
         ShoppingList shoppingList = getShoppingList.join();
+        logger.warn("Shopping list items is: {}", shoppingList.getItems());
+        ListItem listItem = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
         shoppingList.setModifiedOn(LocalDateTime.now());
         shoppingList.setModifiedBy(user);
         shoppingList.removeItem(listItem);
+//        listItem.setList(null);
+////        listItem.setCreatedBy(null);
         listItemRepository.delete(listItem);
+        logger.warn("Shopping list items is: {}", shoppingList.getItems());
+    }
+
+    @Override
+    @Transactional
+    @Async
+    public void removeListItemsFromList(UUID userId, UUID groupId, UUID listId) {
+        ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId).join();
+        List<ListItem> items = shoppingList.getItems();
+        shoppingList.setItems(new ArrayList<>());
+        listItemRepository.deleteAll(items);
     }
 
     @Override
@@ -143,22 +157,13 @@ public class ListItemService implements IListItemService {
     @Override
     @Transactional
     @Async
-    public void removeListItemsFromList(UUID userId, UUID groupId, UUID listId) {
-        ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId).join();
-        List<ListItem> items = shoppingList.getItems();
-        shoppingList.setItems(new ArrayList<>());
-        listItemRepository.deleteAll(items);
-    }
-
-    @Override
-    @Transactional
-    @Async
-    public void editListItem(UUID userId, UUID groupId, UUID listId, UUID itemId, EditListItemDto editListItemDto) throws ListItemNotFoundException {
+    public CompletableFuture<ListItem> editListItem(UUID userId, UUID groupId, UUID listId, UUID itemId, EditListItemRequest editListItemRequest) throws ListItemNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
         ListItem listItem = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
-        listItem.setName(editListItemDto.name());
-        listItem.setStatus(editListItemDto.status());
-        listItem.setLocked(editListItemDto.locked());
+        listItem.setName(editListItemRequest.name());
+        listItem.setStatus(editListItemRequest.status());
+        listItem.setLocked(editListItemRequest.locked());
+        return CompletableFuture.completedFuture(listItem);
     }
 }

@@ -12,7 +12,7 @@ public interface IShoppingListService {
 
     CompletableFuture<ShoppingListDto> createShoppingList(UUID userId, UUID groupId, String name);
 
-    void changeShoppingListName(UUID userId, UUID groupId, UUID listId, String newName);
+    CompletableFuture<ShoppingListDto> changeShoppingListName(UUID userId, UUID groupId, UUID listId, String newName);
 
     CompletableFuture<ShoppingList> getShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException;
 

@@ -16,11 +16,9 @@ public interface IAuthenticationService {
 
     CompletableFuture<AuthenticationResponse> signIn(SignInRequest request);
 
-    @Transactional
     void saveUserToken(User user, String token, TokenType tokenType);
 
     void refreshToken(HttpServletRequest request, HttpServletResponse response);
 
-    @Transactional
     void _revokeAllTokens(User user);
 }

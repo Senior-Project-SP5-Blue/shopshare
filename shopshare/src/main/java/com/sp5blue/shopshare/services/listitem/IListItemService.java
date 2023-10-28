@@ -2,9 +2,9 @@ package com.sp5blue.shopshare.services.listitem;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
-import com.sp5blue.shopshare.models.listitem.EditListItemDto;
+import com.sp5blue.shopshare.models.listitem.EditListItemRequest;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
+import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface IListItemService {
 
-    CompletableFuture<ListItem> addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemDto listItemDto);
+    CompletableFuture<ListItem> addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemRequest listItemDto);
 
     void removeListItemFromList(UUID userId, UUID groupId, UUID listId, UUID itemId);
 
@@ -33,6 +33,5 @@ public interface IListItemService {
 
     void removeListItemsFromList(UUID userId, UUID groupId, UUID listId);
 
-    @Transactional
-    void editListItem(UUID userId, UUID groupId, UUID listId, UUID itemId, EditListItemDto editListItemDto) throws ListItemNotFoundException;
+    CompletableFuture<ListItem> editListItem(UUID userId, UUID groupId, UUID listId, UUID itemId, EditListItemRequest editListItemRequest) throws ListItemNotFoundException;
 }

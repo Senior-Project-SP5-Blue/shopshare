@@ -29,8 +29,8 @@ public class ShoppingListController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @RequestBody String name) {
-        return ResponseEntity.ok().body(shoppingListService.createShoppingList(userId, groupId, name).join());
+    public ResponseEntity<?> addShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @RequestBody ShoppingListName name) {
+        return ResponseEntity.ok().body(shoppingListService.createShoppingList(userId, groupId, name.name).join());
     }
 
     @GetMapping("/{shopping-list_id}")
@@ -40,8 +40,8 @@ public class ShoppingListController {
 
     @PatchMapping("/{shopping-list_id}")
     public ResponseEntity<?> editShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody ShoppingListName name) {
-        shoppingListService.changeShoppingListName(userId, groupId, listId, name.name);
-        return ResponseEntity.ok().body("Shopping list name changed successfully.");
+        return ResponseEntity.ok().body(shoppingListService.changeShoppingListName(userId, groupId, listId, name.name).join());
+//        return ResponseEntity.ok().body("Shopping list name changed successfully.");
     }
 
     @DeleteMapping("/{shopping-list_id}")

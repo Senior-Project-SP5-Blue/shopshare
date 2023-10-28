@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -40,10 +41,12 @@ public class ShoppingListService implements IShoppingListService {
     @Override
     @Transactional
     @Async
-    public void changeShoppingListName(UUID userId, UUID groupId, UUID listId, String newName) {
+    public CompletableFuture<ShoppingListDto> changeShoppingListName(UUID userId, UUID groupId, UUID listId, String newName) {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         ShoppingList shoppingList = shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
         shoppingList.setName(newName);
+        shoppingList.setModifiedOn(LocalDateTime.now());
+        return CompletableFuture.completedFuture(createShoppingListDto(shoppingList));
     }
 
     @Override

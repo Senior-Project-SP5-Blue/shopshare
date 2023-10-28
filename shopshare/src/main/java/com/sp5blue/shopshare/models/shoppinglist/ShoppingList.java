@@ -36,7 +36,7 @@ public class ShoppingList {
     @JoinColumn(name = "modified_by")
     private User modifiedBy;
 
-    @OneToMany( mappedBy = "list", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany( mappedBy = "list", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<ListItem> items = new ArrayList<>();
 
     @ManyToOne
@@ -111,25 +111,24 @@ public class ShoppingList {
 
     public boolean removeItem(UUID itemId) {
         if (items == null) return false;
-
         return items.removeIf(i -> i.getId().equals(itemId));
     }
 
     public boolean removeItem(ListItem item) {
-        if (items == null) return false;
-
-        return items.remove(item);
+        if (this.items == null) return false;
+//        item.setCreatedBy(null);
+        return this.items.remove(item);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ShoppingList that)) return false;
-        return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) && Objects.equals(getModifiedOn(), that.getModifiedOn());
+        return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getModifiedOn());
+        return Objects.hash(getId(), getName());
     }
 }

@@ -34,7 +34,7 @@ public class ListItem {
     private ItemStatus status = ItemStatus.ACTIVE;
 
     @Column(name = "created_on")
-    private LocalDateTime createdOn = LocalDateTime.now();
+    private final LocalDateTime createdOn = LocalDateTime.now();
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "created_by")
@@ -43,7 +43,7 @@ public class ListItem {
     @Column(name = "locked")
     private boolean locked = false;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "shopping_list_id")
     private ShoppingList list;
 
@@ -59,7 +59,6 @@ public class ListItem {
         this.name = name;
         this.status = status;
         this.locked = locked;
-        createdOn = LocalDateTime.now();
     }
 
     public ListItem(String name, ItemStatus status, User createdBy, boolean locked) {
@@ -67,14 +66,12 @@ public class ListItem {
         this.status = status;
         this.createdBy = createdBy;
         this.locked = locked;
-        createdOn = LocalDateTime.now();
     }
 
     public ListItem(String name, User createdBy, boolean locked) {
         this.name = name;
         this.createdBy = createdBy;
         this.locked = locked;
-        createdOn = LocalDateTime.now();
     }
 
     public ListItem(String name, User createdBy, boolean locked, ShoppingList list) {
@@ -82,7 +79,6 @@ public class ListItem {
         this.createdBy = createdBy;
         this.locked = locked;
         this.list = list;
-        createdOn = LocalDateTime.now();
     }
 
     public ListItem(String name) {
@@ -113,9 +109,9 @@ public class ListItem {
         return createdOn;
     }
 
-    public void setCreatedOn(LocalDateTime createdOn) {
-        this.createdOn = createdOn;
-    }
+//    public void setCreatedOn(LocalDateTime createdOn) {
+//        this.createdOn = createdOn;
+//    }
 
     public User getCreatedBy() {
         return createdBy;
