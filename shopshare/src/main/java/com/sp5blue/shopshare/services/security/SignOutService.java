@@ -15,11 +15,9 @@ import java.util.UUID;
 
 @Service
 public class SignOutService implements LogoutHandler {
-
     private final TokenService tokenService;
 
     private final JwtService jwtService;
-
 
     @Autowired
     public SignOutService(TokenService tokenService, JwtService jwtService) {

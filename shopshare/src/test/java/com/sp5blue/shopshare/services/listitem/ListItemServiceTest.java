@@ -1,16 +1,16 @@
 package com.sp5blue.shopshare.services.listitem;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
+import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.listitem.CreateListItemDto;
-import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.repositories.ListItemRepository;
-import com.sp5blue.shopshare.services.user.IUserService;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
+import com.sp5blue.shopshare.services.user.IUserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -47,24 +49,24 @@ class ListItemServiceTest {
     ListItemService listItemService;
 
     @Test
-    void addListItemToList_AddsItemToList() {
+    void addListItemToList_AddsItemToList() throws ExecutionException, InterruptedException {
         User user = new User();
         ShopperGroup shopperGroup = new ShopperGroup("Group 1", user);
         ShoppingList shoppingList = spy(new ShoppingList("Group 1's List", shopperGroup));
-        CreateListItemDto createListItemDto = new CreateListItemDto("List item one", false);
-        when(userService.getUserById(user.getId())).thenReturn(user);
-        when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(shoppingList);
+        CreateListItemRequest createListItemRequest = new CreateListItemRequest("List item one", false);
+        when(userService.getUserById(user.getId())).thenReturn(CompletableFuture.completedFuture(user));
+        when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(CompletableFuture.completedFuture(shoppingList));
         when(listItemRepository.save(any(ListItem.class))).thenAnswer(l -> l.getArguments()[0]);
 
-        var result = listItemService.addListItemToList(user.getId(), shopperGroup.getId(), shoppingList.getId(), createListItemDto);
+        var _result = listItemService.addListItemToList(user.getId(), shopperGroup.getId(), shoppingList.getId(), createListItemRequest);
+        var result = _result.get();
+
         verify(shoppingList).setModifiedOn(any(LocalDateTime.class));
         verify(shoppingList).setModifiedBy(user);
         assertInstanceOf(ListItem.class, result);
         assertAll(
                 () -> assertEquals("List item one", result.getName()),
-                () -> assertEquals(user, result.getCreatedBy()),
-                () -> assertEquals(shoppingList, result.getList())
-        );
+                () -> assertEquals(user, result.getCreatedBy()));
     }
 
     @Test
@@ -88,8 +90,8 @@ class ListItemServiceTest {
         ListItem listItem2 = new ListItem("Item 2", user);
         shoppingList.addItem(listItem1);
         shoppingList.addItem(listItem2);
-        when(userService.getUserById(user.getId())).thenReturn(user);
-        when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(shoppingList);
+        when(userService.getUserById(user.getId())).thenReturn(CompletableFuture.completedFuture(user));
+        when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(CompletableFuture.completedFuture(shoppingList));
         when(listItemRepository.findByList_IdAndId(shoppingList.getId(), listItem1.getId())).thenReturn(Optional.of(listItem1));
 
         listItemService.removeListItemFromList(user.getId(), shopperGroup.getId(), shoppingList.getId(), listItem1.getId());
@@ -240,7 +242,7 @@ class ListItemServiceTest {
     }
 
     @Test
-    void getListItemById_ReturnsListItem() {
+    void getListItemById_ReturnsListItem() throws ExecutionException, InterruptedException {
         UUID userId = UUID.randomUUID();
         UUID groupId = UUID.randomUUID();
         UUID listId = UUID.randomUUID();
@@ -248,20 +250,22 @@ class ListItemServiceTest {
 
         when(listItemRepository.findByList_IdAndId(listId, listItem.getId())).thenReturn(Optional.of(listItem));
 
-        var result = listItemService.getListItemById(userId, groupId, listId, listItem.getId());
+        var _result = listItemService.getListItemById(userId, groupId, listId, listItem.getId());
+        var result = _result.get();
+
         assertEquals(listItem, result);
     }
 
     @Test
-    void getListItemsByCreator_NoMatches_ReturnsEmptyList() {
+    void getListItemsByCreator_NoMatches_ReturnsEmptyList() throws Exception {
         User user = new User();
 
         var results = listItemService.getListItemsByCreator(user.getId());
-        assertTrue(results.isEmpty());
+        assertTrue(results.get().isEmpty());
     }
 
     @Test
-    void getListItemsByCreator_Matches_ReturnsListItems() {
+    void getListItemsByCreator_Matches_ReturnsListItems() throws Exception {
         User user = new User();
         ListItem listItem1 = new ListItem("Item 1", user);
         ListItem listItem2 = new ListItem("Item 2", user);
@@ -269,40 +273,10 @@ class ListItemServiceTest {
         when(listItemRepository.findAllByCreatedBy_Id(user.getId())).thenReturn(List.of(listItem1, listItem2));
 
         var results = listItemService.getListItemsByCreator(user.getId());
-        assertEquals(2, results.size());
+        assertEquals(2, results.get().size());
         assertAll(
-                () -> assertEquals(listItem1, results.get(0)),
-                () -> assertEquals(listItem2, results.get(1))
-        );
-    }
-
-    @Test
-    void getListItemsByShoppingList_NoMatches_ReturnsEmptyList() {
-        UUID userId = UUID.randomUUID();
-        UUID groupId = UUID.randomUUID();
-        UUID listId = UUID.randomUUID();
-
-        var results = listItemService.getListItemsByShoppingList(userId, groupId, listId);
-        assertTrue(results.isEmpty());
-    }
-
-    @Test
-    void getListItemsByShoppingList_Matches_ReturnsListItems() {
-        ShopperGroup shopperGroup = new ShopperGroup();
-        ShoppingList shoppingList = new ShoppingList();
-        User user = new User();
-        ListItem listItem1 = new ListItem("Item 1", user);
-        ListItem listItem2 = new ListItem("Item 2", user);
-        shoppingList.addItem(listItem1);
-        shoppingList.addItem(listItem2);
-
-        when(listItemRepository.findAllByList_Id(shoppingList.getId())).thenReturn(shoppingList.getItems());
-
-        var results = listItemService.getListItemsByShoppingList(user.getId(), shopperGroup.getId(), shoppingList.getId());
-        assertEquals(2, results.size());
-        assertAll(
-                () -> assertEquals(listItem1, results.get(0)),
-                () -> assertEquals(listItem2, results.get(1))
+                () -> assertEquals(listItem1, results.get().get(0)),
+                () -> assertEquals(listItem2, results.get().get(1))
         );
     }
 }

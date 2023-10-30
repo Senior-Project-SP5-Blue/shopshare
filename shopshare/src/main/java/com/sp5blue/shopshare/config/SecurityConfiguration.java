@@ -1,4 +1,4 @@
-package com.sp5blue.shopshare.security;
+package com.sp5blue.shopshare.config;
 
 import com.sp5blue.shopshare.filters.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
     private final UserDetailsService userDetailsService;
     private final JwtAuthFilter jwtAuthFilter;
-
     private final LogoutHandler logoutHandler;
 
     @Autowired

@@ -23,9 +23,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
 
     @Query(nativeQuery = true, value = """
-SELECT s.* FROM users u JOIN users_shopper_groups usg on u.id = usg.user_id WHERE usg.shopper_group_id = :group_id
+SELECT u.* FROM users u JOIN users_shopper_groups usg on u.id = usg.user_id WHERE usg.shopper_group_id = :group_id
 """)
-    List<User> findByShopperGroup(@Param("group_id") UUID groupId);
+    List<User> findAllByShopperGroup(@Param("group_id") UUID groupId);
+
+    @Query(nativeQuery = true, value = """
+SELECT u.* FROM users u JOIN users_shopper_groups usg on u.id = usg.user_id WHERE usg.shopper_group_id = :group_id AND u.id = :user_id
+""")
+    Optional<User> findByShopperGroup(@Param("group_id") UUID groupId, @Param("user_id") UUID userId);
 
     boolean existsByEmail(String email);
 
@@ -37,6 +42,6 @@ SELECT EXISTS (SELECT * FROM users_shopper_groups usg WHERE usg.shopper_group_id
     boolean existsByGroup(@Param("user_id") UUID userId, @Param("group_id") UUID groupId);
 
     @Query(nativeQuery = true, value = """
-SELECT EXISTS (SELECT * FROM shopper_groups sg JOIN users_shopper_groups usg ON sg.id = usg.shopper_group_id WHERE usg.shopper_group_id =:group_id AND sg.admin =:user_id)""")
+SELECT EXISTS (SELECT * FROM shopper_groups sg JOIN users_shopper_groups usg ON sg.id = usg.shopper_group_id WHERE usg.shopper_group_id =:group_id AND sg.admin_id =:user_id)""")
     boolean existsAsAdminByGroup(@Param("user_id") UUID userId, @Param("group_id") UUID groupId);
 }

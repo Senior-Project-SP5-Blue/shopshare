@@ -39,7 +39,7 @@ public class AuthRestExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AuthErrorResponse> handleException(UserNotFoundException exception) {
-        AuthErrorResponse error = new AuthErrorResponse(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), LocalDateTime.now());
-        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        AuthErrorResponse error = new AuthErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage(), LocalDateTime.now());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 }

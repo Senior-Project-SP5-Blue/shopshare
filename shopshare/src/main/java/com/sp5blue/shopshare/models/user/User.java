@@ -2,7 +2,6 @@ package com.sp5blue.shopshare.models.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.serializers.UserSerializer;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,16 +30,13 @@ public class User implements UserDetails {
     @Column(name = "profile_picture")
     private String profilePicture;
 
-//    @JsonIgnore
+    @JsonIgnore
     @Column(name = "email")
     private String email;
 
     @JsonIgnore
     @Column(name = "password")
     private String password;
-
-    @ManyToMany(mappedBy = "users", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
-    private List<ShopperGroup> groups = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
@@ -103,11 +99,11 @@ public class User implements UserDetails {
                 ", profilePicture='" + profilePicture + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", groups=" + groups +
                 ", roles=" + roles +
                 ", active=" + active +
                 '}';
     }
+
 
     public UUID getId() {
         return id;
@@ -186,27 +182,19 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public List<ShopperGroup> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<ShopperGroup> groups) {
-        this.groups = groups;
-    }
-
     public List<Role> getRoles() {
         return roles;
     }
 
-    public boolean addRole(Role role) {
-        return roles.add(role);
+    public void addRole(Role role) {
+        roles.add(role);
     }
-    public boolean removeRole(Role role) {
-        return roles.remove(role);
+    public void removeRole(Role role) {
+        roles.remove(role);
     }
 
-    public boolean removeRole(String roleName) {
-        return roles.removeIf(r -> r.getAuthority().equals(roleName));
+    public void removeRole(String roleName) {
+        roles.removeIf(r -> r.getAuthority().equals(roleName));
     }
 
     public void setRoles(List<Role> roles) {

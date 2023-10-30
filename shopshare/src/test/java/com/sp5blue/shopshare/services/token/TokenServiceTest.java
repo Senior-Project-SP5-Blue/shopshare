@@ -1,9 +1,9 @@
 package com.sp5blue.shopshare.services.token;
 
 import com.sp5blue.shopshare.exceptions.token.TokenNotFoundException;
-import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.user.Token;
 import com.sp5blue.shopshare.models.user.TokenType;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.repositories.TokenRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -29,17 +30,19 @@ class TokenServiceTest {
     TokenService tokenService;
 
     @Test
-    void create_CreatesNewToken_ReturnsNewToken() {
+    void create_CreatesNewToken_ReturnsNewToken() throws ExecutionException, InterruptedException {
         User user = new User();
         Token token = new Token("jwt", user);
         when(mockTokenRepository.save(token)).thenReturn(token);
 
-        var result = tokenService.create(token);
+        var _result = tokenService.create(token);
+        var result = _result.get();
+
         assertEquals(token, result);
     }
 
     @Test
-    void readAllByShopperId_ValidOnly_ReturnsAllValidTokens() {
+    void readAllByShopperId_ValidOnly_ReturnsAllValidTokens() throws Exception {
         User user1 = new User();
         Token token1 = new Token("jwt", user1);
         Token token2 = new Token("jwt", user1, TokenType.REFRESH);
@@ -49,7 +52,8 @@ class TokenServiceTest {
         Token token4 = new Token("jwt", user1);
         when(mockTokenRepository.findAllValidTokensByUser_Id(user1.getId())).thenReturn(List.of(token1, token2, token4));
 
-        var results = tokenService.readAllByShopperId(user1.getId(), true);
+        var _results = tokenService.readAllByUserId(user1.getId(), true);
+        var results = _results.get();
 
         assertEquals(3, results.size());
         assertAll(
@@ -60,7 +64,7 @@ class TokenServiceTest {
     }
 
     @Test
-    void readAllByShopperId_All_ReturnsAllTokens() {
+    void readAllByShopperId_All_ReturnsAllTokens() throws Exception {
         User user1 = new User();
         Token token1 = new Token("jwt", user1);
         Token token2 = new Token("jwt", user1, TokenType.REFRESH);
@@ -70,7 +74,8 @@ class TokenServiceTest {
         Token token4 = new Token("jwt", user1);
         when(mockTokenRepository.findAllByUser_Id(user1.getId())).thenReturn(List.of(token1, token2, token3, token4));
 
-        var results = tokenService.readAllByShopperId(user1.getId(), false);
+        var _results = tokenService.readAllByUserId(user1.getId(), false);
+        var results = _results.get();
 
         assertEquals(4, results.size());
         assertAll(
@@ -82,7 +87,7 @@ class TokenServiceTest {
     }
 
     @Test
-    void readAllAccessByShopperId_ValidOnly_ReturnsAllValidAccessTokens() {
+    void readAllAccessByShopperId_ValidOnly_ReturnsAllValidAccessTokens() throws ExecutionException, InterruptedException {
         User user1 = new User();
         Token token1 = new Token("jwt", user1);
         Token token2 = new Token("jwt", user1, TokenType.REFRESH);
@@ -92,9 +97,11 @@ class TokenServiceTest {
         Token token4 = new Token("jwt", user1);
         when(mockTokenRepository.findAllValidAccessTokensByUser_Id(user1.getId())).thenReturn(List.of(token1, token4));
 
-        var results = tokenService.readAllAccessByShopperId(user1.getId(), true);
+        var _results = tokenService.readAllAccessByUserId(user1.getId(), true);
+        var results = _results.get();
 
-        assertEquals(2, results.size());
+        assertEquals(2,
+                results.size());
         assertAll(
                 () -> assertEquals(token1, results.get(0)),
                 () -> assertEquals(token4, results.get(1))
@@ -102,7 +109,7 @@ class TokenServiceTest {
     }
 
     @Test
-    void readAllAccessByShopperId_All_ReturnsAllAccessTokens() {
+    void readAllAccessByShopperId_All_ReturnsAllAccessTokens() throws ExecutionException, InterruptedException {
         User user1 = new User();
         Token token1 = new Token("jwt", user1);
         Token token2 = new Token("jwt", user1, TokenType.REFRESH);
@@ -112,7 +119,8 @@ class TokenServiceTest {
         Token token4 = new Token("jwt", user1);
         when(mockTokenRepository.findAllAccessTokensByUser_Id(user1.getId())).thenReturn(List.of(token1, token3, token4));
 
-        var results = tokenService.readAllAccessByShopperId(user1.getId(), false);
+        var _results = tokenService.readAllAccessByUserId(user1.getId(), false);
+        var results = _results.get();
 
         assertEquals(3, results.size());
         assertAll(
@@ -133,7 +141,7 @@ class TokenServiceTest {
         Token token4 = new Token("jwt4", user1);
         when(mockTokenRepository.findRefreshTokenByUser_Id(user1.getId())).thenReturn(Optional.empty());
 
-        var exception = assertThrows(TokenNotFoundException.class, () -> tokenService.readRefreshByShopperId(user1.getId()));
+        var exception = assertThrows(TokenNotFoundException.class, () -> tokenService.readRefreshByUserId(user1.getId()));
         assertEquals("User - " + user1.getId() + " does not have valid refresh token",exception.getMessage());
     }
 
@@ -148,12 +156,14 @@ class TokenServiceTest {
     }
 
     @Test
-    void readByToken_Valid_ReturnsToken() {
+    void readByToken_Valid_ReturnsToken() throws ExecutionException, InterruptedException {
         User user1 = new User();
         Token token1 = new Token("jwt1", user1);
         when(mockTokenRepository.findByToken(token1.getToken())).thenReturn(Optional.of(token1));
 
-        var result = tokenService.readByToken(token1.getToken());
+        var _result = tokenService.readByToken(token1.getToken());
+        var result = _result.get();
+
         assertEquals(token1, result);
     }
 

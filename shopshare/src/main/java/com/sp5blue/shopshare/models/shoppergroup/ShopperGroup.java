@@ -1,19 +1,17 @@
 package com.sp5blue.shopshare.models.shoppergroup;
 
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.models.user.Role;
 import com.sp5blue.shopshare.models.user.RoleType;
 import com.sp5blue.shopshare.models.user.User;
-import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
-import com.sp5blue.shopshare.serializers.ShopperGroupSerializer;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@JsonSerialize(using = ShopperGroupSerializer.class)
+//@JsonSerialize(using = ShopperGroupSerializer.class)
 @Entity
 @Table(name = "shopper_groups")
 public class ShopperGroup {
@@ -25,13 +23,13 @@ public class ShopperGroup {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(name = "users_shopper_groups",
     joinColumns = @JoinColumn(name = "shopper_group_id"),
     inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ShoppingList> lists = new ArrayList<>();
 
     @ManyToOne(optional = false)
@@ -90,11 +88,12 @@ public class ShopperGroup {
         Role role = new Role("ROLE_GROUP_MEMBER-" + getId(), RoleType.ROLE_GROUP_MEMBER);
         user.addRole(role);
         return users.add(user);
+//        return user.getGroups().add(this);
     }
 
-    public boolean removeUser(User user) {
+    public void removeUser(User user) {
         user.removeRole("ROLE_GROUP_MEMBER-" + getId());
-        return users.remove(user);
+        users.remove(user);
     }
 
     public boolean removeUser(UUID userId) {
@@ -104,14 +103,16 @@ public class ShopperGroup {
         return users.removeIf(x -> x.getId().equals(userId));
     }
 
-    public boolean addList(ShoppingList shoppingList) {
-        return lists.add(shoppingList);
+    public void addList(ShoppingList shoppingList) {
+        shoppingList.setGroup(this);
+        lists.add(shoppingList);
     }
 
-    public boolean removeList(ShoppingList shoppingList) {
-        return lists.remove(shoppingList);
+    public void removeList(ShoppingList shoppingList) {
+        shoppingList.setGroup(null);
+        lists.remove(shoppingList);
     }
-    public boolean removeList(UUID listId) {
-        return lists.removeIf(l -> l.getId().equals(listId));
+    public void removeList(UUID listId) {
+        lists.removeIf(l -> l.getId().equals(listId));
     }
 }

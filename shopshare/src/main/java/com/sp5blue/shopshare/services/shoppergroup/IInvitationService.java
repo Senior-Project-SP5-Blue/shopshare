@@ -1,9 +1,10 @@
 package com.sp5blue.shopshare.services.shoppergroup;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public interface IInvitationService {
-
-    boolean invite(UUID groupId, UUID shopperId);
-    boolean acceptInvite(UUID groupId, UUID shopperId);
+    CompletableFuture<Boolean> invite(UUID groupId, UUID shopperId);
+    CompletableFuture<Boolean> acceptInvite(UUID groupId, UUID shopperId) throws ExecutionException, InterruptedException;
 }

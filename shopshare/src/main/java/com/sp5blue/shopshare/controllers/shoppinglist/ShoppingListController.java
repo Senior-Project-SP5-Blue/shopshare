@@ -1,6 +1,8 @@
 package com.sp5blue.shopshare.controllers.shoppinglist;
 
 import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,9 @@ import java.util.UUID;
 @RequestMapping("${api-prefix}/users/{user_id}/groups/{group_id}/shopping-lists")
 public class ShoppingListController {
     private final IShoppingListService shoppingListService;
+    private final Logger logger = LoggerFactory.getLogger(ShoppingListController.class);
+
+    private record ShoppingListName (String name) { }
 
     @Autowired
     public ShoppingListController(IShoppingListService shoppingListService) {
@@ -19,23 +24,23 @@ public class ShoppingListController {
 
     @GetMapping
     public ResponseEntity<?> getShoppingLists(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId) {
-        return ResponseEntity.ok().body(shoppingListService.getShoppingLists(userId, groupId));
+        return ResponseEntity.ok().body(shoppingListService.getShoppingLists(userId, groupId).join());
     }
 
     @PostMapping
-    public ResponseEntity<?> addShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @RequestBody String name) {
-        return ResponseEntity.ok().body(shoppingListService.createShoppingList(userId, groupId, name));
+    public ResponseEntity<?> addShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @RequestBody ShoppingListName name) {
+        return ResponseEntity.ok().body(shoppingListService.createShoppingList(userId, groupId, name.name).join());
     }
 
     @GetMapping("/{shopping-list_id}")
     public ResponseEntity<?> getShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId) {
-        return ResponseEntity.ok().body(shoppingListService.getShoppingListById(userId, groupId, listId));
+        return ResponseEntity.ok().body(shoppingListService.getShoppingListById(userId, groupId, listId).join());
     }
 
     @PatchMapping("/{shopping-list_id}")
-    public ResponseEntity<?> editShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody String name) {
-        shoppingListService.changeShoppingListName(userId, groupId, listId, name);
-        return ResponseEntity.ok().body("Shopping list name changed successfully.");
+    public ResponseEntity<?> editShoppingList(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody ShoppingListName name) {
+        return ResponseEntity.ok().body(shoppingListService.changeShoppingListName(userId, groupId, listId, name.name).join());
+//        return ResponseEntity.ok().body("Shopping list name changed successfully.");
     }
 
     @DeleteMapping("/{shopping-list_id}")
