@@ -2,10 +2,9 @@ package com.sp5blue.shopshare.services.listitem;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
+import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
 import com.sp5blue.shopshare.models.listitem.EditListItemRequest;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;

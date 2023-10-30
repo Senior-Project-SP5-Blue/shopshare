@@ -1,12 +1,8 @@
 package com.sp5blue.shopshare.models.listitem;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.serializers.ListItemSerializer;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
@@ -108,10 +104,6 @@ public class ListItem {
     public LocalDateTime getCreatedOn() {
         return createdOn;
     }
-
-//    public void setCreatedOn(LocalDateTime createdOn) {
-//        this.createdOn = createdOn;
-//    }
 
     public User getCreatedBy() {
         return createdBy;

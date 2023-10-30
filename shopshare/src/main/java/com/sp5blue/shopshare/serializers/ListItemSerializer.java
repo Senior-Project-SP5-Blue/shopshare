@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 
 import java.io.IOException;
 

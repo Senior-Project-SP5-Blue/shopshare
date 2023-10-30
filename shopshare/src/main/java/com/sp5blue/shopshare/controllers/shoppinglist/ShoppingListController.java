@@ -1,7 +1,6 @@
 package com.sp5blue.shopshare.controllers.shoppinglist;
 
 import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
-import io.micrometer.common.util.internal.logging.AbstractInternalLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

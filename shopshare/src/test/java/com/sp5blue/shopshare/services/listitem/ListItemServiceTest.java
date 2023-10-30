@@ -1,16 +1,16 @@
 package com.sp5blue.shopshare.services.listitem;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
+import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
-import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.repositories.ListItemRepository;
-import com.sp5blue.shopshare.services.user.IUserService;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
+import com.sp5blue.shopshare.services.user.IUserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -1,12 +1,10 @@
 package com.sp5blue.shopshare.models.shoppergroup;
 
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.models.user.Role;
 import com.sp5blue.shopshare.models.user.RoleType;
 import com.sp5blue.shopshare.models.user.User;
-import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
-import com.sp5blue.shopshare.serializers.ShopperGroupSerializer;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -93,10 +91,9 @@ public class ShopperGroup {
 //        return user.getGroups().add(this);
     }
 
-    public boolean removeUser(User user) {
+    public void removeUser(User user) {
         user.removeRole("ROLE_GROUP_MEMBER-" + getId());
-        return users.remove(user);
-//        return user.getGroups().remove(this);
+        users.remove(user);
     }
 
     public boolean removeUser(UUID userId) {
@@ -106,16 +103,16 @@ public class ShopperGroup {
         return users.removeIf(x -> x.getId().equals(userId));
     }
 
-    public boolean addList(ShoppingList shoppingList) {
+    public void addList(ShoppingList shoppingList) {
         shoppingList.setGroup(this);
-        return lists.add(shoppingList);
+        lists.add(shoppingList);
     }
 
-    public boolean removeList(ShoppingList shoppingList) {
+    public void removeList(ShoppingList shoppingList) {
         shoppingList.setGroup(null);
-        return lists.remove(shoppingList);
+        lists.remove(shoppingList);
     }
-    public boolean removeList(UUID listId) {
-        return lists.removeIf(l -> l.getId().equals(listId));
+    public void removeList(UUID listId) {
+        lists.removeIf(l -> l.getId().equals(listId));
     }
 }

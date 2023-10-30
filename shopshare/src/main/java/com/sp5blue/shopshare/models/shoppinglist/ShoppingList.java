@@ -1,12 +1,9 @@
 package com.sp5blue.shopshare.models.shoppinglist;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.serializers.ShoppingListSerializer;
 import jakarta.persistence.*;
 import org.springframework.lang.NonNull;
@@ -36,7 +33,7 @@ public class ShoppingList {
     @JoinColumn(name = "modified_by")
     private User modifiedBy;
 
-    @OneToMany( mappedBy = "list", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "list", cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private List<ListItem> items = new ArrayList<>();
 
     @ManyToOne
@@ -103,21 +100,16 @@ public class ShoppingList {
         this.group = group;
     }
 
-    public boolean addItem(ListItem item) {
-        if (items == null) items = new ArrayList<>();
-
-        return items.add(item);
+    public void addItem(ListItem item) {
+        items.add(item);
     }
 
-    public boolean removeItem(UUID itemId) {
-        if (items == null) return false;
-        return items.removeIf(i -> i.getId().equals(itemId));
+    public void removeItem(UUID itemId) {
+        items.removeIf(i -> i.getId().equals(itemId));
     }
 
-    public boolean removeItem(ListItem item) {
-        if (this.items == null) return false;
-//        item.setCreatedBy(null);
-        return this.items.remove(item);
+    public void removeItem(ListItem item) {
+        this.items.remove(item);
     }
 
     @Override

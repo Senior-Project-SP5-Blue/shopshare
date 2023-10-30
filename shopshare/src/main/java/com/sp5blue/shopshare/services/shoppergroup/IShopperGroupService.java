@@ -3,8 +3,8 @@ package com.sp5blue.shopshare.services.shoppergroup;
 import com.sp5blue.shopshare.exceptions.shoppergroup.GroupNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsException;
 import com.sp5blue.shopshare.exceptions.shoppergroup.RemoveGroupAdminException;
-import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
+import com.sp5blue.shopshare.models.user.User;
 
 import java.util.List;
 import java.util.UUID;

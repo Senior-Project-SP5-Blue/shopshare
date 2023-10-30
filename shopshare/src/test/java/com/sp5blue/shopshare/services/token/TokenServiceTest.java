@@ -1,9 +1,9 @@
 package com.sp5blue.shopshare.services.token;
 
 import com.sp5blue.shopshare.exceptions.token.TokenNotFoundException;
-import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.user.Token;
 import com.sp5blue.shopshare.models.user.TokenType;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.repositories.TokenRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,16 +1,16 @@
 package com.sp5blue.shopshare.services.listitem;
 
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
+import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
 import com.sp5blue.shopshare.models.listitem.EditListItemRequest;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
-import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.repositories.ListItemRepository;
-import com.sp5blue.shopshare.services.user.IUserService;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import com.sp5blue.shopshare.services.shoppinglist.IShoppingListService;
+import com.sp5blue.shopshare.services.user.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,22 +62,18 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Transactional
-//    @Async
+    @Async
     public void removeListItemFromList(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
         CompletableFuture<User> getUser = userService.getUserById(userId);
         CompletableFuture<ShoppingList> getShoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
         CompletableFuture.allOf(getUser, getShoppingList).join();
         User user = getUser.join();
         ShoppingList shoppingList = getShoppingList.join();
-        logger.warn("Shopping list items is: {}", shoppingList.getItems());
         ListItem listItem = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
         shoppingList.setModifiedOn(LocalDateTime.now());
         shoppingList.setModifiedBy(user);
         shoppingList.removeItem(listItem);
-//        listItem.setList(null);
-////        listItem.setCreatedBy(null);
         listItemRepository.delete(listItem);
-        logger.warn("Shopping list items is: {}", shoppingList.getItems());
     }
 
     @Override

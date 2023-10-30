@@ -2,7 +2,6 @@ package com.sp5blue.shopshare.models.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.serializers.UserSerializer;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -187,15 +186,15 @@ public class User implements UserDetails {
         return roles;
     }
 
-    public boolean addRole(Role role) {
-        return roles.add(role);
+    public void addRole(Role role) {
+        roles.add(role);
     }
-    public boolean removeRole(Role role) {
-        return roles.remove(role);
+    public void removeRole(Role role) {
+        roles.remove(role);
     }
 
-    public boolean removeRole(String roleName) {
-        return roles.removeIf(r -> r.getAuthority().equals(roleName));
+    public void removeRole(String roleName) {
+        roles.removeIf(r -> r.getAuthority().equals(roleName));
     }
 
     public void setRoles(List<Role> roles) {

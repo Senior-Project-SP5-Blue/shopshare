@@ -3,9 +3,9 @@ package com.sp5blue.shopshare.serializers;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
+import com.sp5blue.shopshare.models.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

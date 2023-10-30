@@ -1,13 +1,12 @@
 package com.sp5blue.shopshare.services.security;
 
-import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.models.user.TokenType;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.security.request.SignInRequest;
 import com.sp5blue.shopshare.security.request.SignUpRequest;
 import com.sp5blue.shopshare.security.response.AuthenticationResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.CompletableFuture;
 
