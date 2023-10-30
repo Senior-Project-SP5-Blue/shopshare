@@ -36,7 +36,7 @@ public class ShopperGroupController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.getId() == #userId")
     public ResponseEntity<?> addShopperGroup(@PathVariable("user_id") UUID userId, @RequestBody String name) {
-        return ResponseEntity.ok().body(shopperGroupService.createShopperGroup(userId, name).join());
+        return ResponseEntity.ok().body(shopperGroupService.addShopperGroup(userId, name).join());
     }
 
     @GetMapping("/{group_id}")

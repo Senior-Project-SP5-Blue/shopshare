@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-//@JsonSerialize(using = ShopperGroupSerializer.class)
 @Entity
 @Table(name = "shopper_groups")
 public class ShopperGroup {

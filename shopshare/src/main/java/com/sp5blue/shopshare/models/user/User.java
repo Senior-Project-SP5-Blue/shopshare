@@ -1,15 +1,12 @@
 package com.sp5blue.shopshare.models.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.sp5blue.shopshare.serializers.UserSerializer;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
-@JsonSerialize(using = UserSerializer.class)
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
