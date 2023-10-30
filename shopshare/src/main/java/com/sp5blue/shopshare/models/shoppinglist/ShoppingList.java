@@ -1,10 +1,8 @@
 package com.sp5blue.shopshare.models.shoppinglist;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sp5blue.shopshare.models.listitem.ListItem;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.user.User;
-import com.sp5blue.shopshare.serializers.ShoppingListSerializer;
 import jakarta.persistence.*;
 import org.springframework.lang.NonNull;
 
@@ -14,7 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@JsonSerialize(using = ShoppingListSerializer.class)
 @Entity
 @Table(name = "shopping_lists")
 public class ShoppingList {

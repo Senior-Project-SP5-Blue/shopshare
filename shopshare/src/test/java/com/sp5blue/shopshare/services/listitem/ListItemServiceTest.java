@@ -1,7 +1,7 @@
 package com.sp5blue.shopshare.services.listitem;
 
+import com.sp5blue.shopshare.dtos.listitem.CreateListItemRequest;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
-import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
@@ -55,10 +55,10 @@ class ListItemServiceTest {
         ShoppingList shoppingList = spy(new ShoppingList("Group 1's List", shopperGroup));
         CreateListItemRequest createListItemRequest = new CreateListItemRequest("List item one", false);
         when(userService.getUserById(user.getId())).thenReturn(CompletableFuture.completedFuture(user));
-        when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(CompletableFuture.completedFuture(shoppingList));
+        when(shoppingListService.readShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(CompletableFuture.completedFuture(shoppingList));
         when(listItemRepository.save(any(ListItem.class))).thenAnswer(l -> l.getArguments()[0]);
 
-        var _result = listItemService.addListItemToList(user.getId(), shopperGroup.getId(), shoppingList.getId(), createListItemRequest);
+        var _result = listItemService.createListItem(user.getId(), shopperGroup.getId(), shoppingList.getId(), createListItemRequest);
         var result = _result.get();
 
         verify(shoppingList).setModifiedOn(any(LocalDateTime.class));
@@ -75,6 +75,8 @@ class ListItemServiceTest {
         ShopperGroup shopperGroup = new ShopperGroup("Group 1", user);
         ShoppingList shoppingList = spy(new ShoppingList("Group 1's List", shopperGroup));
         UUID itemId = UUID.randomUUID();
+        when(userService.getUserById(user.getId())).thenReturn(CompletableFuture.completedFuture(user));
+        when(shoppingListService.readShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(CompletableFuture.completedFuture(shoppingList));
 
         var exception = assertThrows(ListItemNotFoundException.class, () -> listItemService.removeListItemFromList(user.getId(), shopperGroup.getId(), shoppingList.getId(), itemId));
         assertEquals("List item does not exist - " + itemId, exception.getMessage());
@@ -91,7 +93,7 @@ class ListItemServiceTest {
         shoppingList.addItem(listItem1);
         shoppingList.addItem(listItem2);
         when(userService.getUserById(user.getId())).thenReturn(CompletableFuture.completedFuture(user));
-        when(shoppingListService.getShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(CompletableFuture.completedFuture(shoppingList));
+        when(shoppingListService.readShoppingListById(user.getId(), shopperGroup.getId(), shoppingList.getId())).thenReturn(CompletableFuture.completedFuture(shoppingList));
         when(listItemRepository.findByList_IdAndId(shoppingList.getId(), listItem1.getId())).thenReturn(Optional.of(listItem1));
 
         listItemService.removeListItemFromList(user.getId(), shopperGroup.getId(), shoppingList.getId(), listItem1.getId());
@@ -250,7 +252,7 @@ class ListItemServiceTest {
 
         when(listItemRepository.findByList_IdAndId(listId, listItem.getId())).thenReturn(Optional.of(listItem));
 
-        var _result = listItemService.getListItemById(userId, groupId, listId, listItem.getId());
+        var _result = listItemService.readListItemById(userId, groupId, listId, listItem.getId());
         var result = _result.get();
 
         assertEquals(listItem, result);
@@ -272,7 +274,7 @@ class ListItemServiceTest {
 
         when(listItemRepository.findAllByCreatedBy_Id(user.getId())).thenReturn(List.of(listItem1, listItem2));
 
-        var results = listItemService.getListItemsByCreator(user.getId());
+        var results = listItemService.readListItemsByCreator(user.getId());
         assertEquals(2, results.get().size());
         assertAll(
                 () -> assertEquals(listItem1, results.get().get(0)),

@@ -39,7 +39,7 @@ class ShoppingListServiceTest {
         ShopperGroup shopperGroup = new ShopperGroup();
         ArgumentCaptor<ShoppingList> addedList = ArgumentCaptor.forClass(ShoppingList.class);
         UUID userId = UUID.randomUUID();
-        when(shopperGroupService.getShopperGroupById(userId, shopperGroup.getId())).thenReturn(CompletableFuture.completedFuture(shopperGroup));
+        when(shopperGroupService.readShopperGroupById(userId, shopperGroup.getId())).thenReturn(CompletableFuture.completedFuture(shopperGroup));
         when(shoppingListRepository.save(any(ShoppingList.class))).thenAnswer(m -> m.getArguments()[0]);
 
         var _result = shoppingListService.createShoppingList(userId, shopperGroup.getId(), "New List");
@@ -88,7 +88,7 @@ class ShoppingListServiceTest {
         UUID groupId = UUID.randomUUID();
         when(shoppingListRepository.findByGroup_IdAndId(groupId, shoppingList.getId())).thenReturn(Optional.of(shoppingList));
 
-        var _result = shoppingListService.getShoppingListById(userId, groupId, shoppingList.getId());
+        var _result = shoppingListService.readShoppingListById(userId, groupId, shoppingList.getId());
         var result = _result.get();
 
         assertEquals(shoppingList, result);
@@ -115,7 +115,7 @@ class ShoppingListServiceTest {
         shopperGroup.addList(shoppingList2);
         when(shoppingListRepository.findAllByGroup_Id(shopperGroup.getId())).thenReturn(shopperGroup.getLists());
 
-        var _results = shoppingListService.getShoppingLists(userId, shopperGroup.getId());
+        var _results = shoppingListService.readShoppingLists(userId, shopperGroup.getId());
         var results = _results.get();
 
         assertEquals(2, results.size());

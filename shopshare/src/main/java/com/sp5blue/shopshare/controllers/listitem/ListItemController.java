@@ -1,7 +1,8 @@
 package com.sp5blue.shopshare.controllers.listitem;
 
-import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
-import com.sp5blue.shopshare.models.listitem.EditListItemRequest;
+import com.sp5blue.shopshare.dtos.listitem.CreateListItemRequest;
+import com.sp5blue.shopshare.dtos.listitem.EditListItemRequest;
+import com.sp5blue.shopshare.dtos.listitem.ListItemDto;
 import com.sp5blue.shopshare.services.listitem.IListItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class ListItemController {
 
 
     @PostMapping
-    public ResponseEntity<?> addListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody CreateListItemRequest createListItemRequest) {
+    public ResponseEntity<ListItemDto> addListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @RequestBody CreateListItemRequest createListItemRequest) {
         return ResponseEntity.ok().body(listItemService.addListItemToList(userId, groupId, listId, createListItemRequest).join());
     }
 
@@ -31,13 +32,14 @@ public class ListItemController {
     }
 
     @GetMapping("/{list-item_id}")
-    public ResponseEntity<?> getListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId) {
+    public ResponseEntity<ListItemDto> getListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId) {
         return ResponseEntity.ok().body(listItemService.getListItemById(userId, groupId, listId, itemId).join());
     }
 
     @PatchMapping("/{list-item_id}")
-    public ResponseEntity<?> changeListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId, @RequestBody EditListItemRequest editListItemRequest) {
-        return ResponseEntity.ok().body(listItemService.editListItem(userId, groupId, listId, itemId, editListItemRequest).join());
+    public ResponseEntity<ListItemDto> changeListItem(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("shopping-list_id") UUID listId, @PathVariable("list-item_id") UUID itemId, @RequestBody EditListItemRequest editListItemRequest) {
+        var editedItem = listItemService.editListItem(userId, groupId, listId, itemId, editListItemRequest).join();
+        return ResponseEntity.ok().body(new ListItemDto(editedItem));
     }
 
     @DeleteMapping("/{list-item_id}")

@@ -69,7 +69,7 @@ class UserGroupServiceTest {
 
         when(shopperGroupRepository.findAllByUserId(user1.getId())).thenReturn(Arrays.asList(shopperGroup1, shopperGroup2));
 
-        var _results = shopperGroupService1.getShopperGroups(user1.getId());
+        var _results = shopperGroupService1.readShopperGroups(user1.getId());
         var results = _results.get();
 
         assertEquals(2, results.size());
@@ -97,7 +97,7 @@ class UserGroupServiceTest {
         shopperGroup1.addUser(user1);
         when(shopperGroupRepository.findByUserIdAndId(user1.getId(), shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
 
-        var _result = shopperGroupService1.getShopperGroupById(user1.getId(), shopperGroup1.getId());
+        var _result = shopperGroupService1.readShopperGroupById(user1.getId(), shopperGroup1.getId());
         var result = _result.get();
 
         assertEquals(shopperGroup1, result);

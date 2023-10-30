@@ -1,8 +1,9 @@
 package com.sp5blue.shopshare.services.listitem;
 
+import com.sp5blue.shopshare.dtos.listitem.CreateListItemRequest;
+import com.sp5blue.shopshare.dtos.listitem.EditListItemRequest;
+import com.sp5blue.shopshare.dtos.listitem.ListItemDto;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
-import com.sp5blue.shopshare.models.listitem.CreateListItemRequest;
-import com.sp5blue.shopshare.models.listitem.EditListItemRequest;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
@@ -48,16 +49,32 @@ public class ListItemService implements IListItemService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<ListItem> addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemRequest createListItemRequest) {
+    public CompletableFuture<ListItemDto> addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemRequest createListItemRequest) {
         CompletableFuture<User> getCreator = userService.getUserById(userId);
-        CompletableFuture<ShoppingList> getShoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
+        CompletableFuture<ShoppingList> getShoppingList = shoppingListService.readShoppingListById(userId, groupId, listId);
         CompletableFuture.allOf(getCreator, getShoppingList).join();
         ShoppingList shoppingList = getShoppingList.join();
         User creator = getCreator.join();
         ListItem listItem = new ListItem(createListItemRequest.name(), creator, createListItemRequest.locked(), shoppingList);
         shoppingList.setModifiedOn(LocalDateTime.now());
         shoppingList.setModifiedBy(creator);
-        return CompletableFuture.completedFuture(listItemRepository.save(listItem));
+        var addedItem = listItemRepository.save(listItem);
+        return CompletableFuture.completedFuture(new ListItemDto(addedItem));
+    }
+    @Override
+    @Transactional
+    @Async
+    public CompletableFuture<ListItem> createListItem(UUID userId, UUID groupId, UUID listId, CreateListItemRequest createListItemRequest) {
+        CompletableFuture<User> getCreator = userService.getUserById(userId);
+        CompletableFuture<ShoppingList> getShoppingList = shoppingListService.readShoppingListById(userId, groupId, listId);
+        CompletableFuture.allOf(getCreator, getShoppingList).join();
+        ShoppingList shoppingList = getShoppingList.join();
+        User creator = getCreator.join();
+        ListItem listItem = new ListItem(createListItemRequest.name(), creator, createListItemRequest.locked(), shoppingList);
+        shoppingList.setModifiedOn(LocalDateTime.now());
+        shoppingList.setModifiedBy(creator);
+        var addedItem = listItemRepository.save(listItem);
+        return CompletableFuture.completedFuture(addedItem);
     }
 
     @Override
@@ -65,7 +82,7 @@ public class ListItemService implements IListItemService {
     @Async
     public void removeListItemFromList(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
         CompletableFuture<User> getUser = userService.getUserById(userId);
-        CompletableFuture<ShoppingList> getShoppingList = shoppingListService.getShoppingListById(userId, groupId, listId);
+        CompletableFuture<ShoppingList> getShoppingList = shoppingListService.readShoppingListById(userId, groupId, listId);
         CompletableFuture.allOf(getUser, getShoppingList).join();
         User user = getUser.join();
         ShoppingList shoppingList = getShoppingList.join();
@@ -80,7 +97,7 @@ public class ListItemService implements IListItemService {
     @Transactional
     @Async
     public void removeListItemsFromList(UUID userId, UUID groupId, UUID listId) {
-        ShoppingList shoppingList = shoppingListService.getShoppingListById(userId, groupId, listId).join();
+        ShoppingList shoppingList = shoppingListService.readShoppingListById(userId, groupId, listId).join();
         List<ListItem> items = shoppingList.getItems();
         shoppingList.setItems(new ArrayList<>());
         listItemRepository.deleteAll(items);
@@ -138,15 +155,35 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Async
-    public CompletableFuture<ListItem> getListItemById(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
+    public CompletableFuture<ListItemDto> getListItemById(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         shoppingListService.verifyGroupHasList(groupId, listId);
-        return CompletableFuture.completedFuture(listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId)));
+        var item = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
+        return CompletableFuture.completedFuture(new ListItemDto(item));
     }
 
     @Override
     @Async
-    public CompletableFuture<List<ListItem>> getListItemsByCreator(UUID userId) {
+    public CompletableFuture<ListItem> readListItemById(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
+        shopperGroupService.verifyUserHasGroup(userId, groupId);
+        shoppingListService.verifyGroupHasList(groupId, listId);
+        var item = listItemRepository.findByList_IdAndId(listId, itemId).orElseThrow(() -> new ListItemNotFoundException("List item does not exist - " + itemId));
+        return CompletableFuture.completedFuture(item);
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<List<ListItemDto>> getListItemsByCreator(UUID userId) {
+        var _items = listItemRepository.findAllByCreatedBy_Id(userId);
+        var items = _items.stream().map(ListItemDto::new).toList();
+        return CompletableFuture.completedFuture(items);
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<List<ListItem>> readListItemsByCreator(UUID userId) {
         return CompletableFuture.completedFuture(listItemRepository.findAllByCreatedBy_Id(userId));
     }
 

@@ -1,9 +1,7 @@
 package com.sp5blue.shopshare.models.listitem;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.models.user.User;
-import com.sp5blue.shopshare.serializers.ListItemSerializer;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Type;
@@ -12,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@JsonSerialize(using = ListItemSerializer.class)
 @Entity
 @Table(name = "list_items")
 public class ListItem {
