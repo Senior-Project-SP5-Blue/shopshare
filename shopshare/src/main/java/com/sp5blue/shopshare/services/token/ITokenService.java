@@ -10,7 +10,8 @@ import java.util.concurrent.CompletableFuture;
 public interface ITokenService {
     CompletableFuture<Token> create(Token token);
 
-    CompletableFuture<List<Token>> create(List<Token> tokens);
+    CompletableFuture<List<Token>> create(Token[] tokens);
+
     CompletableFuture<List<Token>> readAllByUserId(UUID shopperId, boolean validOnly);
 
     CompletableFuture<List<Token>> readAllAccessByUserId(UUID shopperId, boolean validOnly);

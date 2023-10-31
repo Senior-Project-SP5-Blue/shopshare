@@ -38,16 +38,10 @@ WHERE sg.name =:name
 
     Page<ShopperGroup> findAllByAdmin_Id(UUID adminId, Pageable pageable);
 
-//    @Query(nativeQuery = true, value = """
-//SELECT sg.* FROM shopper_groups sg JOIN shoppers_shopper_groups ssg ON sg.id = ssg.shopper_group_id WHERE ssg.user_id = :user_id
-//""")
+
     List<ShopperGroup> findAllByAdmin_Id(@Param("user_id") UUID userId);
 
-    @Query(nativeQuery = true, value = """
-SELECT sg.* FROM shopper_groups sg
-JOIN users_shopper_groups usg ON sg.id = usg.shopper_group_id
-JOIN users u ON u.id = usg.user_id
-WHERE u.id = :user_id""")
+    @Query("SELECT sg FROM ShopperGroup sg JOIN sg.users u JOIN FETCH sg.users WHERE u.id = :user_id")
     List<ShopperGroup> findAllByUserId(@Param("user_id") UUID userId);
 
     @Query(nativeQuery = true, value = """

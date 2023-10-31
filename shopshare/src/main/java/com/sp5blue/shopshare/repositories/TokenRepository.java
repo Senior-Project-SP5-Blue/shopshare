@@ -2,6 +2,7 @@ package com.sp5blue.shopshare.repositories;
 
 import com.sp5blue.shopshare.models.user.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -40,4 +41,8 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
     Optional<Token> findRefreshTokenByUser_Id(@Param("user_id") UUID user_id);
 
     Optional<Token> findByToken(String token);
+
+    @Modifying(flushAutomatically = true)
+    @Query("UPDATE Token t set t.isRevoked = TRUE, t.isExpired = TRUE WHERE t.user.id = :user_id ")
+    void revokeTokensByUser(@Param("user_id") UUID userId);
 }

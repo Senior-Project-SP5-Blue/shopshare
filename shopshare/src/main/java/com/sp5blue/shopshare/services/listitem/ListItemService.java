@@ -153,6 +153,7 @@ public class ListItemService implements IListItemService {
         listItem.setStatus(ItemStatus.ARCHIVED);
     }
 
+    @Transactional
     @Override
     @Async
     public CompletableFuture<ListItemDto> getListItemById(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException {
@@ -172,8 +173,8 @@ public class ListItemService implements IListItemService {
     }
 
     @Override
-    @Async
     @Transactional
+    @Async
     public CompletableFuture<List<ListItemDto>> getListItemsByCreator(UUID userId) {
         var _items = listItemRepository.findAllByCreatedBy_Id(userId);
         var items = _items.stream().map(ListItemDto::new).toList();
@@ -182,7 +183,6 @@ public class ListItemService implements IListItemService {
 
     @Override
     @Async
-    @Transactional
     public CompletableFuture<List<ListItem>> readListItemsByCreator(UUID userId) {
         return CompletableFuture.completedFuture(listItemRepository.findAllByCreatedBy_Id(userId));
     }

@@ -1,5 +1,6 @@
 package com.sp5blue.shopshare.services.security;
 
+import com.sp5blue.shopshare.models.user.Token;
 import com.sp5blue.shopshare.models.user.TokenType;
 import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.security.request.SignInRequest;
@@ -17,7 +18,7 @@ public interface IAuthenticationService {
 
     void saveUserToken(User user, String token, TokenType tokenType);
 
-    void refreshToken(HttpServletRequest request, HttpServletResponse response);
+    void saveUserTokens(Token... tokens);
 
-    void _revokeAllTokens(User user);
+    void refreshToken(HttpServletRequest request, HttpServletResponse response);
 }

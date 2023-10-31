@@ -2,20 +2,19 @@ package com.sp5blue.shopshare.dtos.shoppergroup;
 
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
-import com.sp5blue.shopshare.models.user.User;
 
 import java.util.List;
 import java.util.UUID;
 
-public record ShopperGroupDto(UUID id, String name, String admin, List<slimUser> users, List<slimList> lists) {
-    private record slimUser(UUID id, String username) {
-        public slimUser(User user) {
-            this (
-                    user.getId(),
-                    user.getUsername()
-            );
-        }
-    }
+public record ShopperGroupDto(UUID id, String name, String admin, int users, List<slimList> lists) {
+//    private record slimUser(UUID id, String username) {
+//        public slimUser(User user) {
+//            this (
+//                    user.getId(),
+//                    user.getUsername()
+//            );
+//        }
+//    }
     private record slimList(UUID id, String name) {
         public slimList(ShoppingList list) {
             this (
@@ -30,7 +29,7 @@ public record ShopperGroupDto(UUID id, String name, String admin, List<slimUser>
                 shopperGroup.getId(),
                 shopperGroup.getName(),
                 shopperGroup.getAdmin().getUsername(),
-                shopperGroup.getUsers().stream().map(slimUser::new).toList(),
+                shopperGroup.getUsers().size(),
                 shopperGroup.getLists().stream().map(slimList::new).toList()
         );
     }
