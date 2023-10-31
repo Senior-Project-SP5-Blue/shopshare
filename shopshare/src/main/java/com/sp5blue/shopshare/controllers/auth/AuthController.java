@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("${api-prefix}/auth")
-public class AuthController {
+public class AuthController implements AuthorizationControllerBase {
     private final AuthenticationService authenticationService;
 
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);
@@ -26,14 +26,20 @@ public class AuthController {
     public AuthController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
+
+    @Override
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateAndGetToken(@RequestBody SignInRequest authRequest) {
         return ResponseEntity.ok(authenticationService.signIn(authRequest).join());
     }
+
+    @Override
     @PostMapping("/signup")
     public ResponseEntity<?> authenticateAndGetToken(@RequestBody SignUpRequest authRequest) {
         return ResponseEntity.ok(authenticationService.signUp(authRequest).join());
     }
+
+    @Override
     @PostMapping("/refresh-signin")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
         authenticationService.refreshToken(request, response);

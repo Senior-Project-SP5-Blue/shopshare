@@ -53,7 +53,16 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
-        http.authorizeHttpRequests(authz -> authz.requestMatchers("index.html", "/api/v1/auth/**", "/h2-console/**").permitAll()
+        http.authorizeHttpRequests(authz -> authz.requestMatchers("index.html",
+                        "/api/v1/auth/**",
+                        "/h2-console/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger.json",
+                        "/swagger-ui.html",
+                        "/webjars/**",
+                        "/v2/api-docs/**",
+                        "/swagger-resources/**").permitAll()
                 .anyRequest().authenticated());
         http.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
