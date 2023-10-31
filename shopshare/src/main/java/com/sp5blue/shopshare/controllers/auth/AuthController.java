@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("${api-prefix}/auth")
-public class AuthController implements AuthorizationControllerBase {
+public class AuthController implements AuthControllerBase {
     private final AuthenticationService authenticationService;
 
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);

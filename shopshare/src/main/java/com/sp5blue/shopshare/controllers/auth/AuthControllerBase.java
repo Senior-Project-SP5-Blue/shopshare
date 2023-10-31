@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Authorization", description = "Signin, Signup, and refreshing Signin")
-public interface AuthorizationControllerBase {
+public interface AuthControllerBase {
 
     @Operation(
             summary = "Logs in users, returns tokens"
