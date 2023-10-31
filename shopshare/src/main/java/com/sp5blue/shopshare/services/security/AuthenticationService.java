@@ -63,6 +63,7 @@ public class AuthenticationService implements IAuthenticationService {
                 request.lastName(),
                 request.username(),
                 request.email(),
+                request.number(),
                 passwordEncoder.encode(request.password()));
         User savedUser = userService.createUser(user).join();
         final String accessToken = jwtService.generateToken(user);

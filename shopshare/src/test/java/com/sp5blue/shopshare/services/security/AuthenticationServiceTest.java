@@ -50,7 +50,7 @@ class AuthenticationServiceTest {
 
     @BeforeAll
     static void beforeAll() {
-        signUpRequest = new SignUpRequest("usertest", "user", "last", "userlast@email.com", "yes");
+        signUpRequest = new SignUpRequest("usertest", "user", "last", "userlast@email.com", "73728292", "yes");
         signInRequest = new SignInRequest("hey@email.com", "password");
     }
 
