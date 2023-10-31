@@ -1,36 +1,35 @@
 package com.sp5blue.shopshare.services.shoppinglist;
 
+import com.sp5blue.shopshare.dtos.shoppinglist.ShoppingListDto;
+import com.sp5blue.shopshare.dtos.shoppinglist.SlimShoppingListDto;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
-import com.sp5blue.shopshare.models.ListItem;
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.ShopperGroup;
-import com.sp5blue.shopshare.models.ShoppingList;
-import org.springframework.transaction.annotation.Transactional;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface IShoppingListService {
-    ShoppingList create(String name, Shopper shopper);
 
-    ShoppingList create(String name, ShopperGroup group);
+    CompletableFuture<SlimShoppingListDto> addShoppingList(UUID userId, UUID groupId, String name);
 
-    ShoppingList create(ShoppingList shoppingList);
+    CompletableFuture<ShoppingList> createShoppingList(UUID userId, UUID groupId, String name);
 
-    ShoppingList readById(UUID id) throws ListNotFoundException;
+    CompletableFuture<SlimShoppingListDto> changeShoppingListName(UUID userId, UUID groupId, UUID listId, String newName);
 
-    List<ShoppingList> readByName(String name) throws ListNotFoundException;
+    CompletableFuture<ShoppingList> updateShoppingListName(UUID userId, UUID groupId, UUID listId, String newName);
 
-    List<ShoppingList> readByShopperId(UUID shopperId);
+    CompletableFuture<ShoppingListDto> getShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException;
 
-    List<ShoppingList> readByShopperGroupId(UUID shopperGroupId);
+    CompletableFuture<List<SlimShoppingListDto>> getShoppingLists(UUID userId, UUID groupId);
 
-    boolean removeItemFromList(UUID listId, UUID itemId) throws ListNotFoundException;
+    CompletableFuture<ShoppingList> readShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException;
 
-    boolean removeItemFromList(UUID listId, ListItem item) throws ListNotFoundException;
+    CompletableFuture<List<ShoppingList>> readShoppingLists(UUID userId, UUID groupId);
 
-    @Transactional
-    boolean addItemToList(UUID listId, UUID itemId) throws ListNotFoundException;
+    CompletableFuture<Boolean> shoppingListExistsById(UUID listId);
 
-    boolean addItemToList(UUID listId, ListItem item) throws ListNotFoundException;
+    void verifyGroupHasList(UUID groupId, UUID listId);
+
+    void deleteShoppingList(UUID userId, UUID groupId, UUID listId);
 }

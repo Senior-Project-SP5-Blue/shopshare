@@ -1,103 +1,129 @@
 package com.sp5blue.shopshare.services.shoppinglist;
 
+import com.sp5blue.shopshare.dtos.shoppinglist.ShoppingListDto;
+import com.sp5blue.shopshare.dtos.shoppinglist.SlimShoppingListDto;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
-import com.sp5blue.shopshare.models.ListItem;
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.ShopperGroup;
-import com.sp5blue.shopshare.models.ShoppingList;
+import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
+import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.repositories.ShoppingListRepository;
-import com.sp5blue.shopshare.services.listitem.IListItemService;
+import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ShoppingListService implements IShoppingListService {
     private final ShoppingListRepository shoppingListRepository;
 
-    private final IListItemService listItemService;
+    private final IShopperGroupService shopperGroupService;
 
     @Autowired
-    public ShoppingListService(ShoppingListRepository shoppingListRepository, IListItemService listItemService) {
+    public ShoppingListService(ShoppingListRepository shoppingListRepository, IShopperGroupService shopperGroupService) {
         this.shoppingListRepository = shoppingListRepository;
-        this.listItemService = listItemService;
+        this.shopperGroupService = shopperGroupService;
     }
 
     @Override
     @Transactional
-    public ShoppingList create(String name, Shopper shopper) {
-        ShoppingList shoppingList = new ShoppingList(name, shopper);
-        return shoppingListRepository.save(shoppingList);
-    }
-
-    @Override
-    @Transactional
-    public ShoppingList create(String name, ShopperGroup group) {
+    @Async
+    public CompletableFuture<SlimShoppingListDto> addShoppingList(UUID userId, UUID groupId, String name) {
+        ShopperGroup group = shopperGroupService.readShopperGroupById(userId, groupId).join();
         ShoppingList shoppingList = new ShoppingList(name, group);
-        return shoppingListRepository.save(shoppingList);
-    }
-    @Override
-    @Transactional
-    public ShoppingList create(ShoppingList shoppingList) {
-        return shoppingListRepository.save(shoppingList);
-    }
-
-    @Override
-    public ShoppingList readById(UUID id) throws ListNotFoundException {
-        Optional<ShoppingList> shoppingList = shoppingListRepository.findById(id);
-        if (shoppingList.isEmpty()) throw new ListNotFoundException("Shopping list does not exist - " + id);
-        return shoppingList.get();
-    }
-
-    @Override
-    public List<ShoppingList> readByName(String name) {
-        return shoppingListRepository.findAllByName(name);
-    }
-
-    @Override
-    public List<ShoppingList> readByShopperId(UUID shopperId) {
-        return shoppingListRepository.findAllByShopper_Id(shopperId);
-    }
-
-    @Override
-    public List<ShoppingList> readByShopperGroupId(UUID shopperGroupId) {
-        return shoppingListRepository.findAllByGroup_Id(shopperGroupId);
+        return CompletableFuture.completedFuture(new SlimShoppingListDto(shoppingListRepository.save(shoppingList)));
     }
 
     @Override
     @Transactional
-    public boolean removeItemFromList(UUID listId, UUID itemId) throws ListNotFoundException {
-        Optional<ShoppingList> shoppingList = shoppingListRepository.findById(listId);
-        if (shoppingList.isEmpty()) throw new ListNotFoundException("Shopping list does not exist - " + listId);
-        return shoppingList.get().removeItem(itemId);
+    @Async
+    public CompletableFuture<ShoppingList> createShoppingList(UUID userId, UUID groupId, String name) {
+        ShopperGroup group = shopperGroupService.readShopperGroupById(userId, groupId).join();
+        ShoppingList shoppingList = new ShoppingList(name, group);
+        return CompletableFuture.completedFuture(shoppingListRepository.save(shoppingList));
     }
 
     @Override
     @Transactional
-    public boolean removeItemFromList(UUID listId, ListItem item) throws ListNotFoundException {
-        Optional<ShoppingList> shoppingList = shoppingListRepository.findById(listId);
-        if (shoppingList.isEmpty()) throw new ListNotFoundException("Shopping list does not exist - " + listId);
-        return shoppingList.get().removeItem(item);
+    @Async
+    public CompletableFuture<SlimShoppingListDto> changeShoppingListName(UUID userId, UUID groupId, UUID listId, String newName) {
+        shopperGroupService.verifyUserHasGroup(userId, groupId);
+        ShoppingList shoppingList = shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+        shoppingList.setName(newName);
+        shoppingList.setModifiedOn(LocalDateTime.now());
+        return CompletableFuture.completedFuture(new SlimShoppingListDto(shoppingList));
     }
 
     @Override
     @Transactional
-    public boolean addItemToList(UUID listId, UUID itemId) throws ListNotFoundException {
-        Optional<ShoppingList> shoppingList = shoppingListRepository.findById(listId);
-        if (shoppingList.isEmpty()) throw new ListNotFoundException("Shopping list does not exist - " + listId);
-        ListItem listItem = listItemService.readById(itemId);
-        return shoppingList.get().addItem(listItem);
+    @Async
+    public CompletableFuture<ShoppingList> updateShoppingListName(UUID userId, UUID groupId, UUID listId, String newName) {
+        shopperGroupService.verifyUserHasGroup(userId, groupId);
+        ShoppingList shoppingList = shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+        shoppingList.setName(newName);
+        shoppingList.setModifiedOn(LocalDateTime.now());
+        return CompletableFuture.completedFuture(shoppingList);
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<ShoppingListDto> getShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException {
+        shopperGroupService.verifyUserHasGroup(userId, groupId);
+        var list = shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+        return CompletableFuture.completedFuture(new ShoppingListDto(list));
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<ShoppingList> readShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException {
+        shopperGroupService.verifyUserHasGroup(userId, groupId);
+        var list = shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+        return CompletableFuture.completedFuture(list);
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<List<SlimShoppingListDto>> getShoppingLists(UUID userId, UUID groupId) {
+        shopperGroupService.verifyUserHasGroup(userId, groupId);
+        var _lists = shoppingListRepository.findAllByGroup_Id(groupId);
+        var lists = _lists.stream().map(SlimShoppingListDto::new).toList();
+        return CompletableFuture.completedFuture(lists);
+    }
+
+
+    @Override
+    @Async
+    public CompletableFuture<List<ShoppingList>> readShoppingLists(UUID userId, UUID groupId) {
+        shopperGroupService.verifyUserHasGroup(userId, groupId);
+        var lists = shoppingListRepository.findAllByGroup_Id(groupId);
+        return CompletableFuture.completedFuture(lists);
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<Boolean> shoppingListExistsById(UUID listId) {
+        return CompletableFuture.completedFuture(shoppingListRepository.existsById(listId));
+    }
+
+
+    @Override
+    @Async
+    public void verifyGroupHasList(UUID groupId, UUID listId) {
+        shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
     }
 
     @Override
     @Transactional
-    public boolean addItemToList(UUID listId, ListItem item) throws ListNotFoundException {
-        Optional<ShoppingList> shoppingList = shoppingListRepository.findById(listId);
-        if (shoppingList.isEmpty()) throw new ListNotFoundException("Shopping list does not exist - " + listId);
-        return shoppingList.get().addItem(item);
+    @Async
+    public void deleteShoppingList(UUID userId, UUID groupId, UUID listId) {
+        ShopperGroup shopperGroup = shopperGroupService.verifyUserHasGroup(userId, groupId);
+        ShoppingList shoppingList = shoppingListRepository.findByGroup_IdAndId(groupId, listId).orElseThrow(() -> new ListNotFoundException("Shopping list does not exist - " + listId));
+        shopperGroup.removeList(listId);
+        shoppingListRepository.delete(shoppingList);
     }
+
 }

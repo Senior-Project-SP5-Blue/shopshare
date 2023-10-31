@@ -6,10 +6,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class InvitationService implements IInvitationService {
@@ -25,34 +28,45 @@ public class InvitationService implements IInvitationService {
 
     @Override
     @Transactional
-    public boolean invite(UUID groupId, UUID shopperId) throws UserAlreadyInvitedException {
+    @Async
+    public CompletableFuture<Boolean> invite(UUID groupId, UUID userId) throws UserAlreadyInvitedException {
         int rowsChanged;
-        boolean alreadyInvited = (boolean) entityManager.createNativeQuery("SELECT COUNT(*) > 0 FROM group_invitations WHERE shopper_group_id = :groupId AND shopper_id = :shopperId")
-                .setParameter("groupId", groupId)
-                .setParameter("shopperId", shopperId)
+        boolean alreadyInvited = (boolean) entityManager.createNativeQuery("SELECT EXISTS ( SELECT * FROM group_invitations WHERE shopper_group_id = :group_id AND user_id = :user_id)")
+                .setParameter("group_i", groupId)
+                .setParameter("user_id", userId)
                 .getSingleResult();
-        if (alreadyInvited) throw new UserAlreadyInvitedException(String.format("User - %s already has active invitation to Group - %s", shopperId, groupId));
+         boolean alreadyInGroup = (boolean) entityManager.createNativeQuery("""
+                         SELECT EXISTS ( SELECT * FROM groups WHERE shopper_group_id = :groupId AND user_id = :userId)
+                         """).setParameter("groupId", groupId)
+                 .setParameter("userId", userId)
+                 .getSingleResult();
+
+        if (alreadyInvited || alreadyInGroup) throw new UserAlreadyInvitedException(String.format("User - %s already has active invitation to Group - %s", userId, groupId));
         try {
-            Query query = entityManager.createNativeQuery("INSERT INTO group_invitations(shopper_group_id, shopper_id) VALUES (:groupId, :shopperId)");
-            rowsChanged = query.setParameter("groupId", groupId).setParameter("shopperId", shopperId).executeUpdate();
+            Query query = entityManager.createNativeQuery("INSERT INTO group_invitations(shopper_group_id, user_id) VALUES (:group_id, :user_id)");
+            rowsChanged = query.setParameter("group_id", groupId).setParameter("user_id", userId).executeUpdate();
         } catch (Exception exception) {
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
 
-        return rowsChanged != 1;
+        return CompletableFuture.completedFuture(rowsChanged == 1);
     }
 
     @Override
     @Transactional
-    public boolean acceptInvite(UUID groupId, UUID shopperId) {
-        boolean hasInvite = (boolean) entityManager.createNativeQuery("SELECT COUNT(*) > 0 FROM group_invitations WHERE shopper_group_id = :groupId AND shopper_id = :shopperId")
+    @Async
+    public CompletableFuture<Boolean> acceptInvite(UUID groupId, UUID userId) throws ExecutionException, InterruptedException {
+        boolean hasInvite = (boolean) entityManager.createNativeQuery("SELECT EXISTS (SELECT *  FROM group_invitations WHERE shopper_group_id = :groupId AND user_id = :userId)")
                 .setParameter("groupId", groupId)
-                .setParameter("shopperId", shopperId)
+                .setParameter("userId", userId)
                 .getSingleResult();
-        if (!hasInvite) throw new UserNotInvitedException(String.format("User - %s has not been invited to Group - %s", shopperId, groupId));
+        if (!hasInvite) throw new UserNotInvitedException(String.format("User - %s has not been invited to Group - %s", userId, groupId));
 
-        return shopperGroupService.addShopperToGroup(groupId, shopperId);
+        CompletableFuture<Boolean> added = shopperGroupService.addUserToShopperGroup(groupId, userId);
+        int rowsChanged = entityManager.createNativeQuery("DELETE FROM group_invitations WHERE shopper_group_id = :groupId AND user_id = :userId")
+                .setParameter("groupId", groupId)
+                .setParameter("userId", userId)
+                .executeUpdate();
+        return CompletableFuture.completedFuture(added.get() && rowsChanged == 1);
     }
-
-
 }

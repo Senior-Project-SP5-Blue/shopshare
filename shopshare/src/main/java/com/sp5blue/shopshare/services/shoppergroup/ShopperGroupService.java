@@ -1,95 +1,182 @@
 package com.sp5blue.shopshare.services.shoppergroup;
 
+import com.sp5blue.shopshare.dtos.shoppergroup.ShopperGroupDto;
+import com.sp5blue.shopshare.dtos.user.UserDto;
 import com.sp5blue.shopshare.exceptions.shoppergroup.GroupNotFoundException;
-import com.sp5blue.shopshare.models.Shopper;
-import com.sp5blue.shopshare.models.ShopperGroup;
+import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsException;
+import com.sp5blue.shopshare.exceptions.shoppergroup.RemoveGroupAdminException;
+import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
+import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.repositories.ShopperGroupRepository;
-import com.sp5blue.shopshare.services.shopper.IShopperService;
-import com.sp5blue.shopshare.services.shopper.ShopperService;
+import com.sp5blue.shopshare.services.user.IUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
-public class ShopperGroupService implements IShopperGroupService {
 
+public class ShopperGroupService implements IShopperGroupService {
     private final ShopperGroupRepository shopperGroupRepository;
-    private final IShopperService shopperService;
+    private final IUserService userService;
+
+    private final Logger logger = LoggerFactory.getLogger(ShopperGroupService.class);
 
     @Autowired
-    public ShopperGroupService(ShopperGroupRepository shopperGroupRepository, ShopperService shopperService) {
+    public ShopperGroupService(ShopperGroupRepository shopperGroupRepository, IUserService userService) {
         this.shopperGroupRepository = shopperGroupRepository;
-        this.shopperService = shopperService;
+        this.userService = userService;
     }
 
     @Override
     @Transactional
-    public ShopperGroup create(String shopperGroupName, Shopper creator) {
-        ShopperGroup shopperGroup = new ShopperGroup(shopperGroupName, creator);
-        return create(shopperGroup);
+    @Async
+    public CompletableFuture<ShopperGroupDto> addShopperGroup(UUID adminId, String groupName) {
+        User user = userService.getUserById(adminId).join();
+        ShopperGroup shopperGroup = new ShopperGroup(groupName, user);
+        var addedGroup = shopperGroupRepository.save(shopperGroup);
+        return CompletableFuture.completedFuture(new ShopperGroupDto(shopperGroup));
+    }
+    @Override
+    @Transactional
+    @Async
+    public CompletableFuture<ShopperGroup> createShopperGroup(UUID adminId, String groupName) {
+        User user = userService.getUserById(adminId).join();
+        ShopperGroup shopperGroup = new ShopperGroup(groupName, user);
+        var addedGroup = shopperGroupRepository.save(shopperGroup);
+        return CompletableFuture.completedFuture(shopperGroup);
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<List<ShopperGroupDto>> getShopperGroups(UUID userId) {
+        var _groups = shopperGroupRepository.findAllByUserId(userId);
+        var groups = _groups.stream().map(ShopperGroupDto::new).toList();
+        return CompletableFuture.completedFuture(groups);
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<List<ShopperGroup>> readShopperGroups(UUID userId) {
+        return CompletableFuture.completedFuture(shopperGroupRepository.findAllByUserId(userId));
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<ShopperGroupDto> getShopperGroupById(UUID userId, UUID groupId) throws GroupNotFoundException {
+        var group = shopperGroupRepository.findByUserIdAndId(userId, groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        return CompletableFuture.completedFuture(new ShopperGroupDto(group));
+    }
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<ShopperGroup> readShopperGroupById(UUID userId, UUID groupId) throws GroupNotFoundException {
+        var group = shopperGroupRepository.findByUserIdAndId(userId, groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        return CompletableFuture.completedFuture(group);
     }
 
     @Override
     @Transactional
-    public ShopperGroup create(ShopperGroup shopperGroup) {
-        return shopperGroupRepository.save(shopperGroup);
-    }
-
-    @Override
-    public ShopperGroup readById(UUID groupId) throws GroupNotFoundException {
-        Optional<ShopperGroup> shopperGroup = shopperGroupRepository.findById(groupId);
-        if (shopperGroup.isEmpty()) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
-
-        return shopperGroup.get();
-    }
-
-    @Override
-    public List<ShopperGroup> readByName(String name) {
-        return shopperGroupRepository.findAllByName(name);
-    }
-
-    @Override
-    public List<ShopperGroup> readByShopperId(UUID shopperId) {
-        return shopperGroupRepository.findAllByCreatedBy_Id(shopperId);
-    }
-
-    @Override
-    public List<ShopperGroup> read() {
-        return shopperGroupRepository.findAll();
+    @Async
+    public void deleteShopperGroup(UUID userId, UUID groupId) throws GroupNotFoundException, InvalidUserPermissionsException {
+        ShopperGroup shopperGroup = shopperGroupRepository.findByUserIdAndId(userId, groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        if (userIsAdmin(userId, groupId)) {
+            shopperGroup.setUsers(new ArrayList<>());
+            shopperGroupRepository.delete(shopperGroup);
+            return;
+        }
+        User user = userService.getUserById(userId).join();
+        shopperGroup.removeUser(user);
     }
 
     @Override
     @Transactional
-    public boolean addShopperToGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException {
-        Optional<ShopperGroup> group = shopperGroupRepository.findById(groupId);
-        if (group.isEmpty()) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
-        Shopper shopper = shopperService.readById(shopperId);
-        return group.get().addShopper(shopper);
-    }
-    @Override
-    @Transactional
-    public boolean addShopperToGroup(UUID groupId, Shopper shopper) throws GroupNotFoundException {
-        Optional<ShopperGroup> group = shopperGroupRepository.findById(groupId);
-        if (group.isEmpty()) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
-        return group.get().addShopper(shopper);
+    @Async
+    public CompletableFuture<ShopperGroupDto> changeShopperGroupName(UUID userId, UUID groupId, String newName) {
+        ShopperGroup shopperGroup = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        if (!userIsAdmin(userId, groupId)) throw new InvalidUserPermissionsException("User - " + userId + " does not have permission to modify group");
+        shopperGroup.setName(newName);
+        return CompletableFuture.completedFuture(new ShopperGroupDto(shopperGroup));
     }
 
     @Override
     @Transactional
-    public boolean removeShopperFromGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException {
-        Optional<ShopperGroup> group = shopperGroupRepository.findById(groupId);
-        if (group.isEmpty()) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
-        return group.get().removeShopper(shopperId);
+    @Async
+    public CompletableFuture<ShopperGroup> updateShopperGroupName(UUID userId, UUID groupId, String newName) {
+        ShopperGroup shopperGroup = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        if (!userIsAdmin(userId, groupId)) throw new InvalidUserPermissionsException("User - " + userId + " does not have permission to modify group");
+        shopperGroup.setName(newName);
+        return CompletableFuture.completedFuture(shopperGroup);
     }
+
     @Override
     @Transactional
-    public boolean removeShopperFromGroup(UUID groupId, Shopper shopper) throws GroupNotFoundException {
-        Optional<ShopperGroup> group = shopperGroupRepository.findById(groupId);
-        if (group.isEmpty()) throw new GroupNotFoundException("Shopper group does not exist - " + groupId);
-        return group.get().removeShopper(shopper);
+    @Async
+    public CompletableFuture<Boolean> addUserToShopperGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException {
+        ShopperGroup group = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        User user = userService.getUserById(shopperId).join();
+        return CompletableFuture.completedFuture(group.addUser(user));
+    }
+    
+    @Override
+    @Transactional
+    @Async
+    public CompletableFuture<Boolean> addUserToShopperGroup(UUID groupId, User user) throws GroupNotFoundException {
+        ShopperGroup group = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        return CompletableFuture.completedFuture(group.addUser(user));
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<List<UserDto>> getShopperGroupUsers(UUID userId, UUID groupId) {
+        verifyUserHasGroup(userId, groupId);
+        var _users = userService.getUsersByShopperGroup(groupId).join();
+        var users = _users.stream().map(UserDto::new).toList();
+        return CompletableFuture.completedFuture(users);
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<UserDto> getShopperGroupUser(UUID userId, UUID groupId, UUID memberId) {
+        verifyUserHasGroup(userId, groupId);
+        return CompletableFuture.completedFuture(new UserDto(userService.getUserByShopperGroup(groupId, memberId).join()));
+    }
+
+    @Override
+    @Transactional
+    @Async
+    public CompletableFuture<Boolean> removeUserFromShopperGroup(UUID userId, UUID groupId, UUID shopperId) throws GroupNotFoundException, RemoveGroupAdminException {
+        boolean shopperIsAdmin = userIsAdmin(shopperId, groupId);
+        if (shopperIsAdmin) throw new RemoveGroupAdminException("Cannot remove group admin.");
+        ShopperGroup shopperGroup;
+        shopperGroup = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        if (userId.equals(shopperId)) {
+            return CompletableFuture.completedFuture(shopperGroup.removeUser(shopperId));
+        }
+
+        if (!shopperGroup.getAdmin().getId().equals(userId)) throw new InvalidUserPermissionsException("User - " + userId + " does not have permission to remove from group");
+        return CompletableFuture.completedFuture(shopperGroup.removeUser(shopperId));
+    }
+
+
+    private boolean userIsAdmin(UUID userId, UUID groupId) throws InvalidUserPermissionsException {
+        return userService.userExistsAsAdminByGroup(userId, groupId).join();
+    }
+
+    @Override
+    public ShopperGroup verifyUserHasGroup(UUID userId, UUID groupId) {
+        return shopperGroupRepository.findByUserIdAndId(userId, groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
     }
 }
