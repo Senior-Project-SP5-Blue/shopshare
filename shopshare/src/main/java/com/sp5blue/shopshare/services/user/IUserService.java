@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 public interface IUserService {
     CompletableFuture<User> createUser(User user) throws UserAlreadyExistsException;
 
-    CompletableFuture<User> createUser(String firstName, String lastName, String username, String email, String password) throws UserAlreadyExistsException;
+    CompletableFuture<User> createUser(String firstName, String lastName, String username, String email, String number, String password) throws UserAlreadyExistsException;
 
     User getUserById(String id);
 
