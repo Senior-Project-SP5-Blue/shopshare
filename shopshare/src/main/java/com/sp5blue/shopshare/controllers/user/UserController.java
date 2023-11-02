@@ -1,6 +1,7 @@
 package com.sp5blue.shopshare.controllers.user;
 
 import com.sp5blue.shopshare.models.user.User;
+import com.sp5blue.shopshare.security.accessannotations.AdminPermission;
 import com.sp5blue.shopshare.services.user.IUserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class UserController {
     }
 
     @GetMapping
+    @AdminPermission
     public List<User> getUsers() {
         return userService.getUsers().join();
     }
