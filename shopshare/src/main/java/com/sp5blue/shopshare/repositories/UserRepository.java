@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,17 +15,24 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
+    @NonNull
+    @Override
+    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.id = :user_id")
+    Optional<User> findById(@NonNull @Param("user_id") UUID uuid);
 
     Page<User> findAllByFirstName(String firstName, Pageable pageable);
     List<User> findAllByFirstName(String firstName);
 
-    Optional<User> findByUsername(String username);
+    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.username = :user_username")
+    Optional<User> findByUsername(@Param("user_username") String username);
 
-    Optional<User> findByEmail(String email);
+    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.email = :user_email")
+    Optional<User> findByEmail(@Param("user_email") String email);
 
-    @Query(nativeQuery = true, value = """
-SELECT u.* FROM users u JOIN users_shopper_groups usg on u.id = usg.user_id WHERE usg.shopper_group_id = :group_id
-""")
+//    @Query(nativeQuery = true, value = """
+//SELECT u.* FROM users u JOIN users_shopper_groups usg on u.id = usg.user_id WHERE usg.shopper_group_id = :group_id
+//""")
+    @Query("SELECT DISTINCT u FROM ShopperGroup shopperGroup JOIN shopperGroup.users u WHERE shopperGroup.id = :group_id")
     List<User> findAllByShopperGroup(@Param("group_id") UUID groupId);
 
     @Query(nativeQuery = true, value = """

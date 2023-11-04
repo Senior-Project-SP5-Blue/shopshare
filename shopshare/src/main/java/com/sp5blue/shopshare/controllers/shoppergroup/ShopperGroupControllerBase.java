@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -50,7 +51,13 @@ public interface ShopperGroupControllerBase {
     )
     ResponseEntity<?> deleteShopperGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId);
 
-//    @GroupPermission
+    @GroupAdminPermission
+    @Operation(
+            summary = "Changes a group's name"
+    )
+    ResponseEntity<?> modifyShopperGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @RequestBody CreateEditShopperGroupRequest request);
+
+    @GroupPermission
     @Operation(
             summary = "Get a list of all the users in the group"
     )

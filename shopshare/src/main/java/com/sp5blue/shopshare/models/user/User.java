@@ -45,7 +45,7 @@ public class User implements UserDetails {
     private List<Role> roles = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Token> tokens = new ArrayList<>();
 
     @JsonIgnore

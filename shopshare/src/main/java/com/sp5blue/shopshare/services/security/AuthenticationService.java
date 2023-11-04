@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -66,11 +65,12 @@ public class AuthenticationService implements IAuthenticationService {
                 request.number(),
                 passwordEncoder.encode(request.password()));
         User savedUser = userService.createOrSaveUser(user).join();
-        final String accessToken = jwtService.generateToken(user);
-        final String refreshToken = jwtService.generateRefreshToken(user);
-        saveUserToken(savedUser, accessToken, TokenType.ACCESS);
-        saveUserToken(savedUser, refreshToken, TokenType.REFRESH);
-        return CompletableFuture.completedFuture(new AuthenticationResponse(accessToken, refreshToken));
+        final String accessJwt = jwtService.generateToken(user);
+        final String refreshJwt = jwtService.generateRefreshToken(user);
+        Token accessToken = new Token(accessJwt, user, TokenType.ACCESS);
+        Token refreshToken = new Token(refreshJwt, user, TokenType.REFRESH);
+        saveUserTokens(accessToken, refreshToken);
+        return CompletableFuture.completedFuture(new AuthenticationResponse(accessJwt, refreshJwt));
     }
 
     @Override
@@ -80,12 +80,13 @@ public class AuthenticationService implements IAuthenticationService {
         CompletableFuture<User> getUser = userService.getUserByEmail(request.email());
         User user = getUser.join();
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
-        final String accessToken = jwtService.generateToken(user);
-        final String refreshToken = jwtService.generateRefreshToken(user);
+        final String accessJwt = jwtService.generateToken(user);
+        final String refreshJwt = jwtService.generateRefreshToken(user);
+        Token accessToken = new Token(accessJwt, user, TokenType.ACCESS);
+        Token refreshToken = new Token(refreshJwt, user, TokenType.REFRESH);
         tokenService.revokeAllUserTokens(user.getId());
-        saveUserToken(user, accessToken, TokenType.ACCESS);
-        saveUserToken(user, refreshToken, TokenType.REFRESH);
-        return CompletableFuture.completedFuture(new AuthenticationResponse(accessToken, refreshToken));
+        saveUserTokens(accessToken, refreshToken);
+        return CompletableFuture.completedFuture(new AuthenticationResponse(accessJwt, refreshJwt));
     }
 
 
@@ -95,6 +96,13 @@ public class AuthenticationService implements IAuthenticationService {
     public void saveUserToken(User user, String token, TokenType tokenType) {
         Token _token = new Token(token, user, tokenType);
         tokenService.create(_token);
+    }
+
+    @Override
+    @Transactional
+    @Async
+    public void saveUserTokens(Token... tokens) {
+        tokenService.create(tokens);
     }
 
     @Override
@@ -116,7 +124,7 @@ public class AuthenticationService implements IAuthenticationService {
 
             if (jwtService.validateToken(refreshToken, user)) {
                 String accessToken = jwtService.generateToken(user);
-                saveUserToken(user, accessToken, TokenType.ACCESS);
+                saveUserTokens(new Token(accessToken, user, TokenType.ACCESS));
                 AuthenticationResponse authenticationResponse = new AuthenticationResponse(accessToken, refreshToken);
                 try {
                     new ObjectMapper().writeValue(response.getOutputStream(), authenticationResponse);
@@ -126,18 +134,5 @@ public class AuthenticationService implements IAuthenticationService {
                 }
             }
         }
-    }
-
-    @Override
-    @Transactional
-    @Async
-    public void _revokeAllTokens(User user) {
-        List<Token> validTokens = tokenService.readAllByUserId(user.getId(), true).join();
-        if (validTokens.isEmpty()) return;
-
-        validTokens.forEach(t -> {
-            t.setRevoked(true);
-            t.setExpired(true);
-        });
     }
 }

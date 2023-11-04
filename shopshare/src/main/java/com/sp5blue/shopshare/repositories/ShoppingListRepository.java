@@ -38,7 +38,8 @@ public interface ShoppingListRepository extends JpaRepository<ShoppingList, UUID
     Page<ShoppingList> findAllByGroup_Id(UUID groupId, Pageable pageable);
     List<ShoppingList> findAllByGroup_Id(UUID groupId);
 
-    Optional<ShoppingList> findByGroup_IdAndId(UUID groupId, UUID listId);
+    @Query("SELECT sl FROM ShoppingList sl LEFT JOIN FETCH sl.items WHERE sl.group.id= :group_id AND sl.id= :list_id")
+    Optional<ShoppingList> findByGroup_IdAndId(@Param("group_id") UUID groupId, @Param("list_id")UUID listId);
 
     long countByGroup_Id(UUID shopperId);
 

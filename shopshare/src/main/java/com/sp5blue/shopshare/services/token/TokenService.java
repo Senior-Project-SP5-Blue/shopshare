@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -32,8 +33,8 @@ public class TokenService implements ITokenService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<List<Token>> create(List<Token> tokens) {
-        return CompletableFuture.completedFuture(tokenRepository.saveAll(tokens));
+    public CompletableFuture<List<Token>> create(Token[] tokens) {
+        return CompletableFuture.completedFuture(tokenRepository.saveAll(Arrays.asList(tokens)));
     }
 
     @Override
@@ -73,11 +74,7 @@ public class TokenService implements ITokenService {
     @Override
     @Transactional
     @Async
-    public void revokeAllUserTokens(UUID shopperId) {
-        List<Token> tokens = tokenRepository.findAllByUser_Id(shopperId);
-        tokens.forEach(t -> {
-            t.setExpired(true);
-            t.setRevoked(true);
-        });
+    public void revokeAllUserTokens(UUID userId) {
+        tokenRepository.revokeTokensByUser(userId);
     }
 }

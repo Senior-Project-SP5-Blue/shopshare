@@ -6,8 +6,6 @@ import com.sp5blue.shopshare.dtos.listitem.ListItemDto;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListNotFoundException;
 import com.sp5blue.shopshare.models.listitem.ListItem;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,8 +15,6 @@ public interface IListItemService {
 
     CompletableFuture<ListItemDto> addListItemToList(UUID userId, UUID groupId, UUID listId, CreateListItemRequest listItemDto);
 
-    @Transactional
-    @Async
     CompletableFuture<ListItem> createListItem(UUID userId, UUID groupId, UUID listId, CreateListItemRequest createListItemRequest);
 
     void removeListItemFromList(UUID userId, UUID groupId, UUID listId, UUID itemId);
@@ -35,14 +31,12 @@ public interface IListItemService {
 
     CompletableFuture<ListItemDto> getListItemById(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListNotFoundException;
 
-    @Async
     CompletableFuture<ListItem> readListItemById(UUID userId, UUID groupId, UUID listId, UUID itemId) throws ListItemNotFoundException;
 
     CompletableFuture<List<ListItemDto>> getListItemsByCreator(UUID userId);
 
     void removeListItemsFromList(UUID userId, UUID groupId, UUID listId);
 
-    @Async
     CompletableFuture<List<ListItem>> readListItemsByCreator(UUID userId);
 
     CompletableFuture<ListItem> editListItem(UUID userId, UUID groupId, UUID listId, UUID itemId, EditListItemRequest editListItemRequest) throws ListItemNotFoundException;

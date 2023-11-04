@@ -70,6 +70,7 @@ public class ShoppingListService implements IShoppingListService {
     }
 
     @Override
+    @Transactional
     @Async
     public CompletableFuture<ShoppingListDto> getShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
@@ -87,6 +88,7 @@ public class ShoppingListService implements IShoppingListService {
 
     @Override
     @Async
+    @Transactional
     public CompletableFuture<List<SlimShoppingListDto>> getShoppingLists(UUID userId, UUID groupId) {
         shopperGroupService.verifyUserHasGroup(userId, groupId);
         var _lists = shoppingListRepository.findAllByGroup_Id(groupId);

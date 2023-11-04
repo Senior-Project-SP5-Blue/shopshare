@@ -61,6 +61,11 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
         shopperGroupService.deleteShopperGroup(userId, groupId);
         return ResponseEntity.noContent().build();
     }
+    @Override
+    @PatchMapping("/{group_id}")
+    public ResponseEntity<?> modifyShopperGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @RequestBody CreateEditShopperGroupRequest request) {
+        return ResponseEntity.ok().body(shopperGroupService.changeShopperGroupName(userId, groupId, request.name()).join());
+    }
 
     @Override
     @GetMapping("/{group_id}/members")
