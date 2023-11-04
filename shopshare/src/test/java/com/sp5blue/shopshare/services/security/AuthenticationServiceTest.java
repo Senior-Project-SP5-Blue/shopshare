@@ -78,12 +78,12 @@ class AuthenticationServiceTest {
         User user = new User("usertest", "user", "last", "userlast@email.com", "yes");
         when(userService.userExistsByUsername(anyString())).thenReturn(CompletableFuture.completedFuture(false));
         when(userService.userExistsByEmail(anyString())).thenReturn(CompletableFuture.completedFuture(false));
-        when(userService.createUser(any(User.class))).thenReturn(CompletableFuture.completedFuture(user));
+        when(userService.createOrSaveUser(any(User.class))).thenReturn(CompletableFuture.completedFuture(user));
 
         var _result = authenticationService.signUp(signUpRequest);
         var result = _result.get();
 
-        verify(userService).createUser(captor.capture());
+        verify(userService).createOrSaveUser(captor.capture());
         verify(jwtService).generateToken(captor.getValue());
         assertNotNull(result);
     }

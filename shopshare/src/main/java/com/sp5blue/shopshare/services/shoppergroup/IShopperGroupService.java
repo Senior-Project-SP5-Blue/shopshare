@@ -17,28 +17,20 @@ import java.util.concurrent.CompletableFuture;
 public interface IShopperGroupService {
     CompletableFuture<ShopperGroupDto> addShopperGroup(UUID adminId, String groupName);
 
-    @Transactional
-    @Async
     CompletableFuture<ShopperGroup> createShopperGroup(UUID adminId, String groupName);
 
     CompletableFuture<List<ShopperGroupDto>> getShopperGroups(UUID userId);
 
-    @Async
-    @Transactional
     CompletableFuture<List<ShopperGroup>> readShopperGroups(UUID userId);
 
     CompletableFuture<ShopperGroupDto> getShopperGroupById(UUID userId, UUID groupId) throws GroupNotFoundException;
 
-    @Async
-    @Transactional
     CompletableFuture<ShopperGroup> readShopperGroupById(UUID userId, UUID groupId) throws GroupNotFoundException;
 
     void deleteShopperGroup(UUID userId, UUID groupId) throws GroupNotFoundException, InvalidUserPermissionsException;
 
     CompletableFuture<ShopperGroupDto> changeShopperGroupName(UUID userId, UUID groupId, String newName);
 
-    @Transactional
-    @Async
     CompletableFuture<ShopperGroup> updateShopperGroupName(UUID userId, UUID groupId, String newName);
 
     CompletableFuture<Boolean> addUserToShopperGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException;
@@ -50,6 +42,8 @@ public interface IShopperGroupService {
     CompletableFuture<UserDto> getShopperGroupUser(UUID userId, UUID groupId, UUID memberId);
 
     CompletableFuture<Boolean> removeUserFromShopperGroup(UUID userId, UUID groupId, UUID shopperId) throws GroupNotFoundException, RemoveGroupAdminException;
+
+    CompletableFuture<Boolean> userExistsInGroup(UUID userId, UUID groupId);
 
     ShopperGroup verifyUserHasGroup(UUID userId, UUID groupId);
 }
