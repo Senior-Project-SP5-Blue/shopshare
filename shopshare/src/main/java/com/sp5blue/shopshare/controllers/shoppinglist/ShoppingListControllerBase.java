@@ -4,6 +4,7 @@ import com.sp5blue.shopshare.dtos.shoppinglist.CreateEditShoppingListRequest;
 import com.sp5blue.shopshare.dtos.shoppinglist.ShoppingListDto;
 import com.sp5blue.shopshare.dtos.shoppinglist.SlimShoppingListDto;
 import com.sp5blue.shopshare.security.accessannotations.GroupPermission;
+import com.sp5blue.shopshare.security.accessannotations.UserPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,13 @@ import java.util.UUID;
 
 @Tag(name = "Shopping Lists", description = "Managing shopping lists shared across users in a group. Must be a part of group.")
 public interface ShoppingListControllerBase {
+    @UserPermission
+    @Operation(
+            summary = """
+                    Get all shopping lists that a user has access to"""
+    )
+    ResponseEntity<List<SlimShoppingListDto>> getAllUsersShoppingLists(@PathVariable("user_id") UUID userId);
+
     @GroupPermission
     @Operation(
             summary = """

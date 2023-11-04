@@ -25,6 +25,8 @@ public interface IShoppingListService {
 
     CompletableFuture<ShoppingList> readShoppingListById(UUID userId, UUID groupId, UUID listId) throws ListNotFoundException;
 
+    CompletableFuture<List<SlimShoppingListDto>> getShoppingLists(UUID userId);
+
     CompletableFuture<List<ShoppingList>> readShoppingLists(UUID userId, UUID groupId);
 
     CompletableFuture<Boolean> shoppingListExistsById(UUID listId);
