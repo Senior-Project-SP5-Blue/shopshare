@@ -34,7 +34,7 @@ public class UserService implements UserDetailsService, IUserService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<User> createUser(User user) throws UserAlreadyExistsException {
+    public CompletableFuture<User> createOrSaveUser(User user) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(user.getEmail())) throw new UserAlreadyExistsException("Shopper with email already exists - " + user.getEmail());
         if (userRepository.existsByUsername(user.getUsername())) throw new UserAlreadyExistsException("Shopper with username already exists - " + user.getUsername());
         return CompletableFuture.completedFuture(userRepository.save(user));
@@ -43,7 +43,7 @@ public class UserService implements UserDetailsService, IUserService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<User> createUser(String firstName, String lastName, String username, String email, String number, String password) throws UserAlreadyExistsException {
+    public CompletableFuture<User> createOrSaveUser(String firstName, String lastName, String username, String email, String number, String password) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(email)) throw new UserAlreadyExistsException("Shopper with email already exists - " + email);
         if (userRepository.existsByEmail(username)) throw new UserAlreadyExistsException("Shopper with username already exists - " + username);
         User user = new User(firstName, lastName, username, email, number, password);

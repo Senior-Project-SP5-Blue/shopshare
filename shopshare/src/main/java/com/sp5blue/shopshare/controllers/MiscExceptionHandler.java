@@ -34,13 +34,13 @@ public class MiscExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<ShoppingListErrorResponse> handleException(Exception exception) {
+//    @ExceptionHandler
+//    public ResponseEntity<ShoppingListErrorResponse> handleException(Exception exception) {
 //        exception.printStackTrace();
 //        logger.warn(exception.getMessage());
-        ShoppingListErrorResponse error = new ShoppingListErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                LocalDateTime.now());
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//        ShoppingListErrorResponse error = new ShoppingListErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+//                LocalDateTime.now());
+//        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 }

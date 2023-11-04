@@ -39,7 +39,7 @@ class UserServiceTest {
         when(mockShopperRepo.existsByEmail("tom@email.com")).thenReturn(true);
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
 
-        var exception = assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(user));
+        var exception = assertThrows(UserAlreadyExistsException.class, () -> userService.createOrSaveUser(user));
 
         assertEquals("Shopper with email already exists - tom@email.com", exception.getMessage());
     }
@@ -50,7 +50,7 @@ class UserServiceTest {
         when(mockShopperRepo.existsByUsername("tomUserName")).thenReturn(true);
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
 
-        var exception = assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(user));
+        var exception = assertThrows(UserAlreadyExistsException.class, () -> userService.createOrSaveUser(user));
 
         assertEquals("Shopper with username already exists - tomUserName", exception.getMessage());
     }
@@ -60,7 +60,7 @@ class UserServiceTest {
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
         when(mockShopperRepo.save(user)).thenReturn(user);
 
-        var _result = userService.createUser(user);
+        var _result = userService.createOrSaveUser(user);
         var result = _result.get();
 
         verify(mockShopperRepo).existsByEmail("tom@email.com");
