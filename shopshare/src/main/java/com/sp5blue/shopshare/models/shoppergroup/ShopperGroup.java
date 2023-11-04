@@ -22,7 +22,7 @@ public class ShopperGroup {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinTable(name = "users_shopper_groups",
     joinColumns = @JoinColumn(name = "shopper_group_id"),
     inverseJoinColumns = @JoinColumn(name = "user_id"))
@@ -40,12 +40,8 @@ public class ShopperGroup {
 
     public ShopperGroup(String name, User createdBy) {
         this.name = name;
-        Role role = new Role("ROLE_GROUP_ADMIN-"+ getId(), RoleType.ROLE_GROUP_ADMIN);
-        createdBy.addRole(role);
         this.admin = createdBy;
-        this.users = new ArrayList<>();
         this.users.add(createdBy);
-        this.lists = new ArrayList<>();
     }
 
     public User getAdmin() {
@@ -84,22 +80,21 @@ public class ShopperGroup {
     }
 
     public boolean addUser(User user) {
-        Role role = new Role("ROLE_GROUP_MEMBER-" + getId(), RoleType.ROLE_GROUP_MEMBER);
-        user.addRole(role);
         return users.add(user);
-//        return user.getGroups().add(this);
     }
 
     public void removeUser(User user) {
-        user.removeRole("ROLE_GROUP_MEMBER-" + getId());
         users.remove(user);
     }
 
     public boolean removeUser(UUID userId) {
         User user = users.stream().filter(s -> s.getId().equals(userId)).findFirst().orElse(null);
         if (user == null) return false;
-        user.removeRole("ROLE_GROUP_MEMBER-" + getId());
         return users.removeIf(x -> x.getId().equals(userId));
+    }
+
+    public void removeAllUsers() {
+        users = new ArrayList<>();
     }
 
     public void addList(ShoppingList shoppingList) {

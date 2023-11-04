@@ -59,14 +59,14 @@ public class TokenService implements ITokenService {
     @Override
     @Async
     public CompletableFuture<Token> readByToken(String token) throws TokenNotFoundException {
-        return CompletableFuture.completedFuture(tokenRepository.findByToken(token).orElseThrow(() -> new TokenNotFoundException("Token does not exist - " + token)));
+        return CompletableFuture.completedFuture(tokenRepository.findByToken(token).orElseThrow(() -> new TokenNotFoundException("Invalid Token")));
     }
 
     @Override
     @Transactional
     @Async
     public void revokeAccessToken(String jwt) {
-        Token storedToken = tokenRepository.findByToken(jwt).orElseThrow(() -> new TokenNotFoundException("Token does not exist - " + jwt));
+        Token storedToken = tokenRepository.findByToken(jwt).orElseThrow(() -> new TokenNotFoundException("Invalid Token"));
         storedToken.setExpired(true);
         storedToken.setRevoked(true);
     }

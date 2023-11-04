@@ -35,7 +35,10 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+    @Column(name = "number")
+    private String number;
+
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -78,6 +81,15 @@ public class User implements UserDetails {
         this.active = true;
     }
 
+    public User(String firstName, String lastName, String username, String email, String number, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.number = number;
+    }
+
     public User(String firstName, String lastName, String username, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -87,20 +99,30 @@ public class User implements UserDetails {
         this.active = true;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
     @Override
     public String toString() {
-        return "Shopper{" +
+        return "User{" +
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", profilePicture='" + profilePicture + '\'' +
+                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", roles=" + roles +
+                ", number='" + number + '\'' +
                 ", active=" + active +
                 '}';
     }
-
 
     public UUID getId() {
         return id;
