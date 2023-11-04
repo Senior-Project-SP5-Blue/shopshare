@@ -6,7 +6,7 @@ import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record SlimShoppingListDto(UUID id, String name, LocalDateTime modifiedOn, Number completed, int total) {
+public record SlimShoppingListDto(UUID id, String name, LocalDateTime modifiedOn, Number completed, int total, UUID groupId) {
 
     public SlimShoppingListDto(ShoppingList shoppingList) {
         this(
@@ -14,7 +14,8 @@ public record SlimShoppingListDto(UUID id, String name, LocalDateTime modifiedOn
                 shoppingList.getName(),
                 shoppingList.getModifiedOn(),
                 shoppingList.getItems().stream().filter(i -> i.getStatus() == ItemStatus.COMPLETED).count(),
-                shoppingList.getItems().size()
+                shoppingList.getItems().size(),
+                shoppingList.getGroup().getId()
         );
     }
 }

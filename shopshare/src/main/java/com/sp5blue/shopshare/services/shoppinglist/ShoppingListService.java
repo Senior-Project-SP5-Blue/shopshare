@@ -94,6 +94,15 @@ public class ShoppingListService implements IShoppingListService {
         return CompletableFuture.completedFuture(lists);
     }
 
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<List<SlimShoppingListDto>> getShoppingLists(UUID userId) {
+        var _lists = shoppingListRepository.findAllBUser(userId);
+        var lists = _lists.stream().map(SlimShoppingListDto::new).toList();
+        return CompletableFuture.completedFuture(lists);
+    }
+
 
     @Override
     @Async
