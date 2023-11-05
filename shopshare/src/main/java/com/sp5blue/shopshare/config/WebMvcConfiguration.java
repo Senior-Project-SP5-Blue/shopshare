@@ -7,9 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 import java.util.List;
 
@@ -31,6 +29,19 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:8080", "http://localhost:5173");
+        WebMvcConfigurer.super.addCorsMappings(registry);
+    }
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer.setUseTrailingSlashMatch(true);
+        WebMvcConfigurer.super.configurePathMatch(configurer);
+    }
+
+    @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.removeIf(converter -> {
             String converterName = converter.getClass().getSimpleName();
@@ -39,17 +50,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         converters.add(jacksonMessageConverter());
         WebMvcConfigurer.super.extendMessageConverters(converters);
     }
-
-//    @Override
-//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-//        converters.removeIf(converter -> {
-//            String converterName = converter.getClass().getSimpleName();
-//            return converterName.equals("MappingJackson2HttpMessageConverter");
-//        });
-//        converters.add(new ByteArrayHttpMessageConverter());
-//        converters.add(jacksonMessageConverter());
-//        WebMvcConfigurer.super.configureMessageConverters(converters);
-//    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
