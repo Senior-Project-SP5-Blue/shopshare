@@ -4,7 +4,6 @@ import com.sp5blue.shopshare.exceptions.shoppergroup.UserAlreadyInGroupException
 import com.sp5blue.shopshare.exceptions.shoppergroup.UserNotInvitedException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Service
 public class InvitationService implements IInvitationService {

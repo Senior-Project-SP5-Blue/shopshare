@@ -26,14 +26,14 @@ public class TokenService implements ITokenService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<Token> create(Token token) {
+    public CompletableFuture<Token> createOrSave(Token token) {
         return CompletableFuture.completedFuture(tokenRepository.save(token));
     }
 
     @Override
     @Transactional
     @Async
-    public CompletableFuture<List<Token>> create(Token[] tokens) {
+    public CompletableFuture<List<Token>> createOrSave(Token[] tokens) {
         return CompletableFuture.completedFuture(tokenRepository.saveAll(Arrays.asList(tokens)));
     }
 
@@ -60,6 +60,13 @@ public class TokenService implements ITokenService {
     @Async
     public CompletableFuture<Token> readByToken(String token) throws TokenNotFoundException {
         return CompletableFuture.completedFuture(tokenRepository.findByToken(token).orElseThrow(() -> new TokenNotFoundException("Invalid Token")));
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<Token> readByConfirmationToken(String token) throws TokenNotFoundException {
+        return CompletableFuture.completedFuture(tokenRepository.findByConfirmationToken(token).orElseThrow(() -> new TokenNotFoundException("Invalid Token")));
+
     }
 
     @Override
