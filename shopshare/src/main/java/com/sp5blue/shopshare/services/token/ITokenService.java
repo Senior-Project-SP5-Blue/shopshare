@@ -8,9 +8,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface ITokenService {
-    CompletableFuture<Token> create(Token token);
+    CompletableFuture<Token> createOrSave(Token token);
 
-    CompletableFuture<List<Token>> create(Token[] tokens);
+    CompletableFuture<List<Token>> createOrSave(Token[] tokens);
 
     CompletableFuture<List<Token>> readAllByUserId(UUID shopperId, boolean validOnly);
 
@@ -19,6 +19,8 @@ public interface ITokenService {
     CompletableFuture<Token> readRefreshByUserId(UUID shopperId) throws TokenNotFoundException ;
 
     CompletableFuture<Token> readByToken(String token) throws TokenNotFoundException;
+
+    CompletableFuture<Token> readByConfirmationToken(String token) throws TokenNotFoundException;
 
     void revokeAccessToken(String jwt) throws TokenNotFoundException;
 

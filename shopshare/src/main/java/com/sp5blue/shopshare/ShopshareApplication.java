@@ -1,7 +1,5 @@
 package com.sp5blue.shopshare;
 
-import com.sp5blue.shopshare.services.mail.IMailService;
-import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

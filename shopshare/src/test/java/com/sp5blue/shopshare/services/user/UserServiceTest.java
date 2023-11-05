@@ -36,7 +36,7 @@ class UserServiceTest {
 
     @Test
     void create_DuplicateEmail_ThrowsUserAlreadyExistsException() {
-        when(mockShopperRepo.existsByEmail("tom@email.com")).thenReturn(true);
+        when(mockShopperRepo.existsByEmailIgnoreCase("tom@email.com")).thenReturn(true);
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
 
         var exception = assertThrows(UserAlreadyExistsException.class, () -> userService.createOrSaveUser(user));
@@ -47,7 +47,7 @@ class UserServiceTest {
 
     @Test
     void create_DuplicateUsername_ThrowsUserAlreadyExistsException() {
-        when(mockShopperRepo.existsByUsername("tomUserName")).thenReturn(true);
+        when(mockShopperRepo.existsByUsernameIgnoreCase("tomUserName")).thenReturn(true);
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
 
         var exception = assertThrows(UserAlreadyExistsException.class, () -> userService.createOrSaveUser(user));
@@ -63,8 +63,8 @@ class UserServiceTest {
         var _result = userService.createOrSaveUser(user);
         var result = _result.get();
 
-        verify(mockShopperRepo).existsByEmail("tom@email.com");
-        verify(mockShopperRepo).existsByUsername("tomUserName");
+        verify(mockShopperRepo).existsByEmailIgnoreCase("tom@email.com");
+        verify(mockShopperRepo).existsByUsernameIgnoreCase("tomUserName");
         verify(mockShopperRepo).save(user);
         assertEquals(user, result);
     }
@@ -81,7 +81,7 @@ class UserServiceTest {
     @Test
     void loadUserByUsername_Valid_ReturnsShopper() {
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
-        when(mockShopperRepo.findByEmail("tom@email.com")).thenReturn(Optional.of(user));
+        when(mockShopperRepo.findByEmailIgnoreCase("tom@email.com")).thenReturn(Optional.of(user));
 
         var result = userService.loadUserByUsername("tom@email.com");
         assertEquals(user, result);
@@ -120,7 +120,7 @@ class UserServiceTest {
     @Test
     void readByEmail_Valid_ReturnsShopper() throws ExecutionException, InterruptedException {
         User user = new User("Tom", "Banks", "tomUserName", "tom@email.com", "tomPass");
-        when(mockShopperRepo.findByEmail("tom@email.com")).thenReturn(Optional.of(user));
+        when(mockShopperRepo.findByEmailIgnoreCase("tom@email.com")).thenReturn(Optional.of(user));
 
         var _result = userService.getUserByEmail("tom@email.com");
         var result = _result.get();

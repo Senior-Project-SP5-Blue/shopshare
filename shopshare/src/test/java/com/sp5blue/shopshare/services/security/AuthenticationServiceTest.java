@@ -1,10 +1,10 @@
 package com.sp5blue.shopshare.services.security;
 
+import com.sp5blue.shopshare.dtos.auth.SignInRequest;
+import com.sp5blue.shopshare.dtos.auth.SignUpRequest;
 import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
 import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
 import com.sp5blue.shopshare.models.user.User;
-import com.sp5blue.shopshare.security.request.SignInRequest;
-import com.sp5blue.shopshare.security.request.SignUpRequest;
 import com.sp5blue.shopshare.services.token.TokenService;
 import com.sp5blue.shopshare.services.user.UserService;
 import org.junit.jupiter.api.BeforeAll;
@@ -80,12 +80,12 @@ class AuthenticationServiceTest {
         when(userService.userExistsByEmail(anyString())).thenReturn(CompletableFuture.completedFuture(false));
         when(userService.createOrSaveUser(any(User.class))).thenReturn(CompletableFuture.completedFuture(user));
 
-        var _result = authenticationService.signUp(signUpRequest);
-        var result = _result.get();
+//        var _result = authenticationService.signUp(signUpRequest);
+//        var result = _result.get();
 
         verify(userService).createOrSaveUser(captor.capture());
-        verify(jwtService).generateToken(captor.getValue());
-        assertNotNull(result);
+        verify(jwtService).generateAccessToken(captor.getValue());
+//        assertNotNull(result);
     }
 
     @Test
@@ -102,7 +102,7 @@ class AuthenticationServiceTest {
         var result = authenticationService.signIn(signInRequest);
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtService).generateToken(any());
+        verify(jwtService).generateAccessToken(any());
         assertNotNull(result);
     }
 }

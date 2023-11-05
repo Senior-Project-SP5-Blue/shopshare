@@ -2,8 +2,6 @@ package com.sp5blue.shopshare.models.shoppergroup;
 
 
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
-import com.sp5blue.shopshare.models.user.Role;
-import com.sp5blue.shopshare.models.user.RoleType;
 import com.sp5blue.shopshare.models.user.User;
 import jakarta.persistence.*;
 

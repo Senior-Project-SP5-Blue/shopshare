@@ -24,14 +24,12 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findAllByFirstName(String firstName);
 
     @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.username = :user_username")
-    Optional<User> findByUsername(@Param("user_username") String username);
+    Optional<User> findByUsernameIgnoreCase(@Param("user_username") String username);
 
     @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.email = :user_email")
-    Optional<User> findByEmail(@Param("user_email") String email);
+    Optional<User> findByEmailIgnoreCase(@Param("user_email") String email);
 
-//    @Query(nativeQuery = true, value = """
-//SELECT u.* FROM users u JOIN users_shopper_groups usg on u.id = usg.user_id WHERE usg.shopper_group_id = :group_id
-//""")
+
     @Query("SELECT DISTINCT u FROM ShopperGroup shopperGroup JOIN shopperGroup.users u WHERE shopperGroup.id = :group_id")
     List<User> findAllByShopperGroup(@Param("group_id") UUID groupId);
 
@@ -40,9 +38,9 @@ SELECT u.* FROM users u JOIN users_shopper_groups usg on u.id = usg.user_id WHER
 """)
     Optional<User> findByShopperGroup(@Param("group_id") UUID groupId, @Param("user_id") UUID userId);
 
-    boolean existsByEmail(String email);
+    boolean existsByEmailIgnoreCase(String email);
 
-    boolean existsByUsername(String username);
+    boolean existsByUsernameIgnoreCase(String username);
 
     @Query(nativeQuery = true, value = """
 SELECT EXISTS (SELECT * FROM users_shopper_groups usg WHERE usg.shopper_group_id = :group_id AND usg.user_id =:user_id)

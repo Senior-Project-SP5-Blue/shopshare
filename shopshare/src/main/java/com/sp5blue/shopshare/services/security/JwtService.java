@@ -31,10 +31,16 @@ public class JwtService {
 
     Logger logger = LoggerFactory.getLogger(JwtService.class);
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateAccessToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", ((User)userDetails).getId());
         return createToken(claims, userDetails.getUsername(), jwtExpiration);
+    }
+
+    public String generateConfirmationToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        String subject = ((User)userDetails).getEmail();
+        return createToken(claims, subject, jwtExpiration);
     }
 
     public String generateRefreshToken(UserDetails userDetails) {

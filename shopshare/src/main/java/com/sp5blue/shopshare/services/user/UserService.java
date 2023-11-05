@@ -35,8 +35,8 @@ public class UserService implements UserDetailsService, IUserService {
     @Transactional
     @Async
     public CompletableFuture<User> createOrSaveUser(User user) throws UserAlreadyExistsException {
-        if (userRepository.existsByEmail(user.getEmail())) throw new UserAlreadyExistsException("Shopper with email already exists - " + user.getEmail());
-        if (userRepository.existsByUsername(user.getUsername())) throw new UserAlreadyExistsException("Shopper with username already exists - " + user.getUsername());
+        if (userRepository.existsByEmailIgnoreCase(user.getEmail()) && !userRepository.existsById(user.getId())) throw new UserAlreadyExistsException("Email is unavailable");
+        if (userRepository.existsByUsernameIgnoreCase(user.getUsername()) && !userRepository.existsById(user.getId())) throw new UserAlreadyExistsException("Username is unavailable");
         return CompletableFuture.completedFuture(userRepository.save(user));
     }
 
@@ -44,15 +44,15 @@ public class UserService implements UserDetailsService, IUserService {
     @Transactional
     @Async
     public CompletableFuture<User> createOrSaveUser(String firstName, String lastName, String username, String email, String number, String password) throws UserAlreadyExistsException {
-        if (userRepository.existsByEmail(email)) throw new UserAlreadyExistsException("Shopper with email already exists - " + email);
-        if (userRepository.existsByEmail(username)) throw new UserAlreadyExistsException("Shopper with username already exists - " + username);
+        if (userRepository.existsByEmailIgnoreCase(email)) throw new UserAlreadyExistsException("Email is unavailable");
+        if (userRepository.existsByUsernameIgnoreCase(username)) throw new UserAlreadyExistsException("Username is unavailable");
         User user = new User(firstName, lastName, username, email, number, password);
         return CompletableFuture.completedFuture(userRepository.save(user));
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
-        return userRepository.findByEmail(username).orElseThrow(() -> new UserNotFoundException("User does not exist - " + username));
+        return userRepository.findByEmailIgnoreCase(username).orElseThrow(() -> new UserNotFoundException("Account with email does not exist - " +  username));
     }
 
     @Override
@@ -64,19 +64,19 @@ public class UserService implements UserDetailsService, IUserService {
     @Override
     @Async
     public CompletableFuture<User> getUserById(UUID id) throws UserNotFoundException {
-        return CompletableFuture.completedFuture(userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User does not exist - " + id)));
+        return CompletableFuture.completedFuture(userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Account with id does not exist - " + id)));
     }
 
     @Override
     @Async
     public CompletableFuture<User> getUserByEmail(String email) throws UserNotFoundException {
-        return CompletableFuture.completedFuture(userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User does not exist - " + email)));
+        return CompletableFuture.completedFuture(userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new UserNotFoundException("Account with email does not exist - " + email)));
     }
 
     @Override
     @Async
     public CompletableFuture<User> getUserByUsername(String username) throws UserNotFoundException {
-        return CompletableFuture.completedFuture(userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User does not exist - " + username)));
+        return CompletableFuture.completedFuture(userRepository.findByUsernameIgnoreCase(username).orElseThrow(() -> new UserNotFoundException("Account with username does not exist - " + username)));
     }
 
     @Override
@@ -88,7 +88,7 @@ public class UserService implements UserDetailsService, IUserService {
     @Override
     @Async
     public CompletableFuture<User> getUserByShopperGroup(UUID groupId, UUID userId) {
-        User user = userRepository.findByShopperGroup(groupId, userId).orElseThrow(() -> new UserNotFoundException("User does not exist - " + userId));
+        User user = userRepository.findByShopperGroup(groupId, userId).orElseThrow(() -> new UserNotFoundException("Account with id does not exist - " + userId));
         return CompletableFuture.completedFuture(user);
     }
 
@@ -113,13 +113,13 @@ public class UserService implements UserDetailsService, IUserService {
     @Override
     @Async
     public CompletableFuture<Boolean> userExistsByEmail(String email) {
-        return CompletableFuture.completedFuture(userRepository.existsByEmail(email));
+        return CompletableFuture.completedFuture(userRepository.existsByEmailIgnoreCase(email));
     }
 
     @Override
     @Async
     public CompletableFuture<Boolean> userExistsByUsername(String username) {
-        return CompletableFuture.completedFuture(userRepository.existsByUsername(username));
+        return CompletableFuture.completedFuture(userRepository.existsByUsernameIgnoreCase(username));
     }
 
     @Override

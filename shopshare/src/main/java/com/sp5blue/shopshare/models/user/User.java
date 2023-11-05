@@ -50,7 +50,7 @@ public class User implements UserDetails {
 
     @JsonIgnore
     @Column(name = "active")
-    private boolean active;
+    private boolean active = false;
 
     public List<Token> getTokens() {
         return tokens;
@@ -78,7 +78,6 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.roles = roles;
-        this.active = true;
     }
 
     public User(String firstName, String lastName, String username, String email, String number, String password) {
@@ -96,7 +95,6 @@ public class User implements UserDetails {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.active = true;
     }
 
     public void setUsername(String username) {

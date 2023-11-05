@@ -6,8 +6,6 @@ import com.sp5blue.shopshare.exceptions.shoppergroup.GroupNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsException;
 import com.sp5blue.shopshare.exceptions.shoppergroup.RemoveGroupAdminException;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
-import com.sp5blue.shopshare.models.user.Role;
-import com.sp5blue.shopshare.models.user.RoleType;
 import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.repositories.ShopperGroupRepository;
 import com.sp5blue.shopshare.services.user.IUserService;
@@ -18,7 +16,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;

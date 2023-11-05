@@ -28,7 +28,7 @@ public class Token {
     private boolean isRevoked;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 

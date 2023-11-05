@@ -2,7 +2,6 @@ package com.sp5blue.shopshare.dtos.shoppergroup;
 
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
-import com.sp5blue.shopshare.models.user.User;
 
 import java.util.List;
 import java.util.UUID;

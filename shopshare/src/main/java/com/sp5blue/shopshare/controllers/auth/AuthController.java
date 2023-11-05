@@ -1,19 +1,19 @@
 package com.sp5blue.shopshare.controllers.auth;
 
 
-import com.sp5blue.shopshare.security.request.SignInRequest;
-import com.sp5blue.shopshare.security.request.SignUpRequest;
+import com.sp5blue.shopshare.dtos.auth.SignInRequest;
+import com.sp5blue.shopshare.dtos.auth.SignUpRequest;
 import com.sp5blue.shopshare.services.security.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("${api-prefix}/auth")
@@ -36,7 +36,19 @@ public class AuthController implements AuthControllerBase {
     @Override
     @PostMapping("/signup")
     public ResponseEntity<?> authenticateAndGetToken(@RequestBody SignUpRequest authRequest) {
-        return ResponseEntity.ok(authenticationService.signUp(authRequest).join());
+        authenticationService.signUp(authRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @RequestMapping(value = "/confirm-signup", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<String> confirmEmail(@RequestParam("token") String token) {
+        authenticationService.confirmEmail(token);
+        String content = """
+                <h1>Account Email Verified</h1>""";
+        HttpHeaders responseHeader = new HttpHeaders();
+        responseHeader.setContentType(MediaType.TEXT_HTML);
+        return new ResponseEntity<>(content, responseHeader, HttpStatus.OK);
     }
 
     @Override
