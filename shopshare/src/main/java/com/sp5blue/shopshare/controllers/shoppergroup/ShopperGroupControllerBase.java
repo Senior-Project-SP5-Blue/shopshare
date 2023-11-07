@@ -26,6 +26,9 @@ public interface ShopperGroupControllerBase {
     ResponseEntity<List<ShopperGroupDto>> getShopperGroups(@PathVariable("user_id") UUID userId);
 
     @UserPermission
+    ResponseEntity<ShopperGroupDto> acceptShopperGroupInvitation(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId);
+
+    @UserPermission
     @Operation(
             summary = "Creates a new group, user will be admin"
     )
@@ -36,12 +39,6 @@ public interface ShopperGroupControllerBase {
             summary = "Get a specific group that a user is a part of. Returns group"
     )
     ResponseEntity<ShopperGroupDto> getShopperGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId);
-
-    @UserPermission
-    @Operation(
-            summary = "Accepts invitation to a group. User will now be apart of group."
-    )
-    ResponseEntity<ShopperGroupDto> acceptShopperGroupInvitation(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId);
 
     @GroupAdminPermission
     @Operation(

@@ -63,6 +63,13 @@ public class ShopperGroupService implements IShopperGroupService {
     }
 
     @Override
+    @Async
+    public CompletableFuture<ShopperGroup> findShopperGroupById(UUID groupId) {
+        var group = shopperGroupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+        return CompletableFuture.completedFuture(group);
+    }
+
+    @Override
     @Transactional
     @Async
     public CompletableFuture<List<ShopperGroup>> readShopperGroups(UUID userId) {

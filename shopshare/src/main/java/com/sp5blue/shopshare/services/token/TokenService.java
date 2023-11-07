@@ -66,7 +66,12 @@ public class TokenService implements ITokenService {
     @Async
     public CompletableFuture<Token> readByConfirmationToken(String token) throws TokenNotFoundException {
         return CompletableFuture.completedFuture(tokenRepository.findByConfirmationToken(token).orElseThrow(() -> new TokenNotFoundException("Invalid Token")));
+    }
 
+    @Override
+    @Async
+    public CompletableFuture<Token> readByInvitationToken(String token) throws TokenNotFoundException {
+        return CompletableFuture.completedFuture(tokenRepository.findByInvitationToken(token).orElseThrow(() -> new TokenNotFoundException("Invalid Token")));
     }
 
     @Override

@@ -22,6 +22,8 @@ public interface ITokenService {
 
     CompletableFuture<Token> readByConfirmationToken(String token) throws TokenNotFoundException;
 
+    CompletableFuture<Token> readByInvitationToken(String token) throws TokenNotFoundException;
+
     void revokeAccessToken(String jwt) throws TokenNotFoundException;
 
     void revokeAllUserTokens(UUID shopperId);

@@ -29,7 +29,7 @@ public class ShopperGroup {
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<ShoppingList> lists = new ArrayList<>();
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "admin_id")
     private User admin;
 

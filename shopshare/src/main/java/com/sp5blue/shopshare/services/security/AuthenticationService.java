@@ -106,7 +106,7 @@ public class AuthenticationService implements IAuthenticationService {
     @Async
     public void saveUserToken(User user, String token, TokenType tokenType) {
         Token _token = new Token(token, user, tokenType);
-        tokenService.createOrSave(_token);
+        tokenService.createOrSave(_token).join();
     }
 
     @Override
@@ -118,7 +118,6 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     @Transactional
-    @Async
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         String refreshToken;
@@ -137,6 +136,7 @@ public class AuthenticationService implements IAuthenticationService {
                 String accessToken = jwtService.generateAccessToken(user);
                 saveUserTokens(new Token(accessToken, user, TokenType.ACCESS));
                 AuthenticationResponse authenticationResponse = new AuthenticationResponse(accessToken, refreshToken);
+                response.setHeader("Content-Type", "application/json");
                 try {
                     new ObjectMapper().writeValue(response.getOutputStream(), authenticationResponse);
                 }

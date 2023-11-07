@@ -19,6 +19,8 @@ public interface IShopperGroupService {
 
     CompletableFuture<List<ShopperGroupDto>> getShopperGroups(UUID userId);
 
+    CompletableFuture<ShopperGroup> findShopperGroupById(UUID groupId);
+
     CompletableFuture<List<ShopperGroup>> readShopperGroups(UUID userId);
 
     CompletableFuture<ShopperGroupDto> getShopperGroupById(UUID userId, UUID groupId) throws GroupNotFoundException;
