@@ -51,7 +51,7 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
     @Override
     @PostMapping("/{group_id}")
     public ResponseEntity<ShopperGroupDto> acceptShopperGroupInvitation(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId) {
-        invitationService.acceptInvite(groupId, userId).join();
+        invitationService.acceptInvite(groupId, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -82,7 +82,7 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
     @Override
     @PostMapping("/{group_id}/invitations/{new_member_id}")
     public ResponseEntity<?> inviteShopperToGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("new_member_id") UUID invitedShopperId) {
-        invitationService.invite(groupId, invitedShopperId).join();
+        invitationService.invite(groupId, invitedShopperId);
         return ResponseEntity.noContent().build();
     }
 

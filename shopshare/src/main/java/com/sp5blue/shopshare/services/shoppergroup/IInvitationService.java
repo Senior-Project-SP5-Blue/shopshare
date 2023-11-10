@@ -4,6 +4,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface IInvitationService {
-    CompletableFuture<Boolean> invite(UUID groupId, UUID shopperId);
-    CompletableFuture<Boolean> acceptInvite(UUID groupId, UUID shopperId);
+    CompletableFuture<Void> invite(UUID groupId, UUID shopperId);
+    CompletableFuture<Void> acceptInvite(UUID groupId, UUID shopperId);
+
+    CompletableFuture<Void> acceptInvite(String inviteToken);
 }

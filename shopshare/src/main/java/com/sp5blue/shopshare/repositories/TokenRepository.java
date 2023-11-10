@@ -46,8 +46,12 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
 SELECT * FROM tokens t WHERE t.type = 'CONFIRMATION'
 """)
     Optional<Token> findByConfirmationToken(String token);
+    @Query(nativeQuery = true, value = """
+    SELECT * FROM tokens t WHERE t.type = 'INVITATION'
+    """)
+    Optional<Token> findByInvitationToken(String token);
 
-    @Modifying(flushAutomatically = true)
-    @Query("UPDATE Token t set t.isRevoked = TRUE, t.isExpired = TRUE WHERE t.user.id = :user_id ")
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("UPDATE Token t set t.isRevoked = TRUE, t.isExpired = TRUE WHERE t.user.id = :user_id")
     void revokeTokensByUser(@Param("user_id") UUID userId);
 }

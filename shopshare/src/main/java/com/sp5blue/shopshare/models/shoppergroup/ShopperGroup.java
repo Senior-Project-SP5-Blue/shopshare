@@ -5,9 +5,7 @@ import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.models.user.User;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "shopper_groups")
@@ -24,7 +22,7 @@ public class ShopperGroup {
     @JoinTable(name = "users_shopper_groups",
     joinColumns = @JoinColumn(name = "shopper_group_id"),
     inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> users = new ArrayList<>();
+    private Set<User> users = new HashSet<>();
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<ShoppingList> lists = new ArrayList<>();
@@ -61,11 +59,11 @@ public class ShopperGroup {
         this.name = name;
     }
 
-    public List<User> getUsers() {
+    public Set<User> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(Set<User> users) {
         this.users = users;
     }
 
@@ -92,7 +90,7 @@ public class ShopperGroup {
     }
 
     public void removeAllUsers() {
-        users = new ArrayList<>();
+        users = new HashSet<>();
     }
 
     public void addList(ShoppingList shoppingList) {
@@ -106,5 +104,14 @@ public class ShopperGroup {
     }
     public void removeList(UUID listId) {
         lists.removeIf(l -> l.getId().equals(listId));
+    }
+
+    @Override
+    public String toString() {
+        return "ShopperGroup{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", lists=" + lists +
+                '}';
     }
 }
