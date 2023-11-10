@@ -85,6 +85,7 @@ public class ShopperGroupService implements IShopperGroupService {
     }
     @Override
     @Async
+    @Transactional
     public CompletableFuture<ShopperGroup> readShopperGroupById(UUID userId, UUID groupId) throws GroupNotFoundException {
         var group = shopperGroupRepository.findByUserIdAndId(userId, groupId).orElseThrow(() -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
         return CompletableFuture.completedFuture(group);

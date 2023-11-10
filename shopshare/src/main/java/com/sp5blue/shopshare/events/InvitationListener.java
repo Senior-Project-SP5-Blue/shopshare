@@ -1,8 +1,6 @@
 package com.sp5blue.shopshare.events;
 
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
-import com.sp5blue.shopshare.models.user.Token;
-import com.sp5blue.shopshare.models.user.TokenType;
 import com.sp5blue.shopshare.models.user.User;
 import com.sp5blue.shopshare.services.mail.IMailService;
 import com.sp5blue.shopshare.services.security.JwtService;
@@ -15,8 +13,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class InvitationListener {
@@ -42,32 +42,35 @@ public class InvitationListener {
     }
 
     @Async
-    @TransactionalEventListener(OnInvitationCompleteEvent.class)
-    public void onApplicationEvent(@NonNull OnInvitationCompleteEvent event) {
-        logger.error("Is transaction active: {}", TransactionSynchronizationManager.isActualTransactionActive());
+    @TransactionalEventListener(value = OnInvitationCompleteEvent.class, phase = TransactionPhase.BEFORE_COMMIT)
+    public CompletableFuture<Void> onApplicationEvent(@NonNull OnInvitationCompleteEvent event) {
         User user = event.getUser();
         ShopperGroup group = event.getGroup();
 
-        String invitationJwt = jwtService.generateInvitationToken(user, group);
-        Token confirmationToken = new Token(invitationJwt, user, TokenType.INVITATION);
-        tokenService.createOrSave(confirmationToken).join();
+//        TO-DO maybe: implement email invitation
+//        String invitationJwt = jwtService.generateInvitationToken(user, group);
+//        Token confirmationToken = new Token(invitationJwt, user, TokenType.INVITATION);
+//        tokenService.createOrSave(confirmationToken).join();
 
         String recipientAddress = user.getEmail();
         String subject = "Group Invitation";
-//        TO-DO implement token
+
+//        TO-DO: implement token
 //        String acceptInviteUrl = String.format("%s%s/users/%s/groups?invite=%s", domain, apiPrefix, user.getId(), invitationJwt);
+
         String acceptInviteUrl = String.format("%s%s/users/%s/groups/%s", domain, apiPrefix, user.getId(), group.getId());
-        String inviter = group.getAdmin().getUsername();
         String _htmlMessage = """
-                <div style="display: flex; flex-direction: column;">
-                <h2>You have been invited to the group <b>%s</b> by %s!</h2>
-                </div>""";
-        String htmlMessage = String.format(_htmlMessage, group.getName(), inviter);
+                <h0>You have been invited to the group <em>%s</em>!</h0>
+                """;
+
+        String htmlMessage = String.format(_htmlMessage, group.getName());
+
         try {
             mailService.sendHTMLMessage(recipientAddress, subject, htmlMessage);
         } catch (MessagingException messagingException) {
             messagingException.printStackTrace();
             logger.error(messagingException.getMessage());
         }
+        return null;
     }
 }

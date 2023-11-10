@@ -21,7 +21,7 @@ public interface ListItemRepository extends JpaRepository<ListItem, UUID> {
     List<ListItem> findAllByCreatedBy_Id(UUID listId);
 
     @Query(nativeQuery = true, value = """
-SELECT li.* FROM list_items li JOIN shopping_lists sl ON sl.id = :list_id WHERE li.id = :item_id""")
+    SELECT li.* FROM list_items li JOIN shopping_lists sl ON sl.id = :list_id WHERE li.id = :item_id""")
 //    @Query("SELECT li FROM ListItem li JOIN li.list l WHERE l.id= :list_id AND li.id= :item_id")
     Optional<ListItem> findByList_IdAndId(@Param("list_id") UUID listId, @Param("item_id") UUID itemId);
 

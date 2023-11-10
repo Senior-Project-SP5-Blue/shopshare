@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ShoppingListRepository extends JpaRepository<ShoppingList, UUID> {
-
     Page<ShoppingList> findAllByName(String name, Pageable pageable);
     List<ShoppingList> findAllByName(String name);
 
@@ -45,7 +44,4 @@ public interface ShoppingListRepository extends JpaRepository<ShoppingList, UUID
 
     boolean existsByGroup_Id(UUID groupId);
     boolean existsById(@NonNull UUID listId);
-
-
-
 }

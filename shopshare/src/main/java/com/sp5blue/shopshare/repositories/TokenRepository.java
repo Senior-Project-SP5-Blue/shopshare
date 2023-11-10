@@ -51,7 +51,7 @@ SELECT * FROM tokens t WHERE t.type = 'CONFIRMATION'
     """)
     Optional<Token> findByInvitationToken(String token);
 
-    @Modifying(flushAutomatically = true)
-    @Query("UPDATE Token t set t.isRevoked = TRUE, t.isExpired = TRUE WHERE t.user.id = :user_id ")
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("UPDATE Token t set t.isRevoked = TRUE, t.isExpired = TRUE WHERE t.user.id = :user_id")
     void revokeTokensByUser(@Param("user_id") UUID userId);
 }
