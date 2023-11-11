@@ -1,5 +1,7 @@
 package com.sp5blue.shopshare.services.user;
 
+import com.sp5blue.shopshare.dtos.user.ChangePasswordRequest;
+import com.sp5blue.shopshare.exceptions.authentication.BadCredentialsException;
 import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
 import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
 import com.sp5blue.shopshare.models.user.User;
@@ -9,11 +11,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -23,12 +28,14 @@ import java.util.concurrent.CompletableFuture;
 public class UserService implements UserDetailsService, IUserService {
 
     private final UserRepository userRepository;
-
+    private final PasswordEncoder passwordEncoder;
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
+
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -48,6 +55,22 @@ public class UserService implements UserDetailsService, IUserService {
         if (userRepository.existsByUsernameIgnoreCase(username)) throw new UserAlreadyExistsException("Username is unavailable");
         User user = new User(firstName, lastName, username, email, number, password);
         return CompletableFuture.completedFuture(userRepository.save(user));
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
+        var user = (User)((UsernamePasswordAuthenticationToken)connectedUser).getPrincipal();
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Invalid password");
+        }
+        if (!request.newPassword().equals(request.confirmPassword())) {
+            throw new BadCredentialsException("Confirmation password must match");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
     }
 
     @Override

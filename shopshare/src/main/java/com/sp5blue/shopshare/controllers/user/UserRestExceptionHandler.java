@@ -30,4 +30,10 @@ public class UserRestExceptionHandler {
         UserErrorResponse error = new UserErrorResponse(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), LocalDateTime.now());
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<UserErrorResponse> handleException(com.sp5blue.shopshare.exceptions.authentication.BadCredentialsException exception) {
+        UserErrorResponse error = new UserErrorResponse(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), LocalDateTime.now());
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
 }
