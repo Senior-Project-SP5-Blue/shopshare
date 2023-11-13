@@ -1,19 +1,15 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {StyleSheet} from 'react-native';
 
 import AppNavigator from './navigation';
+import {Provider} from 'react-redux';
+import store from './redux/store';
 
-const App = () =>{
+const App = () => {
   return (
-    <AppNavigator/>
+    <Provider store={store}>
+      <AppNavigator />
+    </Provider>
   );
 };
 
