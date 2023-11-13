@@ -11,89 +11,9 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {StatusBar} from 'react-native';
 import COLORS from '../constants/colors';
 import Button from '../components/Button';
-
-const signin = {
-  email: 'user9first@email.com',
-  password: 'user9pass',
-};
-
-type Token = {
-  accessToken: string;
-  refreshToken: string;
-};
-/**
- *
- * {"accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjlhMjU1OTQ3LTVmMDUtNDViNC05NDBkLTc1NzA5YWRkYmJjNyIsInN1YiI6InVzZXI5IiwiaWF0IjoxNjk4Nzc0NjI2LCJleHAiOjE2OTg4NjEwMjZ9.-xA-54z-nMbjA3IVbyKEcwrulroOxSedmlOgIMBqVdk", "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJyZWZyZXNoIjoidHJ1ZSIsInN1YiI6InVzZXI5IiwiaWF0IjoxNjk4Nzc0NjI2LCJleHAiOjE3MDY1NTA2MjZ9.Ti241RhTjh3fDSeQCzwLuV-Y456it9H1g1p3e4uRWKw"}
- */
-
-fetch('http://10.101.164.98:8080/api/v1/auth/signin', {
-  method: 'POST',
-  // mode: "no-cors",
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(signin),
-})
-  .then(res => res.json())
-  .then(_res => {
-    const _tokens = _res as Token;
-    console.log(_tokens.accessToken);
-    console.log(_tokens.refreshToken);
-    // Do SOMETHING
-    console.log(_res);
-  });
-type ShopperGroup = {
-  id: string;
-  name: string;
-  admin: string;
-  users: {
-    id: string;
-    username: string;
-  }[];
-  lists: {
-    id: string;
-    name: string;
-  }[];
-};
-
-// fetch("http://10.101.164.98:8080/api/v1/users/9a255947-5f05-45b4-940d-75709addbbc7/groups", {
-// method: "GET",
-// // mode: "no-cors",
-// headers: {
-// "Content-Type": "application/json",
-// "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjlhMjU1OTQ3LTVmMDUtNDViNC05NDBkLTc1NzA5YWRkYmJjNyIsInN1YiI6InVzZXI5IiwiaWF0IjoxNjk4Nzc1MjY3LCJleHAiOjE2OTg4NjE2Njd9.wjVPw1sAAov3dkII0m4kC0HVDUk07CT0NfMjWmQxt8s",
-// },
-// // body: JSON.stringify(signin),
-// })
-// .then((res) => res.json())
-// .then((_res) => {
-// // Do SOMETHING
-// _res.map((x:any) => x as ShopperGroup)
-
-// _res.forEach((element: ShopperGroup) => {
-//   console.log(element.admin)
-//   console.log(element.id)
-//   console.log(element.name)
-//   element.users.forEach((u:any) => {console.log(u.username)});
-//   element.lists.forEach((u:any) => {console.log(u.name)});
-// });
-// // console.log(_res);
-// });
-
-// fetch("http://10.101.164.98:8080/api/v1/users/9a255947-5f05-45b4-940d-75709addbbc7/groups/26147cc0-9499-4ab7-9a8c-d7de7d42d073/shopping-lists/62dbf4b9-fdfc-4d4c-8135-fbec64e6d83a", {
-// method: "GET",
-// // mode: "no-cors",
-// headers: {
-// "Content-Type": "application/json",
-// "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjlhMjU1OTQ3LTVmMDUtNDViNC05NDBkLTc1NzA5YWRkYmJjNyIsInN1YiI6InVzZXI5IiwiaWF0IjoxNjk4Nzc1MjY3LCJleHAiOjE2OTg4NjE2Njd9.wjVPw1sAAov3dkII0m4kC0HVDUk07CT0NfMjWmQxt8s",
-// },
-// // body: JSON.stringify(signin),
-// })
-// .then((res) => res.json())
-// .then((_res) => {
-// // Do SOMETHING
-// console.log(_res);
-// });
+import {useSignInMutation} from '../redux/slices/authApiSlice';
+import {setAuthContext} from '../redux/slices/authSlice';
+import {useAppDispatch} from '../redux/store';
 
 interface LoginScreenProps {
   navigation: any;
@@ -103,6 +23,27 @@ const LoginScreen = (props: LoginScreenProps) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const lists = () => props.navigation.navigate('Lists');
   const home = () => props.navigation.navigate('Welcome');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const dispatch = useAppDispatch();
+  const [login, {status, isLoading, isError, isSuccess}] = useSignInMutation();
+
+  const handleLogin = (email: string, password: string) => {
+    console.log(`Email: ${email} Password: ${password}`);
+    login({email, password})
+      .unwrap()
+      .then(userData => {
+        // console.log(userData);
+        dispatch(setAuthContext({...userData, user: userData.userContext}));
+        setEmail('');
+        setPassword('');
+        lists();
+      })
+      .catch(err => {
+        console.log('ERROR!! ');
+        console.log(err);
+      });
+  };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>
@@ -153,6 +94,8 @@ const LoginScreen = (props: LoginScreenProps) => {
             }}>
             <TextInput
               placeholder="Enter your username or email"
+              defaultValue={email}
+              onChangeText={newEmail => setEmail(newEmail)}
               placeholderTextColor={COLORS.black}
               style={{width: '100%', fontSize: 15}}
             />
@@ -176,6 +119,8 @@ const LoginScreen = (props: LoginScreenProps) => {
             <TextInput
               placeholder="Enter your password"
               placeholderTextColor={COLORS.black}
+              defaultValue={password}
+              onChangeText={newPassword => setPassword(newPassword)}
               secureTextEntry={isPasswordShown}
               style={{width: '100%', fontSize: 15}}
             />
@@ -215,8 +160,8 @@ const LoginScreen = (props: LoginScreenProps) => {
         <Button
           title="Login"
           filled
-          onPress={lists}
           style={{marginTop: 20, marginBottom: 4}}
+          onPress={() => handleLogin(email, password)}
         />
         <View>
           <Image

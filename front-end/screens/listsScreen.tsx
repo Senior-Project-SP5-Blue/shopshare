@@ -1,10 +1,7 @@
 import {
   Image,
-  ScrollView,
-  SectionList,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   FlatList,
 } from 'react-native';
@@ -13,8 +10,14 @@ import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 import mockData from '../mockData';
+import {useSelector} from 'react-redux';
+import {selectCurrentUser} from '../redux/slices/authSlice';
 
 const ListsScreen = () => {
+  const user = useSelector(selectCurrentUser);
+  console.log('Current user');
+  console.log(user);
+  console.log('Successfully logged in');
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flexDirection: 'row'}}>

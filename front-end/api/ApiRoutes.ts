@@ -42,4 +42,11 @@ class ApiRoutes {
   }
 }
 
+export type apiPathParams = {
+  groupId: string;
+  memberId?: string;
+  listId?: string;
+  itemId?: string;
+};
+
 export default new ApiRoutes('http://localhost:8080');

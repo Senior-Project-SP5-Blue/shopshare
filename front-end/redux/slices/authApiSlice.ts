@@ -9,7 +9,6 @@ export const authApiSlice = apiSlice.injectEndpoints({
       query: (request: SignUpRequest) => ({
         url: `/auth/signup`,
         method: `POST`,
-        headers: {'content-type': 'application/json'},
         body: JSON.stringify(request),
       }),
     }),
@@ -17,7 +16,6 @@ export const authApiSlice = apiSlice.injectEndpoints({
       query: (request: SignInRequest) => ({
         url: `/auth/signin`,
         method: `POST`,
-        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(request),
       }),
     }),
@@ -25,9 +23,11 @@ export const authApiSlice = apiSlice.injectEndpoints({
       query: (request: SignInRequest) => ({
         url: `/auth/refresh-signin`,
         method: `POST`,
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer'},
         body: JSON.stringify(request),
       }),
     }),
   }),
 });
+
+export const {useSignUpMutation, useSignInMutation, useRefreshSignInMutation} =
+  authApiSlice;

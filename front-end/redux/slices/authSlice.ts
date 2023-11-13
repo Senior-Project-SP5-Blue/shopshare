@@ -35,6 +35,6 @@ export const {setAuthContext, signOut} = authSlice.actions;
 
 export default authSlice.reducer;
 
-export const selectCurrentUser = (state: authContext) => state.user;
-export const selectAccessToken = (state: authContext) => state.accessToken;
-export const selectRefreshToken = (state: authContext) => state.refreshToken;
+export const selectCurrentUser = (state: any) => state.auth.user;
+export const selectAccessToken = (state: any) => state.auth.accessToken;
+export const selectRefreshToken = (state: any) => state.auth.refreshToken;

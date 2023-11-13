@@ -1,8 +1,8 @@
-import ApiRoutes from '../../api/ApiRoutes';
+import ApiRoutes, {apiPathParams} from '../../api/ApiRoutes';
 import CreateEditShopperGroupRequest from '../../models/shoppergroup/CreateEditShopperGroupRequest';
 import ShopperGroupDto from '../../models/shoppergroup/ShopperGroupDto';
 import UserDto from '../../models/user/UserDto';
-import {apiPathParams, apiSlice} from './shopshareApiSlice';
+import {apiSlice} from './shopshareApiSlice';
 
 export const shopperGroupApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
@@ -10,7 +10,6 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
       query: () => ({
         url: `/users/1/groups`,
         method: 'GET',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
       }),
       providesTags: (result = []) => [
         ...result.map(({id}) => ({
@@ -24,7 +23,6 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
       query: ({groupId}) => ({
         url: ApiRoutes.users('1').groups(groupId).buildUrl(),
         method: 'GET',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
       }),
       providesTags: (result = []) => [
         ...result.map(({id}) => ({
@@ -38,7 +36,6 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
       query: ({groupId, memberId}) => ({
         url: ApiRoutes.users('1').groups(groupId).members(memberId).buildUrl(),
         method: 'GET',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
       }),
     }),
     inviteUserToGroup: builder.mutation<void, apiPathParams>({
@@ -57,7 +54,6 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
       query: request => ({
         url: ApiRoutes.users('1').groups().buildUrl(),
         method: 'POST',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
         body: JSON.stringify(request.name),
       }),
       invalidatesTags: (_result, _error, _arg) => [
@@ -68,7 +64,6 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
       query: ({groupId}) => ({
         url: ApiRoutes.users('1').groups(groupId).buildUrl(),
         method: 'POST',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
       }),
       invalidatesTags: (_result, _error, _arg) => [
         {type: 'ShopperGroup', id: 'LIST'},
@@ -81,7 +76,6 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
       query: ({groupId, name}) => ({
         url: ApiRoutes.users('1').groups(groupId).buildUrl(),
         method: 'PATCH',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
         body: JSON.stringify(name),
       }),
       invalidatesTags: (_result, _error, arg) => [
@@ -93,7 +87,6 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
       query: ({groupId, memberId}) => ({
         url: ApiRoutes.users('1').groups(groupId).members(memberId).buildUrl(),
         method: 'DELETE',
-        headers: {Authorization: 'Bearer '},
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShopperGroup', id: 'LIST'},
@@ -104,7 +97,6 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
       query: ({groupId, memberId}) => ({
         url: ApiRoutes.users('1').groups(groupId).members(memberId).buildUrl(),
         method: 'DELETE',
-        headers: {Authorization: 'Bearer '},
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShopperGroup', id: 'LIST'},
@@ -113,3 +105,14 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
     }),
   }),
 });
+
+export const {
+  useGetGroupsQuery,
+  useGetGroupMembersQuery,
+  useGetGroupMemberQuery,
+  useCreateNewGroupMutation,
+  useInviteUserToGroupMutation,
+  useAcceptGroupInvitationMutation,
+  useChangeGroupNameMutation,
+  useDeleteShopperGroupMutation,
+} = shopperGroupApiSlice;

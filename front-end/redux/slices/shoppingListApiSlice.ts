@@ -1,8 +1,8 @@
-import ApiRoutes from '../../api/ApiRoutes';
+import ApiRoutes, {apiPathParams} from '../../api/ApiRoutes';
 import CreateEditShoppingListRequest from '../../models/shoppinglist/CreateEditShoppingListRequest';
 import ShoppingListDto from '../../models/shoppinglist/ShoppingListDto';
 import SlimShoppingListDto from '../../models/shoppinglist/SlimShoppingListDto';
-import {apiPathParams, apiSlice} from './shopshareApiSlice';
+import {apiSlice} from './shopshareApiSlice';
 
 export const shoppingListApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
@@ -10,7 +10,6 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
       query: () => ({
         url: ApiRoutes.users('1').groups().lists().buildUrl(),
         method: 'GET',
-        headers: {Authorization: 'Bearer '},
       }),
       providesTags: (result = []) => [
         ...result.map(({id}) => ({
@@ -24,7 +23,6 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
       query: ({groupId}) => ({
         url: ApiRoutes.users('1').groups(groupId).lists().buildUrl(),
         method: 'GET',
-        headers: {Authorization: 'Bearer '},
       }),
       providesTags: (result = []) => [
         ...result.map(({id}) => ({
@@ -38,7 +36,6 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
       query: ({groupId, listId}) => ({
         url: ApiRoutes.users('1').groups(groupId).lists(listId).buildUrl(),
         method: 'GET',
-        headers: {Authorization: 'Bearer '},
       }),
       providesTags: result =>
         result ? [{type: 'ShoppingList', id: result!.id}] : [],
@@ -50,7 +47,6 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
       query: ({groupId, name}) => ({
         url: ApiRoutes.users('1').groups(groupId).lists().buildUrl(),
         method: 'POST',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
         body: JSON.stringify(name),
       }),
       invalidatesTags: (_result, _error, arg) => [
@@ -66,7 +62,6 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
       query: ({groupId, listId, name}) => ({
         url: ApiRoutes.users('1').groups(groupId).lists(listId).buildUrl(),
         method: 'PATCH',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
         body: JSON.stringify(name),
       }),
       invalidatesTags: (_result, _error, arg) => [
@@ -79,7 +74,6 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
       query: ({groupId, listId}) => ({
         url: ApiRoutes.users('1').groups(groupId).lists(listId).buildUrl(),
         method: 'DELETE',
-        headers: {Authorization: 'Bearer '},
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShoppingList', id: 'LIST'},
@@ -89,3 +83,12 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
     }),
   }),
 });
+
+export const {
+  useGetShoppingListsQuery,
+  useGetGroupShoppingListsQuery,
+  useGetGroupShoppingListQuery,
+  useAddShoppingListMutation,
+  useChangeShoppingListNameMutation,
+  useDeleteShoppingListMutation,
+} = shoppingListApiSlice;

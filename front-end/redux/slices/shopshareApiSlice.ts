@@ -3,7 +3,7 @@ import {
   createApi,
   fetchBaseQuery,
 } from '@reduxjs/toolkit/query/react';
-import {RootState} from '../store';
+// import {RootState} from '../store';
 import {setAuthContext, signOut} from './authSlice';
 
 // build.mutation<ReturnType, ArgType>. I
@@ -13,17 +13,10 @@ import {setAuthContext, signOut} from './authSlice';
 //   Authorization: `Bearer <API_TOKEN>`,
 // };
 
-export type apiPathParams = {
-  groupId: string;
-  memberId?: string;
-  listId?: string;
-  itemId?: string;
-};
-
 const baseQuery = fetchBaseQuery({
   baseUrl: 'http://localhost:8080/api/v1',
   prepareHeaders: (headers, {getState}) => {
-    const state: RootState = getState() as RootState;
+    const state = getState() as any;
     const token = state.auth.accessToken;
     headers.set('Content-Type', 'application/json');
     if (token && !headers.has('Authorization')) {
@@ -41,7 +34,7 @@ const baseQueryWithReAuth = async (
   let result = await baseQuery(args, api, extraOptions);
 
   if (result?.error?.status === 403) {
-    const _state = api.getState() as RootState;
+    const _state = api.getState() as any;
     console.log('Sending refresh token');
     const refreshResult: any = await baseQuery(
       {
@@ -65,22 +58,6 @@ const baseQueryWithReAuth = async (
   }
   return result;
 };
-
-/**
- * fetchBaseQuery({
-    baseUrl: 'http://localhost:8080/api/v1',
-    prepareHeaders: (headers, {getState}) => {
-      const state: RootState = getState() as RootState;
-      const token = state.auth.accessToken;
-      headers.set('Content-Type', 'application/json');
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  })
- * 
- */
 
 // Define a service using a base URL and expected endpoints
 export const apiSlice = createApi({

@@ -1,8 +1,8 @@
-import ApiRoutes from '../../api/ApiRoutes';
+import ApiRoutes, {apiPathParams} from '../../api/ApiRoutes';
 import CreateListItemRequest from '../../models/listitem/CreateListItemRequest';
 import EditListItemRequest from '../../models/listitem/EditListItemRequest';
 import ListItemDto from '../../models/listitem/ListItemDto';
-import {apiPathParams, apiSlice} from './shopshareApiSlice';
+import {apiSlice} from './shopshareApiSlice';
 
 export const listItemApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
@@ -13,7 +13,6 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       query: ({groupId, name, locked}) => ({
         url: ApiRoutes.users('1').groups(groupId).lists().buildUrl(),
         method: 'POST',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
         body: JSON.stringify({name, locked}),
       }),
       invalidatesTags: (_result, _error, arg) => [
@@ -33,7 +32,6 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
           .items(request.itemId)
           .buildUrl(),
         method: 'PATCH',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
         body: JSON.stringify({
           name: request.name,
           status: request.status,
@@ -54,7 +52,6 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
           .items(itemId)
           .buildUrl(),
         method: 'DELETE',
-        headers: {Authorization: 'Bearer '},
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShoppingList', id: arg.listId},
@@ -66,7 +63,6 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       query: ({groupId, listId}) => ({
         url: ApiRoutes.users('1').groups(groupId).lists(listId).buildUrl(),
         method: 'DELETE',
-        headers: {Authorization: 'Bearer '},
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShoppingList', id: arg.listId},
@@ -75,3 +71,10 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
     }),
   }),
 });
+
+export const {
+  useAddItemToListMutation,
+  useChangeListItemMutation,
+  useRemoveAllItemsFromListMutation,
+  useRemoveListItemMutation,
+} = listItemApiSlice;

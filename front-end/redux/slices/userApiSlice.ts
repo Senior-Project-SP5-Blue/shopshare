@@ -9,16 +9,16 @@ export const userApiSlice = apiSlice.injectEndpoints({
       query: () => ({
         url: ApiRoutes.users('1').groups().invitations().buildUrl(),
         method: 'GET',
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer '},
       }),
     }),
     changePassword: builder.mutation<void, ChangePasswordRequest>({
       query: (request: ChangePasswordRequest) => ({
         url: `/users/1/password`,
         method: `PATCH`,
-        headers: {'Content-Type': 'application/json', Authorization: 'Bearer'},
         body: JSON.stringify(request),
       }),
     }),
   }),
 });
+
+export const {useGetInvitationsQuery, useChangePasswordMutation} = userApiSlice;
