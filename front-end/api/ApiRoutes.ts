@@ -1,9 +1,10 @@
+import Config from 'react-native-config';
+
 class ApiRoutes {
-  #baseURL: string;
+  #baseURL: string = Config.API_URL ?? '';
   #url: string;
 
-  constructor(baseURL: string) {
-    this.#baseURL = baseURL;
+  constructor() {
     this.#url = '';
   }
 
@@ -49,4 +50,4 @@ export type apiPathParams = {
   itemId?: string;
 };
 
-export default new ApiRoutes('http://localhost:8080');
+export default new ApiRoutes();
