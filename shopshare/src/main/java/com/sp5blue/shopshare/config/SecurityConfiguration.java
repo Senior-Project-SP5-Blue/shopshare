@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -30,23 +29,21 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     private final JwtAuthFilter jwtAuthFilter;
     private final LogoutHandler logoutHandler;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
-    public SecurityConfiguration(UserDetailsService userDetailsService, JwtAuthFilter jwtAuthFilter, LogoutHandler logoutHandler) {
+    public SecurityConfiguration(UserDetailsService userDetailsService, JwtAuthFilter jwtAuthFilter, LogoutHandler logoutHandler, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthFilter = jwtAuthFilter;
         this.logoutHandler = logoutHandler;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(authProvider);
     }
 

@@ -40,7 +40,7 @@ class JwtServiceTest {
     void generateToken() {
         User user = new User("Jack", "Ripper", "jackr", "jackr@email.com", "jackpassword");
         ReflectionTestUtils.setField(jwtService, "SECRET", SECRET);
-        String result  = jwtService.generateToken(user);
+        String result  = jwtService.generateAccessToken(user);
 
         assertNotNull(result);
     }

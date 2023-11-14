@@ -2,7 +2,7 @@ package com.sp5blue.shopshare.controllers.auth;
 
 import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
 import com.sp5blue.shopshare.exceptions.authentication.UserNotFoundException;
-import com.sp5blue.shopshare.exceptions.token.InvalidRefreshTokenException;
+import com.sp5blue.shopshare.exceptions.token.InvalidTokenException;
 import com.sp5blue.shopshare.exceptions.token.TokenNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ public class AuthRestExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
     @ExceptionHandler
-    public ResponseEntity<AuthErrorResponse> handleException(InvalidRefreshTokenException exception) {
+    public ResponseEntity<AuthErrorResponse> handleException(InvalidTokenException exception) {
         AuthErrorResponse error = new AuthErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Invalid permissions. Please log in.", LocalDateTime.now());
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }

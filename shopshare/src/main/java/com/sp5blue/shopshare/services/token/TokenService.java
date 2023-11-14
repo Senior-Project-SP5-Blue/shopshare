@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -25,15 +26,15 @@ public class TokenService implements ITokenService {
     @Override
     @Transactional
     @Async
-    public CompletableFuture<Token> create(Token token) {
+    public CompletableFuture<Token> createOrSave(Token token) {
         return CompletableFuture.completedFuture(tokenRepository.save(token));
     }
 
     @Override
     @Transactional
     @Async
-    public CompletableFuture<List<Token>> create(List<Token> tokens) {
-        return CompletableFuture.completedFuture(tokenRepository.saveAll(tokens));
+    public CompletableFuture<List<Token>> createOrSave(Token[] tokens) {
+        return CompletableFuture.completedFuture(tokenRepository.saveAll(Arrays.asList(tokens)));
     }
 
     @Override
@@ -58,14 +59,26 @@ public class TokenService implements ITokenService {
     @Override
     @Async
     public CompletableFuture<Token> readByToken(String token) throws TokenNotFoundException {
-        return CompletableFuture.completedFuture(tokenRepository.findByToken(token).orElseThrow(() -> new TokenNotFoundException("Token does not exist - " + token)));
+        return CompletableFuture.completedFuture(tokenRepository.findByToken(token).orElseThrow(() -> new TokenNotFoundException("Invalid Token")));
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<Token> readByConfirmationToken(String token) throws TokenNotFoundException {
+        return CompletableFuture.completedFuture(tokenRepository.findByConfirmationToken(token).orElseThrow(() -> new TokenNotFoundException("Invalid Token")));
+    }
+
+    @Override
+    @Async
+    public CompletableFuture<Token> readByInvitationToken(String token) throws TokenNotFoundException {
+        return CompletableFuture.completedFuture(tokenRepository.findByInvitationToken(token).orElseThrow(() -> new TokenNotFoundException("Invalid Token")));
     }
 
     @Override
     @Transactional
     @Async
     public void revokeAccessToken(String jwt) {
-        Token storedToken = tokenRepository.findByToken(jwt).orElseThrow(() -> new TokenNotFoundException("Token does not exist - " + jwt));
+        Token storedToken = tokenRepository.findByToken(jwt).orElseThrow(() -> new TokenNotFoundException("Invalid Token"));
         storedToken.setExpired(true);
         storedToken.setRevoked(true);
     }
@@ -73,11 +86,7 @@ public class TokenService implements ITokenService {
     @Override
     @Transactional
     @Async
-    public void revokeAllUserTokens(UUID shopperId) {
-        List<Token> tokens = tokenRepository.findAllByUser_Id(shopperId);
-        tokens.forEach(t -> {
-            t.setExpired(true);
-            t.setRevoked(true);
-        });
+    public void revokeAllUserTokens(UUID userId) {
+        tokenRepository.revokeTokensByUser(userId);
     }
 }

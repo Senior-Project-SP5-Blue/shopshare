@@ -20,13 +20,4 @@ public class ShoppingListRestExceptionHandler {
         ShoppingListErrorResponse error = new ShoppingListErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage(), LocalDateTime.now());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
-
-    @ExceptionHandler
-    public ResponseEntity<ShoppingListErrorResponse> handleException(Exception exception) {
-        exception.printStackTrace();
-        logger.warn(exception.getMessage());
-        ShoppingListErrorResponse error = new ShoppingListErrorResponse(HttpStatus.I_AM_A_TEAPOT.value(), exception.getMessage(), LocalDateTime.now());
-        return new ResponseEntity<>(error, HttpStatus.I_AM_A_TEAPOT);
-    }
-
 }

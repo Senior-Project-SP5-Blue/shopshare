@@ -1,5 +1,6 @@
 package com.sp5blue.shopshare.controllers.shoppergroup;
 
+import com.sp5blue.shopshare.dtos.shoppergroup.CreateEditShopperGroupRequest;
 import com.sp5blue.shopshare.dtos.shoppergroup.ShopperGroupDto;
 import com.sp5blue.shopshare.dtos.user.UserDto;
 import com.sp5blue.shopshare.services.shoppergroup.IInvitationService;
@@ -37,8 +38,8 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
 
     @Override
     @PostMapping
-    public ResponseEntity<ShopperGroupDto> addShopperGroup(@PathVariable("user_id") UUID userId, @RequestBody String name) {
-        return ResponseEntity.ok().body(shopperGroupService.addShopperGroup(userId, name).join());
+    public ResponseEntity<ShopperGroupDto> addShopperGroup(@PathVariable("user_id") UUID userId, @RequestBody CreateEditShopperGroupRequest request) {
+        return ResponseEntity.ok().body(shopperGroupService.addShopperGroup(userId, request.name()).join());
     }
 
     @Override
@@ -48,10 +49,22 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
     }
 
     @Override
+    @PostMapping("/{group_id}")
+    public ResponseEntity<ShopperGroupDto> acceptShopperGroupInvitation(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId) {
+        invitationService.acceptInvite(groupId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     @DeleteMapping("/{group_id}")
     public ResponseEntity<?> deleteShopperGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId) {
         shopperGroupService.deleteShopperGroup(userId, groupId);
-        return ResponseEntity.status(200).body("Shopper group deleted successfully");
+        return ResponseEntity.noContent().build();
+    }
+    @Override
+    @PatchMapping("/{group_id}")
+    public ResponseEntity<?> modifyShopperGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @RequestBody CreateEditShopperGroupRequest request) {
+        return ResponseEntity.ok().body(shopperGroupService.changeShopperGroupName(userId, groupId, request.name()).join());
     }
 
     @Override
@@ -67,9 +80,10 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
     }
 
     @Override
-    @PostMapping("/{group_id}/invitations/{member_id}")
-    public ResponseEntity<Boolean> inviteShopperToGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("member_id") UUID invitedShopperId) {
-        return ResponseEntity.ok().body(invitationService.invite(groupId, invitedShopperId).join());
+    @PostMapping("/{group_id}/invitations/{new_member_id}")
+    public ResponseEntity<?> inviteShopperToGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("new_member_id") UUID invitedShopperId) {
+        invitationService.invite(groupId, invitedShopperId);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
@@ -77,6 +91,6 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
     public ResponseEntity<?> removeShopperFromGroup(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId, @PathVariable("member_id") UUID memberId) {
         boolean shopperRemoved = shopperGroupService.removeUserFromShopperGroup(userId, groupId, memberId).join();
         if (!shopperRemoved) return ResponseEntity.status(404).body("Shopper is not in group");
-        return ResponseEntity.ok().body("Shopper removed successfully");
+        return ResponseEntity.noContent().build();
     }
 }
