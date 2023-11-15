@@ -4,6 +4,7 @@ import {
   fetchBaseQuery,
 } from '@reduxjs/toolkit/query/react';
 // import {RootState} from '../store';
+import Config from 'react-native-config';
 import {setAuthContext, signOut} from './authSlice';
 
 // build.mutation<ReturnType, ArgType>. I
@@ -14,7 +15,7 @@ import {setAuthContext, signOut} from './authSlice';
 // };
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:8080/api/v1',
+  baseUrl: Config.API_URL ?? '',
   prepareHeaders: (headers, {getState}) => {
     const state = getState() as any;
     const token = state.auth.accessToken;

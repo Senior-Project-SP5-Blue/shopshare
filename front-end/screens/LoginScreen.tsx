@@ -33,7 +33,6 @@ const LoginScreen = (props: LoginScreenProps) => {
     login({email, password})
       .unwrap()
       .then(userData => {
-        // console.log(userData);
         dispatch(setAuthContext({...userData, user: userData.userContext}));
         setEmail('');
         setPassword('');
@@ -120,6 +119,7 @@ const LoginScreen = (props: LoginScreenProps) => {
               placeholder="Enter your password"
               placeholderTextColor={COLORS.black}
               defaultValue={password}
+              autoCapitalize="none"
               onChangeText={newPassword => setPassword(newPassword)}
               secureTextEntry={isPasswordShown}
               style={{width: '100%', fontSize: 15}}
