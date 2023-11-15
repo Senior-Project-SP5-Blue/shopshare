@@ -1,14 +1,13 @@
-import ApiRoutes, {apiPathParams} from '../../api/ApiRoutes';
-import CreateEditShopperGroupRequest from '../../models/shoppergroup/CreateEditShopperGroupRequest';
+import {shopperGroupApiRequest} from '../../api/ApiRoutes';
 import ShopperGroupDto from '../../models/shoppergroup/ShopperGroupDto';
 import UserDto from '../../models/user/UserDto';
 import {apiSlice} from './shopshareApiSlice';
 
 export const shopperGroupApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    getGroups: builder.query<ShopperGroupDto[], void>({
-      query: () => ({
-        url: `/users/1/groups`,
+    getGroups: builder.query<ShopperGroupDto[], string>({
+      query: userId => ({
+        url: `/users/${userId}/groups`,
         method: 'GET',
       }),
       providesTags: (result = []) => [
@@ -19,9 +18,9 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
         {type: 'ShopperGroup', id: 'LIST'},
       ],
     }),
-    getGroupMembers: builder.query<UserDto[], apiPathParams>({
-      query: ({groupId}) => ({
-        url: ApiRoutes.users('1').groups(groupId).buildUrl(),
+    getGroupMembers: builder.query<UserDto[], shopperGroupApiRequest>({
+      query: ({userId, groupId}) => ({
+        url: `/users/${userId}/groups/${groupId}/members`,
         method: 'GET',
       }),
       providesTags: (result = []) => [
@@ -32,60 +31,51 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
         {type: 'User', id: 'LIST'},
       ],
     }),
-    getGroupMember: builder.query<UserDto, apiPathParams>({
-      query: ({groupId, memberId}) => ({
-        url: ApiRoutes.users('1').groups(groupId).members(memberId).buildUrl(),
+    getGroupMember: builder.query<UserDto, shopperGroupApiRequest>({
+      query: ({userId, groupId, memberId}) => ({
+        url: `/users/${userId}/groups/${groupId}/members${memberId}`,
         method: 'GET',
       }),
     }),
-    inviteUserToGroup: builder.mutation<void, apiPathParams>({
-      query: ({groupId, memberId}) => ({
-        url: ApiRoutes.users('1')
-          .groups(groupId)
-          .invitations(memberId)
-          .buildUrl(),
+    inviteUserToGroup: builder.mutation<void, shopperGroupApiRequest>({
+      query: ({userId, groupId, memberId}) => ({
+        url: `/users/${userId}/groups/${groupId}/invitations/${memberId}`,
         method: 'POST',
       }),
     }),
-    createNewGroup: builder.mutation<
-      ShopperGroupDto,
-      CreateEditShopperGroupRequest
-    >({
-      query: request => ({
-        url: ApiRoutes.users('1').groups().buildUrl(),
+    createNewGroup: builder.mutation<ShopperGroupDto, shopperGroupApiRequest>({
+      query: ({userId, body}) => ({
+        url: `/users/${userId}/groups`,
         method: 'POST',
-        body: JSON.stringify(request.name),
+        body: JSON.stringify(body),
       }),
       invalidatesTags: (_result, _error, _arg) => [
         {type: 'ShopperGroup', id: 'LIST'},
       ],
     }),
-    acceptGroupInvitation: builder.mutation<void, apiPathParams>({
-      query: ({groupId}) => ({
-        url: ApiRoutes.users('1').groups(groupId).buildUrl(),
+    acceptGroupInvitation: builder.mutation<void, shopperGroupApiRequest>({
+      query: ({userId, groupId}) => ({
+        url: `/users/${userId}/groups/${groupId}`,
         method: 'POST',
       }),
       invalidatesTags: (_result, _error, _arg) => [
         {type: 'ShopperGroup', id: 'LIST'},
       ],
     }),
-    changeGroupName: builder.mutation<
-      void,
-      apiPathParams & CreateEditShopperGroupRequest
-    >({
-      query: ({groupId, name}) => ({
-        url: ApiRoutes.users('1').groups(groupId).buildUrl(),
+    changeGroupName: builder.mutation<void, shopperGroupApiRequest>({
+      query: ({userId, groupId, body}) => ({
+        url: `/users/${userId}/groups/${groupId}`,
         method: 'PATCH',
-        body: JSON.stringify(name),
+        body: JSON.stringify(body),
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShopperGroup', id: 'LIST'},
         {type: 'ShopperGroup', id: arg.groupId},
       ],
     }),
-    removeMemberFromGroup: builder.mutation<void, apiPathParams>({
-      query: ({groupId, memberId}) => ({
-        url: ApiRoutes.users('1').groups(groupId).members(memberId).buildUrl(),
+    removeMemberFromGroup: builder.mutation<void, shopperGroupApiRequest>({
+      query: ({userId, groupId, memberId}) => ({
+        url: `/users/${userId}/groups/${groupId}/members/${memberId}`,
         method: 'DELETE',
       }),
       invalidatesTags: (_result, _error, arg) => [
@@ -93,9 +83,9 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
         {type: 'ShopperGroup', id: arg.groupId},
       ],
     }),
-    deleteShopperGroup: builder.mutation<void, apiPathParams>({
-      query: ({groupId, memberId}) => ({
-        url: ApiRoutes.users('1').groups(groupId).members(memberId).buildUrl(),
+    deleteShopperGroup: builder.mutation<void, shopperGroupApiRequest>({
+      query: ({userId, groupId}) => ({
+        url: `/users/${userId}/groups/${groupId}`,
         method: 'DELETE',
       }),
       invalidatesTags: (_result, _error, arg) => [

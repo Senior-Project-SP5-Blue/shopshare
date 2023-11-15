@@ -1,4 +1,9 @@
 import Config from 'react-native-config';
+import CreateListItemRequest from '../models/listitem/CreateListItemRequest';
+import EditListItemRequest from '../models/listitem/EditListItemRequest';
+import CreateEditShopperGroupRequest from '../models/shoppergroup/CreateEditShopperGroupRequest';
+import CreateEditShoppingListRequest from '../models/shoppinglist/CreateEditShoppingListRequest';
+import ChangePasswordRequest from '../models/auth/ChangePasswordRequest';
 
 class ApiRoutes {
   #baseURL: string = Config.API_URL ?? '';
@@ -44,10 +49,37 @@ class ApiRoutes {
 }
 
 export type apiPathParams = {
-  groupId: string;
+  userId?: string;
+  groupId?: string;
   memberId?: string;
   listId?: string;
   itemId?: string;
 };
 
+export type listItemApiRequest = {
+  userId: string;
+  groupId: string;
+  listId: string;
+  itemId?: string;
+  body?: CreateListItemRequest | EditListItemRequest;
+};
+
+export type shopperGroupApiRequest = {
+  userId: string;
+  groupId?: string;
+  memberId?: string;
+  body?: CreateEditShopperGroupRequest;
+};
+
+export type shoppingListApiRequest = {
+  userId: string;
+  groupId?: string;
+  listId?: string;
+  body?: CreateEditShoppingListRequest;
+};
+
+export type userApiRequest = {
+  userId: string;
+  body?: ChangePasswordRequest;
+};
 export default new ApiRoutes();
