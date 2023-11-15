@@ -21,10 +21,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Page<User> findAllByFirstName(String firstName, Pageable pageable);
     List<User> findAllByFirstName(String firstName);
 
-    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.username = :user_username")
+    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE lower(u.username) = lower(:user_username)")
     Optional<User> findByUsernameIgnoreCase(@Param("user_username") String username);
 
-    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.email = :user_email")
+    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE lower(u.email) = lower(:user_email)")
     Optional<User> findByEmailIgnoreCase(@Param("user_email") String email);
 
 

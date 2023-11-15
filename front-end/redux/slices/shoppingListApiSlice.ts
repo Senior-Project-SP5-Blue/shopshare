@@ -1,14 +1,16 @@
-import ApiRoutes, {apiPathParams} from '../../api/ApiRoutes';
-import CreateEditShoppingListRequest from '../../models/shoppinglist/CreateEditShoppingListRequest';
+import {shoppingListApiRequest} from '../../api/ApiRoutes';
 import ShoppingListDto from '../../models/shoppinglist/ShoppingListDto';
 import SlimShoppingListDto from '../../models/shoppinglist/SlimShoppingListDto';
 import {apiSlice} from './shopshareApiSlice';
 
 export const shoppingListApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    getShoppingLists: builder.query<SlimShoppingListDto[], void>({
-      query: () => ({
-        url: ApiRoutes.users('1').groups().lists().buildUrl(),
+    getShoppingLists: builder.query<
+      SlimShoppingListDto[],
+      shoppingListApiRequest
+    >({
+      query: ({userId}) => ({
+        url: `/users/${userId}/groups/lists`,
         method: 'GET',
       }),
       providesTags: (result = []) => [
@@ -19,9 +21,12 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
         {type: 'ShoppingList', id: 'LIST'},
       ],
     }),
-    getGroupShoppingLists: builder.query<SlimShoppingListDto[], apiPathParams>({
-      query: ({groupId}) => ({
-        url: ApiRoutes.users('1').groups(groupId).lists().buildUrl(),
+    getGroupShoppingLists: builder.query<
+      SlimShoppingListDto[],
+      shoppingListApiRequest
+    >({
+      query: ({userId, groupId}) => ({
+        url: `/users/${userId}/groups/${groupId}/lists`,
         method: 'GET',
       }),
       providesTags: (result = []) => [
@@ -32,22 +37,22 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
         {type: 'ShoppingList', id: 'LIST'},
       ],
     }),
-    getGroupShoppingList: builder.query<ShoppingListDto, apiPathParams>({
-      query: ({groupId, listId}) => ({
-        url: ApiRoutes.users('1').groups(groupId).lists(listId).buildUrl(),
+    getGroupShoppingList: builder.query<
+      ShoppingListDto,
+      shoppingListApiRequest
+    >({
+      query: ({userId, groupId, listId}) => ({
+        url: `/users/${userId}/groups/${groupId}/lists/${listId}`,
         method: 'GET',
       }),
       providesTags: result =>
         result ? [{type: 'ShoppingList', id: result!.id}] : [],
     }),
-    addShoppingList: builder.mutation<
-      ShoppingListDto,
-      apiPathParams & CreateEditShoppingListRequest
-    >({
-      query: ({groupId, name}) => ({
-        url: ApiRoutes.users('1').groups(groupId).lists().buildUrl(),
+    addShoppingList: builder.mutation<ShoppingListDto, shoppingListApiRequest>({
+      query: ({userId, groupId, body}) => ({
+        url: `/users/${userId}/groups/${groupId}/lists`,
         method: 'POST',
-        body: JSON.stringify(name),
+        body: JSON.stringify(body),
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShoppingList', id: 'LIST'},
@@ -57,12 +62,12 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
     }),
     changeShoppingListName: builder.mutation<
       SlimShoppingListDto,
-      apiPathParams & CreateEditShoppingListRequest
+      shoppingListApiRequest
     >({
-      query: ({groupId, listId, name}) => ({
-        url: ApiRoutes.users('1').groups(groupId).lists(listId).buildUrl(),
+      query: ({userId, groupId, listId, body}) => ({
+        url: `/users/${userId}/groups/${groupId}/lists/${listId}`,
         method: 'PATCH',
-        body: JSON.stringify(name),
+        body: JSON.stringify(body),
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShoppingList', id: 'LIST'},
@@ -70,9 +75,9 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
         {type: 'ShopperGroup', id: arg.groupId},
       ],
     }),
-    deleteShoppingList: builder.mutation<void, apiPathParams>({
-      query: ({groupId, listId}) => ({
-        url: ApiRoutes.users('1').groups(groupId).lists(listId).buildUrl(),
+    deleteShoppingList: builder.mutation<void, shoppingListApiRequest>({
+      query: ({userId, groupId, listId}) => ({
+        url: `/users/${userId}/groups/${groupId}/lists/${listId}`,
         method: 'DELETE',
       }),
       invalidatesTags: (_result, _error, arg) => [
