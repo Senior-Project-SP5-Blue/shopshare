@@ -6,7 +6,7 @@ import {
   FlatList,
 } from 'react-native';
 import {View} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 import mockData from '../mockData';
@@ -19,17 +19,33 @@ import {
 import {useSignOutMutation} from '../redux/slices/authApiSlice';
 import {useAppDispatch} from '../redux/store';
 import Button from '../components/Button';
+import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
+import {list} from 'postcss';
 
 const ListsScreen = () => {
   const user = useSelector(selectCurrentUser);
   const token = useSelector(selectAccessToken);
   const [signout] = useSignOutMutation();
   const dispatch = useAppDispatch();
+  const {data: lists, isSuccess} = useGetShoppingListsQuery({userId: user.id});
   console.log('Current user');
   console.log(user);
   console.log('token');
   console.log(token);
   console.log('Successfully logged in');
+
+  console.log('My lists:');
+
+  useEffect(() => {
+    if (isSuccess) {
+      lists.forEach(x => {
+        console.log(x);
+      });
+    }
+  }, [isSuccess, lists]);
+  // lists?.forEach((x, idx) => {
+
+  // })
 
   const handleLogOut = () => {
     signout()
