@@ -36,11 +36,14 @@ const LoginScreen = (props: LoginScreenProps) => {
         dispatch(setAuthContext({...userData, user: userData.userContext}));
         setEmail('');
         setPassword('');
-        lists();
+        // lists();
       })
       .catch(err => {
         console.log('ERROR!! ');
         console.log(err);
+      })
+      .finally(() => {
+        lists();
       });
   };
 

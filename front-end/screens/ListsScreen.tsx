@@ -11,13 +11,45 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 import mockData from '../mockData';
 import {useSelector} from 'react-redux';
-import {selectCurrentUser} from '../redux/slices/authSlice';
+import {
+  selectAccessToken,
+  selectCurrentUser,
+  signOut,
+} from '../redux/slices/authSlice';
+import {useSignOutMutation} from '../redux/slices/authApiSlice';
+import {useAppDispatch} from '../redux/store';
+import Button from '../components/Button';
 
 const ListsScreen = () => {
   const user = useSelector(selectCurrentUser);
+  const token = useSelector(selectAccessToken);
+  const [signout] = useSignOutMutation();
+  const dispatch = useAppDispatch();
   console.log('Current user');
   console.log(user);
+  console.log('token');
+  console.log(token);
   console.log('Successfully logged in');
+
+  const handleLogOut = () => {
+    signout()
+      .unwrap()
+      .then(_res => {
+        dispatch(signOut());
+      })
+      .catch(err => {
+        console.log('There was an error signing out.');
+        console.log(err);
+      });
+    // .unwrap()
+    // .then(_res => {
+    //   dispa(signOut());
+    // })
+    // .catch(err => {
+    //   console.log('There was an error signing out.');
+    //   console.log(err);
+    // });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flexDirection: 'row'}}>
@@ -51,6 +83,9 @@ const ListsScreen = () => {
             </View>
           )}
         />
+      </View>
+      <View>
+        <Button title="Log Out" onPress={handleLogOut} />
       </View>
     </SafeAreaView>
   );
