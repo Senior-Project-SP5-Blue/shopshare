@@ -20,7 +20,7 @@ const signin = {
    */
   
   
-  fetch("http://10.101.164.98:8080/api/v1/auth/signin", {
+  fetch("http://localhot:8080/api/v1/auth/signin", {
   method: "POST",
   // mode: "no-cors",
   headers: {
@@ -51,7 +51,7 @@ const signin = {
 
   }
   
-  // fetch("http://10.101.164.98:8080/api/v1/users/9a255947-5f05-45b4-940d-75709addbbc7/groups", {
+  // fetch("http:/:8080/api/v1/users/9a255947-5f05-45b4-940d-75709addbbc7/groups", {
   // method: "GET",
   // // mode: "no-cors",
   // headers: {
@@ -75,7 +75,7 @@ const signin = {
   // // console.log(_res);
   // });
 
-  // fetch("http://10.101.164.98:8080/api/v1/users/9a255947-5f05-45b4-940d-75709addbbc7/groups/26147cc0-9499-4ab7-9a8c-d7de7d42d073/shopping-lists/62dbf4b9-fdfc-4d4c-8135-fbec64e6d83a", {
+  // fetch("http://8080/api/v1/users/9a255947-5f05-45b4-940d-75709addbbc7/groups/26147cc0-9499-4ab7-9a8c-d7de7d42d073/shopping-lists/62dbf4b9-fdfc-4d4c-8135-fbec64e6d83a", {
   // method: "GET",
   // // mode: "no-cors",
   // headers: {
@@ -109,7 +109,7 @@ const loginScreen = (props: LoginScreenProps) => {
       <View style={{ flex: 1, marginHorizontal: 18 }}>
         <View>
           <TouchableOpacity onPress={home}>
-            <Text style={{ fontSize: 20, color: COLORS.white, fontWeight: "bold", marginLeft: 8 }}>
+            <Text style={{ fontSize: 18, color: COLORS.white, fontWeight: "bold", marginLeft: 8 }}>
               Back
             </Text>
           </TouchableOpacity>

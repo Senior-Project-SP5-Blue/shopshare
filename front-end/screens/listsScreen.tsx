@@ -1,11 +1,24 @@
-import { Image, ScrollView, SectionList, StyleSheet, Text, TextInput, TouchableOpacity, FlatList } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, FlatList, Modal } from "react-native";
 import {View } from 'react-native';
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from "../constants/colors";
 import mockData from "../mockData";
+import YourLists from "../components/YourLists";
+import {createBottomTabNavigator} from "react-navigation-tabs";
 
-const listsScreen = () =>{
+interface listsScreenProps {
+    navigation: any;
+  }
+
+const listsScreen = (props: listsScreenProps) =>{
+    const createLists = () => props.navigation.navigate("CreateListsScreen")
+
+    // const [addListVisible, setAddListVisible] = useState(false);
+  
+    // const toggleAddListsModal = () => {
+    //   setAddListVisible(!addListVisible);
+    // };
         return (
         <SafeAreaView style={styles.container}>
             <View style={{ flexDirection: 'row'}}>
@@ -16,7 +29,7 @@ const listsScreen = () =>{
                 <View style={styles.divider}/>
             </View>
             <View style={{marginVertical:48}}>
-                <TouchableOpacity style={styles.addButton}>
+                <TouchableOpacity style={styles.addButton} onPress={createLists}>
                     <Image 
                         source={require("../assets/add.png")}
                         style={styles.addImage}/>
@@ -29,7 +42,7 @@ const listsScreen = () =>{
                     keyExtractor={item =>item.name} 
                     horizontal={true} 
                     showsHorizontalScrollIndicator={false}
-                    renderItem={({item}) => <View><Text></Text></View>}
+                    renderItem={({item}) => <YourLists list ={item}/>}
                 />
             </View>
         </SafeAreaView>
@@ -77,4 +90,3 @@ const styles = StyleSheet.create({
     }
 })
 export default listsScreen;
-

@@ -5,7 +5,11 @@ import loginScreen from "./screens/loginScreen";
 import listsScreen from './screens/listsScreen';
 import welcome from './screens/welcome';
 import signupScreen from './screens/signupScreen';
-
+import CreateListsScreen from './screens/CreateListsScreen';
+import ShopScreen from './screens/ShopScreen'; 
+import { AccessibilityInfo } from 'react-native';
+import AccountsScreen from './screens/AccountsScreen';
+import Tabs from './components/Tab';
 const {Navigator, Screen} = createNativeStackNavigator();
 
 const AppNavigator =()=> (
@@ -17,6 +21,9 @@ const AppNavigator =()=> (
         <Screen name="Login" component={loginScreen}/>
         <Screen name="Lists" component={listsScreen}/>
         <Screen name="SignUp" component={signupScreen}/>
+        <Screen name="CreateListsScreen" component={CreateListsScreen}/>
+        <Screen name="ShopScreen" component={ShopScreen}/>
+        <Screen name="AccountsScreen" component={AccountsScreen}/>
         </Navigator>
       </NavigationContainer>
   )
