@@ -39,7 +39,7 @@ const LoginScreen = (props: LoginScreenProps) => {
         lists();
       })
       .catch(err => {
-        console.log('ERROR!! ');
+        console.log('ERROR!!  ');
         console.log(err);
       });
   };
