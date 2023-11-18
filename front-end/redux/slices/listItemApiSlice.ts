@@ -17,7 +17,7 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       ],
     }),
     /** modifies an item in a shopping list, i.e., change item name, lock item, complete, etc */
-    changeListItem: builder.mutation<ListItemDto, listItemApiRequest>({
+    changeItem: builder.mutation<ListItemDto, listItemApiRequest>({
       query: ({userId, groupId, listId, itemId, body}) => ({
         url: `/users/${userId}/groups/${groupId}/lists/${listId}/items/${itemId!}`,
         method: 'PATCH',
@@ -29,7 +29,7 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       ],
     }),
     /** removes an item from a shopping list */
-    removeListItem: builder.mutation<void, listItemApiRequest>({
+    removeItem: builder.mutation<void, listItemApiRequest>({
       query: ({userId, groupId, listId, itemId}) => ({
         url: `/users/${userId}/groups/${groupId}/lists/${listId}/items/${itemId}`,
         method: 'DELETE',
@@ -55,7 +55,7 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useAddItemToListMutation,
-  useChangeListItemMutation,
+  useChangeItemMutation,
   useRemoveAllItemsFromListMutation,
-  useRemoveListItemMutation,
+  useRemoveItemMutation,
 } = listItemApiSlice;

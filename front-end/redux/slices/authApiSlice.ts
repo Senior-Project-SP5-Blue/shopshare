@@ -1,15 +1,16 @@
 import SignInPayload from '../../models/auth/SignInPayload';
 import SignInRequest from '../../models/auth/SignInRequest';
 import SignUpRequest from '../../models/auth/SignUpRequest';
+import {AuthApiSignUpReq} from '../types';
 import {apiSlice} from './shopshareApiSlice';
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    signUp: builder.mutation<void, SignUpRequest>({
-      query: request => ({
+    signUp: builder.mutation<void, AuthApiSignUpReq>({
+      query: ({body}): body is SignUpRequest => ({
         url: `/auth/signup`,
         method: `POST`,
-        body: JSON.stringify(request),
+        body: JSON.stringify(body),
       }),
     }),
     signIn: builder.mutation<SignInPayload, SignInRequest>({
