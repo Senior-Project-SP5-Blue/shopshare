@@ -1,18 +1,16 @@
 import React, {useState} from 'react';
 import {
-  View,
+  Image,
   ImageBackground,
+  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
+  View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {StatusBar} from 'react-native';
 import COLORS from '../constants/colors';
-import Button from '../components/Button';
 import {useSignInMutation} from '../redux/slices/authApiSlice';
-import {setAuthContext} from '../redux/slices/authSlice';
 import {useAppDispatch} from '../redux/store';
 
 interface LoginScreenProps {
@@ -28,21 +26,21 @@ const LoginScreen = (props: LoginScreenProps) => {
   const dispatch = useAppDispatch();
   const [login, {status, isLoading, isError, isSuccess}] = useSignInMutation();
 
-  const handleLogin = (email: string, password: string) => {
-    console.log(`Email: ${email} Password: ${password}`);
-    login({email, password})
-      .unwrap()
-      .then(userData => {
-        dispatch(setAuthContext({...userData, user: userData.userContext}));
-        setEmail('');
-        setPassword('');
-        lists();
-      })
-      .catch(err => {
-        console.log('ERROR!!  ');
-        console.log(err);
-      });
-  };
+  // const handleLogin = (email: string, password: string) => {
+  //   console.log(`Email: ${email} Password: ${password}`);
+  //   login({email, password})
+  //     .unwrap()
+  //     .then(userData => {
+  //       dispatch(setAuthContext({...userData, user: userData.userContext}));
+  //       setEmail('');
+  //       setPassword('');
+  //       lists();
+  //     })
+  //     .catch(err => {
+  //       console.log('ERROR!! ');
+  //       console.log(err);
+  //     });
+  // };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>
@@ -157,12 +155,12 @@ const LoginScreen = (props: LoginScreenProps) => {
             </TouchableOpacity>
           </View>
         </View>
-        <Button
+        {/* <Button
           title="Login"
           filled
           style={{marginTop: 20, marginBottom: 4}}
           onPress={() => handleLogin(email, password)}
-        />
+        /> */}
         <View>
           <Image
             style={{

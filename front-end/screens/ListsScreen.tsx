@@ -10,7 +10,7 @@ import React, {useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 import mockData from '../mockData';
-import {useSelector} from 'react-redux';
+//import {useSelector} from 'react-redux';
 import {
   selectAccessToken,
   selectCurrentUser,
@@ -23,40 +23,40 @@ import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
 import {list} from 'postcss';
 
 const ListsScreen = () => {
-  const user = useSelector(selectCurrentUser);
-  const token = useSelector(selectAccessToken);
-  const [signout] = useSignOutMutation();
-  const dispatch = useAppDispatch();
-  const {data: lists, isSuccess} = useGetShoppingListsQuery({userId: user.id});
-  console.log('Current user');
-  console.log(user);
+  //const user = useSelector(selectCurrentUser);
+  //const token = useSelector(selectAccessToken);
+  // const [signout] = useSignOutMutation();
+  // const dispatch = useAppDispatch();
+  // const {data: lists, isSuccess} = useGetShoppingListsQuery({userId: user.id});
+  // console.log('Current user');
+  //console.log(user);
   console.log('token');
-  console.log(token);
+  //console.log(token);
   console.log('Successfully logged in');
 
   console.log('My lists:');
 
-  useEffect(() => {
-    if (isSuccess) {
-      lists.forEach(x => {
-        console.log(x);
-      });
-    }
-  }, [isSuccess, lists]);
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     lists.forEach(x => {
+  //       console.log(x);
+  //     });
+  //   }
+  // }, [isSuccess, lists]);
   // lists?.forEach((x, idx) => {
 
   // })
 
-  const handleLogOut = () => {
-    signout()
-      .unwrap()
-      .then(_res => {
-        dispatch(signOut());
-      })
-      .catch(err => {
-        console.log('There was an error signing out.');
-        console.log(err);
-      });
+  // const handleLogOut = () => {
+  //   signout()
+  //     .unwrap()
+  //     .then(_res => {
+  //       dispatch(signOut());
+  //     })
+  //     .catch(err => {
+  //       console.log('There was an error signing out.');
+  //       console.log(err);
+  //     });
     // .unwrap()
     // .then(_res => {
     //   dispa(signOut());
@@ -65,7 +65,7 @@ const ListsScreen = () => {
     //   console.log('There was an error signing out.');
     //   console.log(err);
     // });
-  };
+  //};
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flexDirection: 'row'}}>
@@ -101,7 +101,9 @@ const ListsScreen = () => {
         />
       </View>
       <View>
-        <Button title="Log Out" onPress={handleLogOut} />
+        {/* <Button title="Log Out" 
+        //onPress={handleLogOut}
+         /> */}
       </View>
     </SafeAreaView>
   );
