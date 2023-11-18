@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -30,30 +29,37 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     private final JwtAuthFilter jwtAuthFilter;
     private final LogoutHandler logoutHandler;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
-    public SecurityConfiguration(UserDetailsService userDetailsService, JwtAuthFilter jwtAuthFilter, LogoutHandler logoutHandler) {
+    public SecurityConfiguration(UserDetailsService userDetailsService, JwtAuthFilter jwtAuthFilter, LogoutHandler logoutHandler, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthFilter = jwtAuthFilter;
         this.logoutHandler = logoutHandler;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(authProvider);
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
-        http.authorizeHttpRequests(authz -> authz.requestMatchers("index.html", "/api/v1/auth/**", "/h2-console/**").permitAll()
+        http.authorizeHttpRequests(authz -> authz.requestMatchers("index.html",
+                        "/api/v1/auth/**",
+                        "/h2-console/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger.json",
+                        "/swagger-ui.html",
+                        "/webjars/**",
+                        "/v2/api-docs/**",
+                        "/swagger-resources/**").permitAll()
                 .anyRequest().authenticated());
         http.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

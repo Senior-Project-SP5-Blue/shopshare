@@ -1,5 +1,6 @@
 package com.sp5blue.shopshare.services.security;
 
+import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -31,10 +32,23 @@ public class JwtService {
 
     Logger logger = LoggerFactory.getLogger(JwtService.class);
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateAccessToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", ((User)userDetails).getId());
         return createToken(claims, userDetails.getUsername(), jwtExpiration);
+    }
+
+    public String generateConfirmationToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        String subject = ((User)userDetails).getEmail();
+        return createToken(claims, subject, jwtExpiration);
+    }
+
+    public String generateInvitationToken(UserDetails userDetails, ShopperGroup group) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("group", group.getId());
+        String subject = ((User)userDetails).getId().toString();
+        return createToken(claims, subject, jwtExpiration);
     }
 
     public String generateRefreshToken(UserDetails userDetails) {

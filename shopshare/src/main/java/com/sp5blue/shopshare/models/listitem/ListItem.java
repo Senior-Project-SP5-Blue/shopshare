@@ -29,14 +29,14 @@ public class ListItem {
     @Column(name = "created_on")
     private final LocalDateTime createdOn = LocalDateTime.now();
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
 
     @Column(name = "locked")
     private boolean locked = false;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shopping_list_id")
     private ShoppingList list;
 

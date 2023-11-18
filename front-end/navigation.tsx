@@ -1,9 +1,9 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import loginScreen from "./screens/loginScreen";
 import listsScreen from './screens/listsScreen';
-import welcome from './screens/welcome';
+import welcome from './screens/Welcome';
 import signupScreen from './screens/signupScreen';
 import CreateListsScreen from './screens/CreateListsScreen';
 import ShopScreen from './screens/ShopScreen'; 

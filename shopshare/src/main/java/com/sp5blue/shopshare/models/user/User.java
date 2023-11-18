@@ -35,19 +35,22 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    @Column(name = "number")
+    private String number;
+
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Token> tokens = new ArrayList<>();
 
     @JsonIgnore
     @Column(name = "active")
-    private boolean active;
+    private boolean active = false;
 
     public List<Token> getTokens() {
         return tokens;
@@ -68,14 +71,22 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String firstName, String lastName, String username, String email, String password, List<Role> roles) {
+    public User(String firstName, String lastName, String username, String email, String password, Set<Role> roles) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.email = email;
         this.password = password;
         this.roles = roles;
-        this.active = true;
+    }
+
+    public User(String firstName, String lastName, String username, String email, String number, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.number = number;
     }
 
     public User(String firstName, String lastName, String username, String email, String password) {
@@ -84,23 +95,32 @@ public class User implements UserDetails {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.active = true;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     @Override
     public String toString() {
-        return "Shopper{" +
+        return "User{" +
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", profilePicture='" + profilePicture + '\'' +
+                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", roles=" + roles +
+                ", number='" + number + '\'' +
                 ", active=" + active +
                 '}';
     }
-
 
     public UUID getId() {
         return id;
@@ -179,7 +199,7 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public List<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
@@ -194,7 +214,7 @@ public class User implements UserDetails {
         roles.removeIf(r -> r.getAuthority().equals(roleName));
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 

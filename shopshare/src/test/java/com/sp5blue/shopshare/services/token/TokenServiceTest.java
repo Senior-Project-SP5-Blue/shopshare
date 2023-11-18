@@ -35,7 +35,7 @@ class TokenServiceTest {
         Token token = new Token("jwt", user);
         when(mockTokenRepository.save(token)).thenReturn(token);
 
-        var _result = tokenService.create(token);
+        var _result = tokenService.createOrSave(token);
         var result = _result.get();
 
         assertEquals(token, result);

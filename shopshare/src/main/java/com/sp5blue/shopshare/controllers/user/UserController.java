@@ -1,16 +1,20 @@
 package com.sp5blue.shopshare.controllers.user;
 
+import com.sp5blue.shopshare.dtos.user.ChangePasswordRequest;
 import com.sp5blue.shopshare.models.user.User;
+import com.sp5blue.shopshare.security.accessannotations.AdminPermission;
+import com.sp5blue.shopshare.security.accessannotations.UserPermission;
 import com.sp5blue.shopshare.services.user.IUserService;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("${api-prefix}/users")
 public class UserController {
 
     private final IUserService userService;
@@ -21,7 +25,15 @@ public class UserController {
     }
 
     @GetMapping
+    @AdminPermission
     public List<User> getUsers() {
         return userService.getUsers().join();
+    }
+
+    @PatchMapping("/{user_id}/password")
+    @UserPermission
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request, Principal connectedUser) {
+        userService.changePassword(request, connectedUser);
+        return ResponseEntity.ok().build();
     }
 }
