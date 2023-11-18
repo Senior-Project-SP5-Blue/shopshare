@@ -14,58 +14,42 @@ import mockData from '../mockData';
 import {
   selectAccessToken,
   selectCurrentUser,
-  signOut,
+  clearAuthContext, //used to sign out
 } from '../redux/slices/authSlice';
 import {useSignOutMutation} from '../redux/slices/authApiSlice';
 import {useAppDispatch} from '../redux/store';
 import Button from '../components/Button';
 import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
 import {list} from 'postcss';
+import {useSelector} from 'react-redux';
 
-const ListsScreen = () => {
-  //const user = useSelector(selectCurrentUser);
-  //const token = useSelector(selectAccessToken);
-  // const [signout] = useSignOutMutation();
-  // const dispatch = useAppDispatch();
-  // const {data: lists, isSuccess} = useGetShoppingListsQuery({userId: user.id});
-  // console.log('Current user');
-  //console.log(user);
-  console.log('token');
-  //console.log(token);
-  console.log('Successfully logged in');
+interface ListScreenProps {
+  navigation: any;
+}
 
-  console.log('My lists:');
+const ListsScreen: React.FC<ListScreenProps> = props => {
+  const welcome = () => props.navigation.navigate('Welcome');
+  const dispatch = useAppDispatch();
+  const user = useSelector(selectCurrentUser); //this is the signed in user
 
-  // useEffect(() => {
-  //   if (isSuccess) {
-  //     lists.forEach(x => {
-  //       console.log(x);
-  //     });
-  //   }
-  // }, [isSuccess, lists]);
-  // lists?.forEach((x, idx) => {
+  const {data: lists, isSuccess} = useGetShoppingListsQuery({
+    userId: user.id,
+  }); //"lists" is all the users lists
 
-  // })
-
-  // const handleLogOut = () => {
-  //   signout()
-  //     .unwrap()
-  //     .then(_res => {
-  //       dispatch(signOut());
-  //     })
-  //     .catch(err => {
-  //       console.log('There was an error signing out.');
-  //       console.log(err);
-  //     });
-    // .unwrap()
-    // .then(_res => {
-    //   dispa(signOut());
-    // })
-    // .catch(err => {
-    //   console.log('There was an error signing out.');
-    //   console.log(err);
-    // });
-  //};
+  const [signOut] = useSignOutMutation();
+  // An example of how to logout
+  const handleLogOut = () => {
+    signOut()
+      .unwrap()
+      .then(_res => {
+        welcome();
+        dispatch(clearAuthContext());
+      })
+      .catch(err => {
+        console.log('There was an error signing out.');
+        console.log(err);
+      });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flexDirection: 'row'}}>
@@ -101,9 +85,7 @@ const ListsScreen = () => {
         />
       </View>
       <View>
-        {/* <Button title="Log Out" 
-        //onPress={handleLogOut}
-         /> */}
+        <Button title="Log Out" onPress={handleLogOut} />
       </View>
     </SafeAreaView>
   );

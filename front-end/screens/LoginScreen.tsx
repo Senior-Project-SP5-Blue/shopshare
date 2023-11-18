@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Button,
   Image,
   ImageBackground,
   StatusBar,
@@ -12,6 +13,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 import {useSignInMutation} from '../redux/slices/authApiSlice';
 import {useAppDispatch} from '../redux/store';
+import {setAuthContext} from '../redux/slices/authSlice';
 
 interface LoginScreenProps {
   navigation: any;
@@ -26,21 +28,21 @@ const LoginScreen = (props: LoginScreenProps) => {
   const dispatch = useAppDispatch();
   const [login, {status, isLoading, isError, isSuccess}] = useSignInMutation();
 
-  // const handleLogin = (email: string, password: string) => {
-  //   console.log(`Email: ${email} Password: ${password}`);
-  //   login({email, password})
-  //     .unwrap()
-  //     .then(userData => {
-  //       dispatch(setAuthContext({...userData, user: userData.userContext}));
-  //       setEmail('');
-  //       setPassword('');
-  //       lists();
-  //     })
-  //     .catch(err => {
-  //       console.log('ERROR!! ');
-  //       console.log(err);
-  //     });
-  // };
+  const handleLogin = (email: string, password: string) => {
+    console.log(`Email: ${email} Password: ${password}`);
+    login({email, password})
+      .unwrap()
+      .then(userData => {
+        dispatch(setAuthContext({...userData, user: userData.userContext}));
+        setEmail('');
+        setPassword('');
+        lists();
+      })
+      .catch(err => {
+        console.log('ERROR!! ');
+        console.log(err);
+      });
+  };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>
@@ -155,12 +157,12 @@ const LoginScreen = (props: LoginScreenProps) => {
             </TouchableOpacity>
           </View>
         </View>
-        {/* <Button
+        <Button
           title="Login"
           filled
           style={{marginTop: 20, marginBottom: 4}}
           onPress={() => handleLogin(email, password)}
-        /> */}
+        />
         <View>
           <Image
             style={{
