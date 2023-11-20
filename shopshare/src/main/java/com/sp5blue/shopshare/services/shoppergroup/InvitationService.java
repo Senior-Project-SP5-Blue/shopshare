@@ -1,5 +1,6 @@
 package com.sp5blue.shopshare.services.shoppergroup;
 
+import com.sp5blue.shopshare.dtos.shoppergroup.InvitationDto;
 import com.sp5blue.shopshare.events.OnInvitationCompleteEvent;
 import com.sp5blue.shopshare.exceptions.shoppergroup.UserAlreadyInGroupException;
 import com.sp5blue.shopshare.exceptions.shoppergroup.UserNotInvitedException;
@@ -12,8 +13,6 @@ import com.sp5blue.shopshare.repositories.InvitationRepository;
 import com.sp5blue.shopshare.services.security.JwtService;
 import com.sp5blue.shopshare.services.token.ITokenService;
 import com.sp5blue.shopshare.services.user.IUserService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -49,6 +49,15 @@ public class InvitationService implements IInvitationService {
         this.tokenService = tokenService;
         this.jwtService = jwtService;
         this.invitationRepository = invitationRepository;
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<List<InvitationDto>> getInvitations(UUID userId) {
+        var _invitations = invitationRepository.findAllByUserId(userId);
+        var invitations = _invitations.stream().map(InvitationDto::new).toList();
+        return CompletableFuture.completedFuture(invitations);
     }
 
     @Override

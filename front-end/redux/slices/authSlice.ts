@@ -23,7 +23,7 @@ const authSlice = createSlice({
       state.accessToken = accessToken;
       state.refreshToken = refreshToken;
     },
-    signOut: (state, _action: PayloadAction<void>) => {
+    clearAuthContext: (state, _action: PayloadAction<void>) => {
       state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
@@ -31,10 +31,10 @@ const authSlice = createSlice({
   },
 });
 
-export const {setAuthContext, signOut} = authSlice.actions;
+export const {setAuthContext, clearAuthContext} = authSlice.actions;
 
 export default authSlice.reducer;
 
-export const selectCurrentUser = (state: any) => state.auth.user;
+export const selectCurrentUser = (state: any): UserDto => state.auth.user;
 export const selectAccessToken = (state: any) => state.auth.accessToken;
 export const selectRefreshToken = (state: any) => state.auth.refreshToken;

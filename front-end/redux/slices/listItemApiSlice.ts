@@ -1,19 +1,20 @@
-import ApiRoutes, {apiPathParams} from '../../api/ApiRoutes';
-import CreateListItemRequest from '../../models/listitem/CreateListItemRequest';
-import EditListItemRequest from '../../models/listitem/EditListItemRequest';
 import ListItemDto from '../../models/listitem/ListItemDto';
+import {
+  ListItemApiAddItemToListReq,
+  ListItemApiChangeItemReq,
+  ListItemApiRemoveAllItemsReq,
+  ListItemApiRemoveItemReq,
+} from '../types';
 import {apiSlice} from './shopshareApiSlice';
 
 export const listItemApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    addItemToList: builder.mutation<
-      ListItemDto,
-      apiPathParams & CreateListItemRequest
-    >({
-      query: ({groupId, name, locked}) => ({
-        url: ApiRoutes.users('1').groups(groupId).lists().buildUrl(),
+    addItemToList: builder.mutation<ListItemDto, ListItemApiAddItemToListReq>({
+      query: ({userId, groupId, listId, body}) => ({
+        // url: ApiRoutes.users(userId).groups(groupId).lists().buildUrl(),
+        url: `/users/${userId}/groups/${groupId}/lists/${listId}/items`,
         method: 'POST',
-        body: JSON.stringify({name, locked}),
+        body: JSON.stringify(body),
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShoppingList', id: arg.listId},
@@ -21,22 +22,11 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       ],
     }),
     /** modifies an item in a shopping list, i.e., change item name, lock item, complete, etc */
-    changeListItem: builder.mutation<
-      ListItemDto,
-      apiPathParams & EditListItemRequest
-    >({
-      query: request => ({
-        url: ApiRoutes.users('1')
-          .groups(request.groupId)
-          .lists(request.listId)
-          .items(request.itemId)
-          .buildUrl(),
+    changeItem: builder.mutation<ListItemDto, ListItemApiChangeItemReq>({
+      query: ({userId, groupId, listId, itemId, body}) => ({
+        url: `/users/${userId}/groups/${groupId}/lists/${listId}/items/${itemId!}`,
         method: 'PATCH',
-        body: JSON.stringify({
-          name: request.name,
-          status: request.status,
-          lcoked: request.locked,
-        }),
+        body: JSON.stringify(body),
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShoppingList', id: arg.listId},
@@ -44,13 +34,9 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       ],
     }),
     /** removes an item from a shopping list */
-    removeListItem: builder.mutation<void, apiPathParams>({
-      query: ({groupId, listId, itemId}) => ({
-        url: ApiRoutes.users('2')
-          .groups(groupId)
-          .lists(listId)
-          .items(itemId)
-          .buildUrl(),
+    removeItem: builder.mutation<void, ListItemApiRemoveItemReq>({
+      query: ({userId, groupId, listId, itemId}) => ({
+        url: `/users/${userId}/groups/${groupId}/lists/${listId}/items/${itemId}`,
         method: 'DELETE',
       }),
       invalidatesTags: (_result, _error, arg) => [
@@ -59,9 +45,12 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       ],
     }),
     /** Removes all items in shopping list */
-    removeAllItemsFromList: builder.mutation<void, apiPathParams>({
-      query: ({groupId, listId}) => ({
-        url: ApiRoutes.users('1').groups(groupId).lists(listId).buildUrl(),
+    removeAllItemsFromList: builder.mutation<
+      void,
+      ListItemApiRemoveAllItemsReq
+    >({
+      query: ({userId, groupId, listId}) => ({
+        url: `/users/${userId}/groups/${groupId}/lists/${listId}/items`,
         method: 'DELETE',
       }),
       invalidatesTags: (_result, _error, arg) => [
@@ -74,7 +63,7 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useAddItemToListMutation,
-  useChangeListItemMutation,
+  useChangeItemMutation,
   useRemoveAllItemsFromListMutation,
-  useRemoveListItemMutation,
+  useRemoveItemMutation,
 } = listItemApiSlice;

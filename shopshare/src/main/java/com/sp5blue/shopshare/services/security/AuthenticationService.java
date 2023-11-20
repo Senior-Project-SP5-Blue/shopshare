@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sp5blue.shopshare.dtos.auth.AuthenticationResponse;
 import com.sp5blue.shopshare.dtos.auth.SignInRequest;
 import com.sp5blue.shopshare.dtos.auth.SignUpRequest;
+import com.sp5blue.shopshare.dtos.user.UserDto;
 import com.sp5blue.shopshare.events.OnSignUpCompleteEvent;
 import com.sp5blue.shopshare.exceptions.authentication.UserAlreadyExistsException;
 import com.sp5blue.shopshare.exceptions.token.InvalidTokenException;
@@ -77,14 +78,14 @@ public class AuthenticationService implements IAuthenticationService {
     public CompletableFuture<AuthenticationResponse> signIn(SignInRequest request) {
         CompletableFuture<User> getUser = userService.getUserByEmail(request.email());
         User user = getUser.join();
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        User loggerInUser = (User) authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password())).getPrincipal();
         final String accessJwt = jwtService.generateAccessToken(user);
         final String refreshJwt = jwtService.generateRefreshToken(user);
         Token accessToken = new Token(accessJwt, user, TokenType.ACCESS);
         Token refreshToken = new Token(refreshJwt, user, TokenType.REFRESH);
         tokenService.revokeAllUserTokens(user.getId());
         saveUserTokens(accessToken, refreshToken);
-        return CompletableFuture.completedFuture(new AuthenticationResponse(accessJwt, refreshJwt));
+        return CompletableFuture.completedFuture(new AuthenticationResponse(accessJwt, refreshJwt, new UserDto(loggerInUser)));
     }
 
     @Override
@@ -135,7 +136,7 @@ public class AuthenticationService implements IAuthenticationService {
             if (jwtService.validateToken(refreshToken, user)) {
                 String accessToken = jwtService.generateAccessToken(user);
                 saveUserTokens(new Token(accessToken, user, TokenType.ACCESS));
-                AuthenticationResponse authenticationResponse = new AuthenticationResponse(accessToken, refreshToken);
+                AuthenticationResponse authenticationResponse = new AuthenticationResponse(accessToken, refreshToken, new UserDto((user)));
                 response.setHeader("Content-Type", "application/json");
                 try {
                     new ObjectMapper().writeValue(response.getOutputStream(), authenticationResponse);

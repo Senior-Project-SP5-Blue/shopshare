@@ -1,6 +1,7 @@
 package com.sp5blue.shopshare.controllers.shoppergroup;
 
 import com.sp5blue.shopshare.dtos.shoppergroup.CreateEditShopperGroupRequest;
+import com.sp5blue.shopshare.dtos.shoppergroup.InvitationDto;
 import com.sp5blue.shopshare.dtos.shoppergroup.ShopperGroupDto;
 import com.sp5blue.shopshare.dtos.user.UserDto;
 import com.sp5blue.shopshare.security.accessannotations.GroupAdminPermission;
@@ -9,6 +10,7 @@ import com.sp5blue.shopshare.security.accessannotations.UserPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -26,7 +28,16 @@ public interface ShopperGroupControllerBase {
     ResponseEntity<List<ShopperGroupDto>> getShopperGroups(@PathVariable("user_id") UUID userId);
 
     @UserPermission
+    @Operation(
+            summary = "Accepts an invitation. User will now have access to group"
+    )
     ResponseEntity<ShopperGroupDto> acceptShopperGroupInvitation(@PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId);
+
+    @UserPermission
+    @Operation(
+            summary = "Get all invitations that a user has received"
+    )
+    ResponseEntity<List<InvitationDto>> getInvitations(@PathVariable("user_id") UUID userId);
 
     @UserPermission
     @Operation(

@@ -1,19 +1,19 @@
 import React, {useState} from 'react';
 import {
-  View,
+  Image,
   ImageBackground,
+  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
+  View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {StatusBar} from 'react-native';
 import COLORS from '../constants/colors';
-import Button from '../components/Button';
 import {useSignInMutation} from '../redux/slices/authApiSlice';
-import {setAuthContext} from '../redux/slices/authSlice';
 import {useAppDispatch} from '../redux/store';
+import {setAuthContext} from '../redux/slices/authSlice';
+import Button from '../components/Button';
 
 interface LoginScreenProps {
   navigation: any;
@@ -26,14 +26,12 @@ const LoginScreen = (props: LoginScreenProps) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const dispatch = useAppDispatch();
-  const [login, {status, isLoading, isError, isSuccess}] = useSignInMutation();
+  const [signIn] = useSignInMutation();
 
-  const handleLogin = (email: string, password: string) => {
-    console.log(`Email: ${email} Password: ${password}`);
-    login({email, password})
+  const handleSignIn = (email: string, password: string) => {
+    signIn({email, password})
       .unwrap()
       .then(userData => {
-        // console.log(userData);
         dispatch(setAuthContext({...userData, user: userData.userContext}));
         setEmail('');
         setPassword('');
@@ -120,6 +118,7 @@ const LoginScreen = (props: LoginScreenProps) => {
               placeholder="Enter your password"
               placeholderTextColor={COLORS.black}
               defaultValue={password}
+              autoCapitalize="none"
               onChangeText={newPassword => setPassword(newPassword)}
               secureTextEntry={isPasswordShown}
               style={{width: '100%', fontSize: 15}}
@@ -161,7 +160,7 @@ const LoginScreen = (props: LoginScreenProps) => {
           title="Login"
           filled
           style={{marginTop: 20, marginBottom: 4}}
-          onPress={() => handleLogin(email, password)}
+          onPress={() => handleSignIn(email, password)}
         />
         <View>
           <Image

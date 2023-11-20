@@ -1,6 +1,7 @@
 package com.sp5blue.shopshare.controllers.shoppergroup;
 
 import com.sp5blue.shopshare.dtos.shoppergroup.CreateEditShopperGroupRequest;
+import com.sp5blue.shopshare.dtos.shoppergroup.InvitationDto;
 import com.sp5blue.shopshare.dtos.shoppergroup.ShopperGroupDto;
 import com.sp5blue.shopshare.dtos.user.UserDto;
 import com.sp5blue.shopshare.services.shoppergroup.IInvitationService;
@@ -34,6 +35,11 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
     @GetMapping
     public ResponseEntity<List<ShopperGroupDto>> getShopperGroups(@PathVariable("user_id") UUID userId) {
         return ResponseEntity.ok(shopperGroupService.getShopperGroups(userId).join());
+    }
+    @Override
+    @GetMapping("/invitations")
+    public ResponseEntity<List<InvitationDto>> getInvitations(@PathVariable("user_id") UUID userId) {
+        return ResponseEntity.ok(invitationService.getInvitations(userId).join());
     }
 
     @Override

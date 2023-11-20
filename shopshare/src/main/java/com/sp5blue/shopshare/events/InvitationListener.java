@@ -29,8 +29,8 @@ public class InvitationListener {
     @Value("${api-prefix}")
     private String apiPrefix;
 
-    @Value("${domain}")
-    private String domain;
+//    @Value("${domain}")
+//    private String domain;
 
     private final Logger logger = LoggerFactory.getLogger(InvitationListener.class);
 
@@ -58,7 +58,7 @@ public class InvitationListener {
 //        TO-DO: implement token
 //        String acceptInviteUrl = String.format("%s%s/users/%s/groups?invite=%s", domain, apiPrefix, user.getId(), invitationJwt);
 
-        String acceptInviteUrl = String.format("%s%s/users/%s/groups/%s", domain, apiPrefix, user.getId(), group.getId());
+//        String acceptInviteUrl = String.format("%s%s/users/%s/groups/%s", domain, apiPrefix, user.getId(), group.getId());
         String _htmlMessage = """
                 <h0>You have been invited to the group <em>%s</em>!</h0>
                 """;

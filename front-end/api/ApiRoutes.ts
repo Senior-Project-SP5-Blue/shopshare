@@ -1,5 +1,4 @@
 import Config from 'react-native-config';
-
 class ApiRoutes {
   #baseURL: string = Config.API_URL ?? '';
   #url: string;
@@ -42,12 +41,4 @@ class ApiRoutes {
     return this.#url;
   }
 }
-
-export type apiPathParams = {
-  groupId: string;
-  memberId?: string;
-  listId?: string;
-  itemId?: string;
-};
-
 export default new ApiRoutes();

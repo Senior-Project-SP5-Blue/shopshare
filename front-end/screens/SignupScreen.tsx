@@ -12,6 +12,9 @@ import COLORS from '../constants/colors';
 import CheckBox from '@react-native-community/checkbox';
 import Button from '../components/Button';
 import {ScrollView} from 'react-native';
+import {AuthApiSignUpReq} from '../redux/types';
+import {useSignUpMutation} from '../redux/slices/authApiSlice';
+import {useNavigation} from '@react-navigation/native';
 
 interface SignUpScreenProps {
   navigation: any;
@@ -19,9 +22,29 @@ interface SignUpScreenProps {
 const SignupScreen = (props: SignUpScreenProps) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [signUpReq, setSignUpReq] = useState<AuthApiSignUpReq>({
+    firstName: '',
+    lastName: '',
+    username: '',
+    email: '',
+    number: '',
+    password: '',
+  });
+  const [signUp] = useSignUpMutation();
+  const navigation = useNavigation();
   const lists = () => props.navigation.navigate('Lists');
   const login = () => props.navigation.navigate('Login');
   const home = () => props.navigation.navigate('Welcome');
+  // fix later
+  const emailConfirm = () => navigation.navigate('EmailConfirmation' as never);
+
+  const handleSignUp = () => {
+    signUp(signUpReq)
+      .unwrap()
+      .then(_res => {
+        emailConfirm();
+      });
+  };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>
@@ -59,7 +82,6 @@ const SignupScreen = (props: SignUpScreenProps) => {
             }}>
             First Name
           </Text>
-
           <View
             style={{
               width: '100%',
@@ -78,6 +100,9 @@ const SignupScreen = (props: SignUpScreenProps) => {
                 width: '100%',
                 fontSize: 15,
               }}
+              onChangeText={firstName =>
+                setSignUpReq({...signUpReq, firstName})
+              }
             />
           </View>
         </View>
@@ -109,6 +134,7 @@ const SignupScreen = (props: SignUpScreenProps) => {
                 width: '100%',
                 fontSize: 15,
               }}
+              onChangeText={lastName => setSignUpReq({...signUpReq, lastName})}
             />
           </View>
         </View>
@@ -140,6 +166,7 @@ const SignupScreen = (props: SignUpScreenProps) => {
                 width: '100%',
                 fontSize: 15,
               }}
+              onChangeText={username => setSignUpReq({...signUpReq, username})}
             />
           </View>
         </View>
@@ -172,6 +199,7 @@ const SignupScreen = (props: SignUpScreenProps) => {
                 width: '100%',
                 fontSize: 15,
               }}
+              onChangeText={email => setSignUpReq({...signUpReq, email})}
             />
           </View>
         </View>
@@ -219,6 +247,7 @@ const SignupScreen = (props: SignUpScreenProps) => {
               style={{
                 width: '80%',
               }}
+              onChangeText={number => setSignUpReq({...signUpReq, number})}
             />
           </View>
         </View>
@@ -247,10 +276,12 @@ const SignupScreen = (props: SignUpScreenProps) => {
               placeholder="Enter your password"
               placeholderTextColor={COLORS.black}
               secureTextEntry={isPasswordShown}
+              autoCapitalize="none"
               style={{
                 width: '100%',
                 fontSize: 15,
               }}
+              onChangeText={password => setSignUpReq({...signUpReq, password})}
             />
             <TouchableOpacity
               onPress={() => setIsPasswordShown(!isPasswordShown)}
@@ -307,7 +338,7 @@ const SignupScreen = (props: SignUpScreenProps) => {
           </Text>
         </View>
         <Button
-          onPress={lists}
+          onPress={handleSignUp}
           title="Sign Up"
           filled
           style={{

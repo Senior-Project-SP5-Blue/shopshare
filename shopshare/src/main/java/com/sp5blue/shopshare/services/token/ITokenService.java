@@ -24,7 +24,9 @@ public interface ITokenService {
 
     CompletableFuture<Token> readByInvitationToken(String token) throws TokenNotFoundException;
 
-    void revokeAccessToken(String jwt) throws TokenNotFoundException;
+    CompletableFuture<Void> revokeAccessToken(String jwt) throws TokenNotFoundException;
 
-    void revokeAllUserTokens(UUID shopperId);
+    CompletableFuture<Void> revokeAllUserTokens(UUID shopperId);
+
+//    CompletableFuture<Void> deleteExpiredTokens();
 }

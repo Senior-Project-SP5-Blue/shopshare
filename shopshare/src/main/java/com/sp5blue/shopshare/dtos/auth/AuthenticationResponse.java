@@ -1,4 +1,6 @@
 package com.sp5blue.shopshare.dtos.auth;
 
-public record AuthenticationResponse (String accessToken, String refreshToken) {
+import com.sp5blue.shopshare.dtos.user.UserDto;
+
+public record AuthenticationResponse (String accessToken, String refreshToken, UserDto userContext) {
 }

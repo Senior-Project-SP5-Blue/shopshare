@@ -10,11 +10,11 @@
 	</parent>
 	<groupId>com.sp5blue</groupId>
 	<artifactId>shopshare</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1</version>
 	<name>shopshare</name>
 	<description>shopshare</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -106,6 +106,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>shopshare-v1</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

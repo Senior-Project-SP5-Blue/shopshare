@@ -1,23 +1,50 @@
+import React from 'react';
 import {
+  FlatList,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
-  FlatList,
+  View,
 } from 'react-native';
-import {View} from 'react-native';
-import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 import mockData from '../mockData';
+//import {useSelector} from 'react-redux';
 import {useSelector} from 'react-redux';
-import {selectCurrentUser} from '../redux/slices/authSlice';
+import Button from '../components/Button';
+import {useSignOutMutation} from '../redux/slices/authApiSlice';
+import {clearAuthContext, selectCurrentUser} from '../redux/slices/authSlice';
+import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
+import {useAppDispatch} from '../redux/store';
 
-const ListsScreen = () => {
-  const user = useSelector(selectCurrentUser);
-  console.log('Current user');
-  console.log(user);
-  console.log('Successfully logged in');
+interface ListScreenProps {
+  navigation: any;
+}
+
+const ListsScreen: React.FC<ListScreenProps> = props => {
+  const welcome = () => props.navigation.navigate('Welcome');
+  const dispatch = useAppDispatch();
+  const user = useSelector(selectCurrentUser); //this is the signed in user
+
+  const {data: lists, isSuccess} = useGetShoppingListsQuery({
+    userId: user.id,
+  }); //"lists" is all the users lists
+
+  const [signOut] = useSignOutMutation();
+  // An example of how to logout
+  const handleSignOut = () => {
+    signOut()
+      .unwrap()
+      .then(_res => {
+        welcome();
+        dispatch(clearAuthContext());
+      })
+      .catch(err => {
+        console.log('There was an error signing out.');
+        console.log(err);
+      });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flexDirection: 'row'}}>
@@ -51,6 +78,9 @@ const ListsScreen = () => {
             </View>
           )}
         />
+      </View>
+      <View>
+        <Button title="Log Out" onPress={handleSignOut} />
       </View>
     </SafeAreaView>
   );
