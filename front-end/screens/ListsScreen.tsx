@@ -57,14 +57,6 @@ const ListsScreen = () => {
         console.log('There was an error signing out.');
         console.log(err);
       });
-    // .unwrap()
-    // .then(_res => {
-    //   dispa(signOut());
-    // })
-    // .catch(err => {
-    //   console.log('There was an error signing out.');
-    //   console.log(err);
-    // });
   };
   return (
     <SafeAreaView style={styles.container}>

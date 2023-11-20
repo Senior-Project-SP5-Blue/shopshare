@@ -1,26 +1,23 @@
-import SignInPayload from '../../models/auth/SignInPayload';
-import SignInRequest from '../../models/auth/SignInRequest';
-import SignUpRequest from '../../models/auth/SignUpRequest';
-import {AuthApiSignUpReq} from '../types';
+import {AuthApiSignInReq, AuthApiSignUpReq, SignInResponse} from '../types';
 import {apiSlice} from './shopshareApiSlice';
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     signUp: builder.mutation<void, AuthApiSignUpReq>({
-      query: ({body}): body is SignUpRequest => ({
+      query: request => ({
         url: `/auth/signup`,
         method: `POST`,
-        body: JSON.stringify(body),
+        body: JSON.stringify(request),
       }),
     }),
-    signIn: builder.mutation<SignInPayload, SignInRequest>({
+    signIn: builder.mutation<SignInResponse, AuthApiSignInReq>({
       query: request => ({
         url: `/auth/signin`,
         method: `POST`,
         body: JSON.stringify(request),
       }),
     }),
-    refreshSignIn: builder.mutation<SignInPayload, void>({
+    refreshSignIn: builder.mutation<SignInResponse, void>({
       query: () => ({
         url: `/auth/refresh-signin`,
         method: `POST`,

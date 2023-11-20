@@ -14,6 +14,7 @@ import Button from '../components/Button';
 import {useSignInMutation} from '../redux/slices/authApiSlice';
 import {setAuthContext} from '../redux/slices/authSlice';
 import {useAppDispatch} from '../redux/store';
+import {AuthApiSignInReq} from '../redux/types';
 
 interface LoginScreenProps {
   navigation: any;
@@ -26,11 +27,10 @@ const LoginScreen = (props: LoginScreenProps) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const dispatch = useAppDispatch();
-  const [login, {status, isLoading, isError, isSuccess}] = useSignInMutation();
+  const [signIn, {status, isLoading, isError, isSuccess}] = useSignInMutation();
 
-  const handleLogin = (email: string, password: string) => {
-    console.log(`Email: ${email} Password: ${password}`);
-    login({email, password})
+  const handleSignIn = (email: string, password: string) => {
+    signIn({email, password} as AuthApiSignInReq)
       .unwrap()
       .then(userData => {
         dispatch(setAuthContext({...userData, user: userData.userContext}));
@@ -161,7 +161,7 @@ const LoginScreen = (props: LoginScreenProps) => {
           title="Login"
           filled
           style={{marginTop: 20, marginBottom: 4}}
-          onPress={() => handleLogin(email, password)}
+          onPress={() => handleSignIn(email, password)}
         />
         <View>
           <Image

@@ -1,10 +1,8 @@
-import ChangePasswordRequest from '../models/auth/ChangePasswordRequest';
-import SignInRequest from '../models/auth/SignInRequest';
-import SignUpRequest from '../models/auth/SignUpRequest';
 import CreateListItemRequest from '../models/listitem/CreateListItemRequest';
 import EditListItemRequest from '../models/listitem/EditListItemRequest';
 import CreateEditShopperGroupRequest from '../models/shoppergroup/CreateEditShopperGroupRequest';
 import CreateEditShoppingListRequest from '../models/shoppinglist/CreateEditShoppingListRequest';
+import UserDto from '../models/user/UserDto';
 
 export type apiPathParams = {
   userId: string;
@@ -12,27 +10,44 @@ export type apiPathParams = {
   memberId: string;
   listId: string;
   itemId: string;
-  body:
-    | CreateListItemRequest
-    | EditListItemRequest
-    | shoppingListApiRequest
-    | ChangePasswordRequest
-    | SignUpRequest
-    | SignInRequest;
 };
+
 // Auth Api
-export type AuthApiSignUpReq = Pick<apiPathParams, 'body'>;
-export type AuthApiSignInReq = Pick<apiPathParams, 'body'>;
+export type AuthApiSignUpReq = {
+  username: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  number: string;
+  password: string;
+};
+
+export type AuthApiSignInReq = {
+  email: string;
+  password: string;
+};
+
+export type SignInResponse = {
+  userContext: UserDto;
+  accessToken: string;
+  refreshToken: string;
+};
+
+export type ChangePasswordRequest = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
 
 // ListItem Api
 export type ListItemApiAddItemToListReq = Pick<
   apiPathParams,
-  'userId' | 'groupId' | 'listId' | 'body'
->;
+  'userId' | 'groupId' | 'listId'
+> & {body: CreateListItemRequest};
 export type ListItemApiChangeItemReq = Pick<
   apiPathParams,
-  'userId' | 'groupId' | 'listId' | 'itemId' | 'body'
->;
+  'userId' | 'groupId' | 'listId' | 'itemId'
+> & {body: EditListItemRequest};
 export type ListItemApiRemoveItemReq = Pick<
   apiPathParams,
   'userId' | 'groupId' | 'listId' | 'itemId'
@@ -57,18 +72,17 @@ export type ShopperGroupApiInviteUserToGroupReq = Pick<
   apiPathParams,
   'userId' | 'groupId' | 'memberId'
 >;
-export type ShopperGroupApiCreateGroupReq = Pick<
-  apiPathParams,
-  'userId' | 'body'
->;
+export type ShopperGroupApiCreateGroupReq = Pick<apiPathParams, 'userId'> & {
+  body: CreateEditShopperGroupRequest;
+};
 export type ShopperGroupApiAcceptInvitation = Pick<
   apiPathParams,
   'userId' | 'groupId'
 >;
 export type ShopperGroupApiChangeGroupNameReq = Pick<
   apiPathParams,
-  'userId' | 'groupId' | 'body'
->;
+  'userId' | 'groupId'
+> & {body: CreateEditShopperGroupRequest};
 export type ShopperGroupApiRemoveMemberReq = Pick<
   apiPathParams,
   'userId' | 'groupId' | 'memberId'
@@ -90,42 +104,18 @@ export type ShoppingListApiGetGroupShoppingListReq = Pick<
 >;
 export type ShoppingListApiCreateShoppingListReq = Pick<
   apiPathParams,
-  'userId' | 'groupId' | 'body'
->;
+  'userId' | 'groupId'
+> & {body: CreateEditShoppingListRequest};
 export type ShoppingListApiChangeShoppingListNameReq = Pick<
   apiPathParams,
-  'userId' | 'groupId' | 'listId' | 'body'
->;
+  'userId' | 'groupId' | 'listId'
+> & {body: CreateEditShoppingListRequest};
 export type ShoppingListApiDeleteShoppingListReq = Pick<
   apiPathParams,
   'userId' | 'groupId' | 'listId'
 >;
 // UserApi
 export type UserApiGetInvitations = Pick<apiPathParams, 'userId'>;
-export type UserApiChangePassword = Pick<apiPathParams, 'userId' | 'body'>;
-export type listItemApiRequest = {
-  userId: string;
-  groupId: string;
-  listId: string;
-  itemId?: string;
-  body?: CreateListItemRequest | EditListItemRequest;
-};
-
-export type shopperGroupApiRequest = {
-  userId: string;
-  groupId?: string;
-  memberId?: string;
-  body?: CreateEditShopperGroupRequest;
-};
-
-export type shoppingListApiRequest = {
-  userId: string;
-  groupId?: string;
-  listId?: string;
-  body?: CreateEditShoppingListRequest;
-};
-
-export type userApiRequest = {
-  userId: string;
-  body?: ChangePasswordRequest;
+export type UserApiChangePassword = Pick<apiPathParams, 'userId'> & {
+  body: ChangePasswordRequest;
 };

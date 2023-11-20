@@ -39,7 +39,7 @@ const baseQueryWithReAuth = async (
     console.log('Sending refresh token');
     const refreshResult: any = await baseQuery(
       {
-        url: `/auth/refresh-signin`,
+        url: '/auth/refresh-signin',
         headers: {Authorization: _state.auth.refreshToken ?? ''},
       },
       api,

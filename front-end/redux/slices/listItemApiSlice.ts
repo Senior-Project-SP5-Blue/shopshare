@@ -1,10 +1,15 @@
-import {listItemApiRequest} from '../../api/ApiRoutes';
 import ListItemDto from '../../models/listitem/ListItemDto';
+import {
+  ListItemApiAddItemToListReq,
+  ListItemApiChangeItemReq,
+  ListItemApiRemoveAllItemsReq,
+  ListItemApiRemoveItemReq,
+} from '../types';
 import {apiSlice} from './shopshareApiSlice';
 
 export const listItemApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    addItemToList: builder.mutation<ListItemDto, listItemApiRequest>({
+    addItemToList: builder.mutation<ListItemDto, ListItemApiAddItemToListReq>({
       query: ({userId, groupId, listId, body}) => ({
         // url: ApiRoutes.users(userId).groups(groupId).lists().buildUrl(),
         url: `/users/${userId}/groups/${groupId}/lists/${listId}/items`,
@@ -17,7 +22,7 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       ],
     }),
     /** modifies an item in a shopping list, i.e., change item name, lock item, complete, etc */
-    changeItem: builder.mutation<ListItemDto, listItemApiRequest>({
+    changeItem: builder.mutation<ListItemDto, ListItemApiChangeItemReq>({
       query: ({userId, groupId, listId, itemId, body}) => ({
         url: `/users/${userId}/groups/${groupId}/lists/${listId}/items/${itemId!}`,
         method: 'PATCH',
@@ -29,7 +34,7 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       ],
     }),
     /** removes an item from a shopping list */
-    removeItem: builder.mutation<void, listItemApiRequest>({
+    removeItem: builder.mutation<void, ListItemApiRemoveItemReq>({
       query: ({userId, groupId, listId, itemId}) => ({
         url: `/users/${userId}/groups/${groupId}/lists/${listId}/items/${itemId}`,
         method: 'DELETE',
@@ -40,7 +45,10 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       ],
     }),
     /** Removes all items in shopping list */
-    removeAllItemsFromList: builder.mutation<void, listItemApiRequest>({
+    removeAllItemsFromList: builder.mutation<
+      void,
+      ListItemApiRemoveAllItemsReq
+    >({
       query: ({userId, groupId, listId}) => ({
         url: `/users/${userId}/groups/${groupId}/lists/${listId}/items`,
         method: 'DELETE',
