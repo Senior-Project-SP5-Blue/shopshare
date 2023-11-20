@@ -10,48 +10,40 @@ import React, {useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 import mockData from '../mockData';
-import {useSelector} from 'react-redux';
+//import {useSelector} from 'react-redux';
 import {
   selectAccessToken,
   selectCurrentUser,
-  signOut,
+  clearAuthContext, //used to sign out
 } from '../redux/slices/authSlice';
 import {useSignOutMutation} from '../redux/slices/authApiSlice';
 import {useAppDispatch} from '../redux/store';
 import Button from '../components/Button';
 import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
 import {list} from 'postcss';
+import {useSelector} from 'react-redux';
 
-const ListsScreen = () => {
-  const user = useSelector(selectCurrentUser);
-  const token = useSelector(selectAccessToken);
-  const [signout] = useSignOutMutation();
+interface ListScreenProps {
+  navigation: any;
+}
+
+const ListsScreen: React.FC<ListScreenProps> = props => {
+  const welcome = () => props.navigation.navigate('Welcome');
   const dispatch = useAppDispatch();
-  const {data: lists, isSuccess} = useGetShoppingListsQuery({userId: user.id});
-  console.log('Current user');
-  console.log(user);
-  console.log('token');
-  console.log(token);
-  console.log('Successfully logged in');
+  const user = useSelector(selectCurrentUser); //this is the signed in user
 
-  console.log('My lists:');
+  const {data: lists, isSuccess} = useGetShoppingListsQuery({
+    userId: user.id,
+  }); //"lists" is all the users lists
 
-  useEffect(() => {
-    if (isSuccess) {
-      lists.forEach(x => {
-        console.log(x);
-      });
-    }
-  }, [isSuccess, lists]);
-  // lists?.forEach((x, idx) => {
-
-  // })
-
+  const [signOut] = useSignOutMutation();
+  // An example of how to logout
   const handleLogOut = () => {
-    signout()
+    signOut()
       .unwrap()
       .then(_res => {
-        dispatch(signOut());
+        welcome();
+        dispatch(clearAuthContext());
       })
       .catch(err => {
         console.log('There was an error signing out.');

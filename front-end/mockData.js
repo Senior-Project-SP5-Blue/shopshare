@@ -2,15 +2,16 @@ export default mockData = [
     {
         name: "Friday Night Dinner",
         color: "#24A6D9",
-        shared: true,
-        sharedWith: "jaredsmith@gmail.com",
+ 
         items: [
             {
                 item1: "Chicken Breast",
                 item2: "Pasta",
                 item3: "Heavy Cream",
                 item4: "Tomatoes",
-                item5: "Green Peppers"
+                item5: "Green Peppers",
+                shared: true,
+                sharedWith: "jaredsmith@gmail.com",
             }
         ]
     },
@@ -24,7 +25,8 @@ export default mockData = [
                 item2: "Avocado",
                 item3: "Peaches",
                 item4: "Bananas",
-                item5: "Milk"
+                item5: "Milk",
+                shared: false,
             }
         ]
 

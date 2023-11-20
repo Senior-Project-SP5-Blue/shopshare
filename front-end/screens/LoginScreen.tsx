@@ -1,20 +1,20 @@
 import React, {useState} from 'react';
 import {
-  View,
+  Button,
+  Image,
   ImageBackground,
+  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
+  View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {StatusBar} from 'react-native';
 import COLORS from '../constants/colors';
-import Button from '../components/Button';
 import {useSignInMutation} from '../redux/slices/authApiSlice';
-import {setAuthContext} from '../redux/slices/authSlice';
 import {useAppDispatch} from '../redux/store';
 import {AuthApiSignInReq} from '../redux/types';
+import {setAuthContext} from '../redux/slices/authSlice';
 
 interface LoginScreenProps {
   navigation: any;
