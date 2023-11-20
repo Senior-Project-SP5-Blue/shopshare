@@ -77,16 +77,26 @@ public class TokenService implements ITokenService {
     @Override
     @Transactional
     @Async
-    public void revokeAccessToken(String jwt) {
+    public CompletableFuture<Void> revokeAccessToken(String jwt) {
         Token storedToken = tokenRepository.findByToken(jwt).orElseThrow(() -> new TokenNotFoundException("Invalid Token"));
         storedToken.setExpired(true);
         storedToken.setRevoked(true);
+        return null;
     }
 
     @Override
     @Transactional
     @Async
-    public void revokeAllUserTokens(UUID userId) {
+    public CompletableFuture<Void> revokeAllUserTokens(UUID userId) {
         tokenRepository.revokeTokensByUser(userId);
+        return null;
     }
+
+//    @Override
+//    @Transactional
+//    @Async
+//    public CompletableFuture<Void> deleteExpiredTokens() {
+//        tokenRepository.deleteExpiredTokens();
+//        return null;
+//    }
 }

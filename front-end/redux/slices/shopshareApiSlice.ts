@@ -5,7 +5,7 @@ import {
 } from '@reduxjs/toolkit/query/react';
 // import {RootState} from '../store';
 import Config from 'react-native-config';
-import {setAuthContext, signOut} from './authSlice';
+import {setAuthContext, clearAuthContext} from './authSlice';
 
 // build.mutation<ReturnType, ArgType>. I
 // const headers: HeadersInit = {
@@ -39,7 +39,7 @@ const baseQueryWithReAuth = async (
     console.log('Sending refresh token');
     const refreshResult: any = await baseQuery(
       {
-        url: `/auth/refresh-signin`,
+        url: '/auth/refresh-signin',
         headers: {Authorization: _state.auth.refreshToken ?? ''},
       },
       api,
@@ -54,7 +54,7 @@ const baseQueryWithReAuth = async (
       //   retry OG request with access token
       await baseQuery(args, api, extraOptions);
     } else {
-      api.dispatch(signOut());
+      api.dispatch(clearAuthContext());
     }
   }
   return result;

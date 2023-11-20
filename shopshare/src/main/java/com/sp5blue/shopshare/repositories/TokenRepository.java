@@ -54,4 +54,8 @@ SELECT * FROM tokens t WHERE t.type = 'CONFIRMATION'
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("UPDATE Token t set t.isRevoked = TRUE, t.isExpired = TRUE WHERE t.user.id = :user_id")
     void revokeTokensByUser(@Param("user_id") UUID userId);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("DELETE FROM Token t WHERE t.isExpired  OR t.isRevoked")
+    void deleteExpiredTokens();
 }

@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {
-  Button,
   Image,
   ImageBackground,
   StatusBar,
@@ -14,6 +13,7 @@ import COLORS from '../constants/colors';
 import {useSignInMutation} from '../redux/slices/authApiSlice';
 import {useAppDispatch} from '../redux/store';
 import {setAuthContext} from '../redux/slices/authSlice';
+import Button from '../components/Button';
 
 interface LoginScreenProps {
   navigation: any;
@@ -26,11 +26,10 @@ const LoginScreen = (props: LoginScreenProps) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const dispatch = useAppDispatch();
-  const [login, {status, isLoading, isError, isSuccess}] = useSignInMutation();
+  const [signIn] = useSignInMutation();
 
-  const handleLogin = (email: string, password: string) => {
-    console.log(`Email: ${email} Password: ${password}`);
-    login({email, password})
+  const handleSignIn = (email: string, password: string) => {
+    signIn({email, password})
       .unwrap()
       .then(userData => {
         dispatch(setAuthContext({...userData, user: userData.userContext}));
@@ -161,7 +160,7 @@ const LoginScreen = (props: LoginScreenProps) => {
           title="Login"
           filled
           style={{marginTop: 20, marginBottom: 4}}
-          onPress={() => handleLogin(email, password)}
+          onPress={() => handleSignIn(email, password)}
         />
         <View>
           <Image
