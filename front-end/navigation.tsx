@@ -6,11 +6,11 @@ import CreateListsScreen from './screens/CreateListsScreen';
 import ShopScreen from './screens/ShopScreen';
 import {AccessibilityInfo} from 'react-native';
 import AccountsScreen from './screens/AccountsScreen';
-import Tabs from './components/Tab';
 import Welcome from './screens/Welcome';
 import LoginScreen from './screens/LoginScreen';
 import ListsScreen from './screens/ListsScreen';
 import SignupScreen from './screens/SignupScreen';
+import EmailConfirmationScreen from './screens/EmailConfirmationScreen';
 const {Navigator, Screen} = createNativeStackNavigator();
 
 const AppNavigator = () => (
@@ -20,6 +20,7 @@ const AppNavigator = () => (
       <Screen name="Login" component={LoginScreen} />
       <Screen name="Lists" component={ListsScreen} />
       <Screen name="SignUp" component={SignupScreen} />
+      <Screen name="EmailConfirmation" component={EmailConfirmationScreen} />
       <Screen name="CreateListsScreen" component={CreateListsScreen} />
       <Screen name="ShopScreen" component={ShopScreen} />
       <Screen name="AccountsScreen" component={AccountsScreen} />

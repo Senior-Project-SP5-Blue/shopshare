@@ -23,8 +23,8 @@ public class SignUpListener implements ApplicationListener<OnSignUpCompleteEvent
 
     private final IMailService mailService;
 
-    @Value("${api-prefix}")
-    private String apiPrefix;
+    @Value("${API_URL}")
+    private String API_URL;
 
     private final Logger logger = LoggerFactory.getLogger(SignUpListener.class);
 
@@ -48,7 +48,7 @@ public class SignUpListener implements ApplicationListener<OnSignUpCompleteEvent
 
         String recipientAddress = user.getEmail();
         String subject = "Registration Confirmation";
-        String confirmationUrl = "http://localhost:8080" + apiPrefix + "/auth/confirm-signup?token=" + confirmationToken.getToken();
+        String confirmationUrl = API_URL + "/auth/confirm-signup?token=" + confirmationToken.getToken();
 
         String htmlMessage = """
                 <h0>Please click the link to <a href="%s">Verify Email</a></h0>

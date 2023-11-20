@@ -1,27 +1,22 @@
+import React from 'react';
 import {
+  FlatList,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
-  FlatList,
+  View,
 } from 'react-native';
-import {View} from 'react-native';
-import React, {useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 import mockData from '../mockData';
 //import {useSelector} from 'react-redux';
-import {
-  selectAccessToken,
-  selectCurrentUser,
-  clearAuthContext, //used to sign out
-} from '../redux/slices/authSlice';
-import {useSignOutMutation} from '../redux/slices/authApiSlice';
-import {useAppDispatch} from '../redux/store';
-import Button from '../components/Button';
-import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
-import {list} from 'postcss';
 import {useSelector} from 'react-redux';
+import Button from '../components/Button';
+import {useSignOutMutation} from '../redux/slices/authApiSlice';
+import {clearAuthContext, selectCurrentUser} from '../redux/slices/authSlice';
+import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
+import {useAppDispatch} from '../redux/store';
 
 interface ListScreenProps {
   navigation: any;
@@ -38,7 +33,7 @@ const ListsScreen: React.FC<ListScreenProps> = props => {
 
   const [signOut] = useSignOutMutation();
   // An example of how to logout
-  const handleLogOut = () => {
+  const handleSignOut = () => {
     signOut()
       .unwrap()
       .then(_res => {
@@ -85,7 +80,7 @@ const ListsScreen: React.FC<ListScreenProps> = props => {
         />
       </View>
       <View>
-        <Button title="Log Out" onPress={handleLogOut} />
+        <Button title="Log Out" onPress={handleSignOut} />
       </View>
     </SafeAreaView>
   );

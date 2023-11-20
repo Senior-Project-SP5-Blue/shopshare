@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {
-  Button,
   Image,
   ImageBackground,
   StatusBar,
@@ -13,8 +12,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 import {useSignInMutation} from '../redux/slices/authApiSlice';
 import {useAppDispatch} from '../redux/store';
-import {AuthApiSignInReq} from '../redux/types';
 import {setAuthContext} from '../redux/slices/authSlice';
+import Button from '../components/Button';
 
 interface LoginScreenProps {
   navigation: any;
@@ -27,10 +26,10 @@ const LoginScreen = (props: LoginScreenProps) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const dispatch = useAppDispatch();
-  const [signIn, {status, isLoading, isError, isSuccess}] = useSignInMutation();
+  const [signIn] = useSignInMutation();
 
   const handleSignIn = (email: string, password: string) => {
-    signIn({email, password} as AuthApiSignInReq)
+    signIn({email, password})
       .unwrap()
       .then(userData => {
         dispatch(setAuthContext({...userData, user: userData.userContext}));

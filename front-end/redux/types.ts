@@ -15,8 +15,8 @@ export type apiPathParams = {
 // Auth Api
 export type AuthApiSignUpReq = {
   username: string;
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   email: string;
   number: string;
   password: string;
