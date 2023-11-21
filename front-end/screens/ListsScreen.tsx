@@ -17,13 +17,14 @@ import {useSignOutMutation} from '../redux/slices/authApiSlice';
 import {clearAuthContext, selectCurrentUser} from '../redux/slices/authSlice';
 import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
 import {useAppDispatch} from '../redux/store';
+import ListCard from '../components/ListCard';
 
 interface ListScreenProps {
   navigation: any;
 }
 
 const ListsScreen: React.FC<ListScreenProps> = props => {
-  const welcome = () => props.navigation.navigate('Welcome');
+  const createList = () => props.navigation.navigate('CreateListsScreen');
   const dispatch = useAppDispatch();
   const user = useSelector(selectCurrentUser); //this is the signed in user
 
@@ -31,13 +32,15 @@ const ListsScreen: React.FC<ListScreenProps> = props => {
     userId: user.id,
   }); //"lists" is all the users lists
 
+  // console.log(lists);
+
   const [signOut] = useSignOutMutation();
   // An example of how to logout
   const handleSignOut = () => {
     signOut()
       .unwrap()
       .then(_res => {
-        welcome();
+        // welcome();
         dispatch(clearAuthContext());
       })
       .catch(err => {
@@ -58,7 +61,7 @@ const ListsScreen: React.FC<ListScreenProps> = props => {
         <View style={styles.divider} />
       </View>
       <View style={{marginVertical: 48}}>
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={createList}>
           <Image
             source={require('../assets/add.png')}
             style={styles.addImage}
@@ -68,15 +71,11 @@ const ListsScreen: React.FC<ListScreenProps> = props => {
       </View>
       <View style={{height: 275, paddingLeft: 32}}>
         <FlatList
-          data={mockData}
+          data={lists}
           keyExtractor={item => item.name}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          renderItem={({item}) => (
-            <View>
-              <Text></Text>
-            </View>
-          )}
+          renderItem={({item}) => <ListCard list={item} />}
         />
       </View>
       <View>

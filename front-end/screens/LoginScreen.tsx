@@ -21,7 +21,6 @@ interface LoginScreenProps {
 
 const LoginScreen = (props: LoginScreenProps) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
-  const lists = () => props.navigation.navigate('Lists');
   const home = () => props.navigation.navigate('Welcome');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -35,7 +34,7 @@ const LoginScreen = (props: LoginScreenProps) => {
         dispatch(setAuthContext({...userData, user: userData.userContext}));
         setEmail('');
         setPassword('');
-        lists();
+        // lists();
       })
       .catch(err => {
         console.log('ERROR!! ');
