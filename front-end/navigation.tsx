@@ -2,10 +2,9 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 
-import CreateListsScreen from './screens/CreateListsScreen';
 import ShopScreen from './screens/ShopScreen';
 import AccountsScreen from './screens/AccountsScreen';
-import Welcome from './screens/Welcome';
+import Welcome from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import ListsScreen from './screens/ListsScreen';
 import SignupScreen from './screens/SignupScreen';
@@ -14,9 +13,20 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useSelector} from 'react-redux';
 import {selectCurrentUser} from './redux/slices/authSlice';
 import GroupsScreen from './screens/GroupsScreen';
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-const ListsStack = createNativeStackNavigator();
+import CreateListScreen from './screens/CreateListScreen';
+import {
+  AuthStackParamList,
+  ListStackParamList,
+  MainTabParamList,
+  RootStackParamList,
+} from './screens/types';
+import ListScreen from './screens/ListScreen';
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const MainTab = createBottomTabNavigator<MainTabParamList>();
+const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+
+const ListsStack = createNativeStackNavigator<ListStackParamList>();
 const AccountStack = createNativeStackNavigator();
 const GroupsStack = createNativeStackNavigator();
 
@@ -24,9 +34,11 @@ const ListStackScreen: React.FC = () => {
   return (
     <ListsStack.Navigator screenOptions={{headerShown: false}}>
       <ListsStack.Screen name="Lists" component={ListsScreen} />
+      <ListsStack.Screen name="CreateListScreen" component={CreateListScreen} />
       <ListsStack.Screen
-        name="CreateListsScreen"
-        component={CreateListsScreen}
+        name="List"
+        component={ListScreen}
+        options={{presentation: 'modal'}}
       />
       <ListsStack.Screen name="ShopScreen" component={ShopScreen} />
     </ListsStack.Navigator>
@@ -36,7 +48,7 @@ const ListStackScreen: React.FC = () => {
 const AccountStackScreen: React.FC = () => {
   return (
     <AccountStack.Navigator screenOptions={{headerShown: false}}>
-      <AccountStack.Screen name="AccountsScreen" component={AccountsScreen} />
+      <AccountStack.Screen name="Accounts" component={AccountsScreen} />
     </AccountStack.Navigator>
   );
 };
@@ -44,46 +56,46 @@ const AccountStackScreen: React.FC = () => {
 const GroupsStackScreen: React.FC = () => {
   return (
     <GroupsStack.Navigator screenOptions={{headerShown: false}}>
-      <GroupsStack.Screen name="GroupsScreen" component={GroupsScreen} />
+      <GroupsStack.Screen name="Groups" component={GroupsScreen} />
     </GroupsStack.Navigator>
   );
 };
 
-const WelcomeStackNav: React.FC = () => {
+const AuthStackScreens: React.FC = () => {
   return (
-    <Stack.Navigator
+    <AuthStack.Navigator
       initialRouteName="Welcome"
       screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Welcome" component={Welcome} />
-      <Stack.Screen name="SignUp" component={SignupScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen
+      <AuthStack.Screen name="Welcome" component={Welcome} />
+      <AuthStack.Screen name="SignUp" component={SignupScreen} />
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen
         name="EmailConfirmation"
         component={EmailConfirmationScreen}
       />
-    </Stack.Navigator>
+    </AuthStack.Navigator>
   );
 };
 
-const MainStackNav: React.FC = () => {
+const MainStackScreens: React.FC = () => {
   return (
-    <Tab.Navigator screenOptions={{headerShown: false}}>
-      <Tab.Screen
+    <MainTab.Navigator screenOptions={{headerShown: false}}>
+      <MainTab.Screen
         name="ListsStack"
         component={ListStackScreen}
         options={{tabBarLabel: 'Lists'}}
       />
-      <Tab.Screen
+      <MainTab.Screen
         name="GroupsStack"
         component={GroupsStackScreen}
         options={{tabBarLabel: 'Groups'}}
       />
-      <Tab.Screen
+      <MainTab.Screen
         name="AccountStack"
         component={AccountStackScreen}
         options={{tabBarLabel: 'Account'}}
       />
-    </Tab.Navigator>
+    </MainTab.Navigator>
   );
 };
 
@@ -94,9 +106,9 @@ const AppNavigator: React.FC = () => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
         {isSignedIn ? (
-          <Stack.Screen name="MainStack" component={MainStackNav} />
+          <Stack.Screen name="MainStack" component={MainStackScreens} />
         ) : (
-          <Stack.Screen name="WelcomeStack" component={WelcomeStackNav} />
+          <Stack.Screen name="WelcomeStack" component={AuthStackScreens} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

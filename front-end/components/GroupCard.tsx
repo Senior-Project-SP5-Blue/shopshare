@@ -7,23 +7,20 @@ import {
   View,
 } from 'react-native';
 import COLORS from '../constants/colors';
-import SlimShoppingListDto from '../models/shoppinglist/SlimShoppingListDto';
 import {useNavigation} from '@react-navigation/native';
-import {ListScreenNavigationProp} from '../screens/types';
+import ShopperGroupDto from '../models/shoppergroup/ShopperGroupDto';
 
-interface ListCardProps {
-  list: SlimShoppingListDto & {color?: string};
+interface GroupCardProps {
+  group: ShopperGroupDto;
 }
 
-const ListCard: React.FC<ListCardProps> = props => {
-  const {
-    list: {id, name, modifiedOn, completed, total, groupId, color},
-  } = props;
-  const navigation = useNavigation<ListScreenNavigationProp>();
+const GroupCard: React.FC<GroupCardProps> = props => {
+  // const {
+  // const navigation = useNavigation<ListScreenNavigationProp>();
 
-  const handleOnListPress = () => {
-    navigation.navigate('List', {groupId: groupId, listId: id});
-  };
+  // const handleOnListPress = () => {
+  //   navigation.navigate('List', {groupId: groupId, listId: id});
+  // };
 
   return (
     <TouchableHighlight
@@ -85,4 +82,4 @@ const ListCard: React.FC<ListCardProps> = props => {
     </TouchableHighlight>
   );
 };
-export default ListCard;
+export default GroupCard;

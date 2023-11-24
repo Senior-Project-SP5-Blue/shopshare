@@ -5,18 +5,21 @@ import {LinearGradient} from 'react-native-linear-gradient';
 import COLORS from '../constants/colors';
 import {Image} from 'react-native';
 import Button from '../components/Button';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 interface WelcomeScreenProps {
   navigation: any;
 }
-const Welcome = (props: WelcomeScreenProps) => {
+const WelcomeScreen = (props: WelcomeScreenProps) => {
   const signup = () => props.navigation.navigate('SignUp');
   const login = () => props.navigation.navigate('Login');
+  const insets = useSafeAreaInsets();
 
   return (
     <LinearGradient
       style={{
         flex: 1,
+        paddingBottom: insets.bottom,
       }}
       colors={[COLORS.secondary, COLORS.primary1]}>
       <View style={{flex: 1}}>
@@ -164,4 +167,4 @@ const Welcome = (props: WelcomeScreenProps) => {
     </LinearGradient>
   );
 };
-export default Welcome;
+export default WelcomeScreen;

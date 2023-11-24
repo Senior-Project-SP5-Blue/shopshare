@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -9,14 +10,10 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
-import mockData from '../mockData';
 //import {useSelector} from 'react-redux';
 import {useSelector} from 'react-redux';
-import Button from '../components/Button';
-import {useSignOutMutation} from '../redux/slices/authApiSlice';
-import {clearAuthContext, selectCurrentUser} from '../redux/slices/authSlice';
+import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
-import {useAppDispatch} from '../redux/store';
 import ListCard from '../components/ListCard';
 
 interface ListScreenProps {
@@ -24,30 +21,21 @@ interface ListScreenProps {
 }
 
 const ListsScreen: React.FC<ListScreenProps> = props => {
-  const createList = () => props.navigation.navigate('CreateListsScreen');
-  const dispatch = useAppDispatch();
-  const user = useSelector(selectCurrentUser); //this is the signed in user
+  const createList = () => props.navigation.navigate('CreateListScreen');
+  const _userId = useSelector(selectCurrentUserId); //this is the signed in user
 
-  const {data: lists, isSuccess} = useGetShoppingListsQuery({
-    userId: user.id,
+  const {data: lists, isLoading: isLoadingLists} = useGetShoppingListsQuery({
+    userId: _userId!,
   }); //"lists" is all the users lists
 
-  // console.log(lists);
+  if (isLoadingLists) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </SafeAreaView>
+    );
+  }
 
-  const [signOut] = useSignOutMutation();
-  // An example of how to logout
-  const handleSignOut = () => {
-    signOut()
-      .unwrap()
-      .then(_res => {
-        // welcome();
-        dispatch(clearAuthContext());
-      })
-      .catch(err => {
-        console.log('There was an error signing out.');
-        console.log(err);
-      });
-  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flexDirection: 'row'}}>
@@ -72,14 +60,11 @@ const ListsScreen: React.FC<ListScreenProps> = props => {
       <View style={{height: 275, paddingLeft: 32}}>
         <FlatList
           data={lists}
-          keyExtractor={item => item.name}
+          keyExtractor={item => item.id}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           renderItem={({item}) => <ListCard list={item} />}
         />
-      </View>
-      <View>
-        <Button title="Log Out" onPress={handleSignOut} />
       </View>
     </SafeAreaView>
   );
