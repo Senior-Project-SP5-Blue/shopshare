@@ -9,7 +9,7 @@ import {
 import COLORS from '../constants/colors';
 import SlimShoppingListDto from '../models/shoppinglist/SlimShoppingListDto';
 import {useNavigation} from '@react-navigation/native';
-import {ListScreenNavigationProp} from '../screens/types';
+import {ListScreenNavigationProp} from '../screens/ListScreen';
 
 interface ListCardProps {
   list: SlimShoppingListDto & {color?: string};

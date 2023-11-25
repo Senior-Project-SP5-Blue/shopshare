@@ -32,8 +32,12 @@ const GroupsStack = createNativeStackNavigator();
 
 const ListStackScreen: React.FC = () => {
   return (
-    <ListsStack.Navigator screenOptions={{headerShown: false}}>
-      <ListsStack.Screen name="Lists" component={ListsScreen} />
+    <ListsStack.Navigator screenOptions={{headerShown: true}}>
+      <ListsStack.Screen
+        // options={{headerTitle: null}}
+        name="Lists"
+        component={ListsScreen}
+      />
       <ListsStack.Screen name="CreateListScreen" component={CreateListScreen} />
       <ListsStack.Screen
         name="List"

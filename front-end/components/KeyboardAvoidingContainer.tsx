@@ -15,10 +15,12 @@ import COLORS from '../constants/colors';
 interface KeyboardAvoidingContainerProps {
   style?: StyleProp<ViewStyle>;
   backgroundColor?: string;
+  scrollEnabled?: boolean;
 }
+
 const KeyboardAvoidingContainer: React.FC<
   PropsWithChildren<KeyboardAvoidingContainerProps & ScrollViewProps>
-> = ({children, backgroundColor, style}) => {
+> = ({children, backgroundColor, style, scrollEnabled}) => {
   const insets = useSafeAreaInsets();
   return (
     <SafeAreaView
@@ -31,6 +33,7 @@ const KeyboardAvoidingContainer: React.FC<
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}>
         <ScrollView
+          scrollEnabled={scrollEnabled ?? true}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[styles.contentContainer, style]}>
           {children}

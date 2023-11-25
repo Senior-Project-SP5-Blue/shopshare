@@ -64,7 +64,9 @@ const LoginScreen = (props: LoginScreenProps) => {
         }}
         source={require('../assets/background.png')}
       />
-      <KeyboardAvoidingContainer>
+      <KeyboardAvoidingContainer
+        scrollEnabled={false}
+        style={{overflow: 'hidden'}}>
         <View>
           <View>
             <TouchableOpacity onPress={home}>

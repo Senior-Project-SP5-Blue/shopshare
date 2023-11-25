@@ -1,5 +1,15 @@
-import React from 'react';
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useGetGroupShoppingListQuery} from '../redux/slices/shoppingListApiSlice';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -7,13 +17,18 @@ import {ListStackParamList} from './types';
 import {useSelector} from 'react-redux';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import COLORS from '../constants/colors';
-import ListItemCard from '../components/ListItemCard';
+import ListItemRow from '../components/ListItemRow';
+import {useNavigation} from '@react-navigation/native';
+import ListItemDto from '../models/listitem/ListItemDto';
 
 type ListScreenProps = NativeStackScreenProps<ListStackParamList, 'List'>;
 
-const ListScreen: React.FC<ListScreenProps> = props => {
-  const _userId = useSelector(selectCurrentUserId);
+export type ListScreenNavigationProp = ListScreenProps['navigation'];
 
+const ListScreen: React.FC<ListScreenProps> = props => {
+  const [editItem, setEditItem] = useState<ListItemDto>();
+  const navigation = useNavigation<ListScreenNavigationProp>();
+  const _userId = useSelector(selectCurrentUserId);
   const {groupId, listId} = props.route.params;
   const {data: list, isLoading: isLoadingList} = useGetGroupShoppingListQuery({
     userId: _userId!,
@@ -21,19 +36,29 @@ const ListScreen: React.FC<ListScreenProps> = props => {
     listId,
   });
 
+  useEffect(() => {
+    navigation.setOptions({title: list?.name});
+  }, [list]);
+
   return (
-    <SafeAreaView>
+    <TouchableWithoutFeedback
+      style={{flex: 1}}
+      onPress={Keyboard.dismiss}
+      accessible={false}>
       {isLoadingList ? (
         <ActivityIndicator size="large" color={COLORS.primary} />
       ) : (
-        <View>
-          <Text style={styles.listTitle}>{list?.name}</Text>
-          {list!.items.map(x => (
-            <ListItemCard item={x} key={x.id} />
-          ))}
-        </View>
+        // <>
+        // <Text>{list?.name}</Text>
+        <FlatList
+          style={{flex: 1}}
+          data={list!.items}
+          renderItem={({item}) => <ListItemRow item={item} />}
+          keyExtractor={item => item.id}
+          showsVerticalScrollIndicator={false}
+        />
       )}
-    </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
