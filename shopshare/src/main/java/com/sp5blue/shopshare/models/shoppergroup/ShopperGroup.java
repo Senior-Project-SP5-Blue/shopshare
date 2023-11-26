@@ -1,117 +1,113 @@
 package com.sp5blue.shopshare.models.shoppergroup;
 
-
 import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.models.user.User;
 import jakarta.persistence.*;
-
 import java.util.*;
 
 @Entity
 @Table(name = "shopper_groups")
 public class ShopperGroup {
 
-    @Id
-    @Column(name = "id")
-    private final UUID id = UUID.randomUUID();
+  @Id
+  @Column(name = "id")
+  private final UUID id = UUID.randomUUID();
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinTable(name = "users_shopper_groups",
-    joinColumns = @JoinColumn(name = "shopper_group_id"),
-    inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> users = new HashSet<>();
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
+  @JoinTable(
+      name = "users_shopper_groups",
+      joinColumns = @JoinColumn(name = "shopper_group_id"),
+      inverseJoinColumns = @JoinColumn(name = "user_id"))
+  private Set<User> users = new HashSet<>();
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
-    private List<ShoppingList> lists = new ArrayList<>();
+  @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+  private List<ShoppingList> lists = new ArrayList<>();
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    private User admin;
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @JoinColumn(name = "admin_id")
+  private User admin;
 
-    public ShopperGroup() {
-    }
+  public ShopperGroup() {}
 
-    public ShopperGroup(String name, User createdBy) {
-        this.name = name;
-        this.admin = createdBy;
-        this.users.add(createdBy);
-    }
+  public ShopperGroup(String name, User createdBy) {
+    this.name = name;
+    this.admin = createdBy;
+    this.users.add(createdBy);
+  }
 
-    public User getAdmin() {
-        return admin;
-    }
+  public User getAdmin() {
+    return admin;
+  }
 
-    public void setAdmin(User createdBy) {
-        this.admin = createdBy;
-    }
-    public UUID getId() {
-        return id;
-    }
+  public void setAdmin(User createdBy) {
+    this.admin = createdBy;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public Set<User> getUsers() {
-        return users;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
+  public Set<User> getUsers() {
+    return users;
+  }
 
-    public List<ShoppingList> getLists() {
-        return lists;
-    }
+  public void setUsers(Set<User> users) {
+    this.users = users;
+  }
 
-    public void setLists(List<ShoppingList> lists) {
-        this.lists = lists;
-    }
+  public List<ShoppingList> getLists() {
+    return lists;
+  }
 
-    public boolean addUser(User user) {
-        return users.add(user);
-    }
+  public void setLists(List<ShoppingList> lists) {
+    this.lists = lists;
+  }
 
-    public void removeUser(User user) {
-        users.remove(user);
-    }
+  public boolean addUser(User user) {
+    return users.add(user);
+  }
 
-    public boolean removeUser(UUID userId) {
-        User user = users.stream().filter(s -> s.getId().equals(userId)).findFirst().orElse(null);
-        if (user == null) return false;
-        return users.removeIf(x -> x.getId().equals(userId));
-    }
+  public void removeUser(User user) {
+    users.remove(user);
+  }
 
-    public void removeAllUsers() {
-        users = new HashSet<>();
-    }
+  public boolean removeUser(UUID userId) {
+    User user = users.stream().filter(s -> s.getId().equals(userId)).findFirst().orElse(null);
+    if (user == null) return false;
+    return users.removeIf(x -> x.getId().equals(userId));
+  }
 
-    public void addList(ShoppingList shoppingList) {
-        shoppingList.setGroup(this);
-        lists.add(shoppingList);
-    }
+  public void removeAllUsers() {
+    users = new HashSet<>();
+  }
 
-    public void removeList(ShoppingList shoppingList) {
-        shoppingList.setGroup(null);
-        lists.remove(shoppingList);
-    }
-    public void removeList(UUID listId) {
-        lists.removeIf(l -> l.getId().equals(listId));
-    }
+  public void addList(ShoppingList shoppingList) {
+    shoppingList.setGroup(this);
+    lists.add(shoppingList);
+  }
 
-    @Override
-    public String toString() {
-        return "ShopperGroup{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", lists=" + lists +
-                '}';
-    }
+  public void removeList(ShoppingList shoppingList) {
+    shoppingList.setGroup(null);
+    lists.remove(shoppingList);
+  }
+
+  public void removeList(UUID listId) {
+    lists.removeIf(l -> l.getId().equals(listId));
+  }
+
+  @Override
+  public String toString() {
+    return "ShopperGroup{" + "id=" + id + ", name='" + name + '\'' + ", lists=" + lists + '}';
+  }
 }

@@ -4,14 +4,14 @@ import com.sp5blue.shopshare.models.user.User;
 import org.springframework.context.ApplicationEvent;
 
 public class OnSignUpCompleteEvent extends ApplicationEvent {
-    private final User user;
+  private final User user;
 
-    public OnSignUpCompleteEvent(Object source, User user) {
-        super(source);
-        this.user = user;
-    }
+  public OnSignUpCompleteEvent(Object source, User user) {
+    super(source);
+    this.user = user;
+  }
 
-    public User getUser() {
-        return user;
-    }
+  public User getUser() {
+    return user;
+  }
 }

@@ -59,6 +59,10 @@ export type ListItemApiRemoveAllItemsReq = Pick<
 
 // ShopperGroupApi
 export type ShopperGroupApiGetGroupsReq = Pick<apiPathParams, 'userId'>;
+export type ShopperGroupApiGetGroupReq = Pick<
+  apiPathParams,
+  'userId' | 'groupId'
+>;
 export type ShopperGroupApiGetGroupMembersReq = Pick<
   apiPathParams,
   'userId' | 'groupId'
