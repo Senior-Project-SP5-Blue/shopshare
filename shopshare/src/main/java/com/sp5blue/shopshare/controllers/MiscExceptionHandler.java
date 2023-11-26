@@ -1,18 +1,17 @@
 package com.sp5blue.shopshare.controllers;
 
 import com.sp5blue.shopshare.controllers.shoppinglist.ShoppingListErrorResponse;
+import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.time.LocalDateTime;
-
-@ControllerAdvice
+@RestControllerAdvice
 public class MiscExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(MiscExceptionHandler.class);
 

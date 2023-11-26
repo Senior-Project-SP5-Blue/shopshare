@@ -7,43 +7,49 @@ import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsExcep
 import com.sp5blue.shopshare.exceptions.shoppergroup.RemoveGroupAdminException;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.user.User;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface IShopperGroupService {
-    CompletableFuture<ShopperGroupDto> addShopperGroup(UUID adminId, String groupName);
+  CompletableFuture<ShopperGroupDto> addShopperGroup(UUID adminId, String groupName);
 
-    CompletableFuture<ShopperGroup> createShopperGroup(UUID adminId, String groupName);
+  CompletableFuture<ShopperGroup> createShopperGroup(UUID adminId, String groupName);
 
-    CompletableFuture<List<ShopperGroupDto>> getShopperGroups(UUID userId);
+  CompletableFuture<List<ShopperGroupDto>> getShopperGroups(UUID userId);
 
-    CompletableFuture<ShopperGroup> findShopperGroupById(UUID groupId);
+  CompletableFuture<ShopperGroup> findShopperGroupById(UUID groupId);
 
-    CompletableFuture<List<ShopperGroup>> readShopperGroups(UUID userId);
+  CompletableFuture<List<ShopperGroup>> readShopperGroups(UUID userId);
 
-    CompletableFuture<ShopperGroupDto> getShopperGroupById(UUID userId, UUID groupId) throws GroupNotFoundException;
+  CompletableFuture<ShopperGroupDto> getShopperGroupById(UUID userId, UUID groupId)
+      throws GroupNotFoundException;
 
-    CompletableFuture<ShopperGroup> readShopperGroupById(UUID userId, UUID groupId) throws GroupNotFoundException;
+  CompletableFuture<ShopperGroup> readShopperGroupById(UUID userId, UUID groupId)
+      throws GroupNotFoundException;
 
-    void deleteShopperGroup(UUID userId, UUID groupId) throws GroupNotFoundException, InvalidUserPermissionsException;
+  void deleteShopperGroup(UUID userId, UUID groupId)
+      throws GroupNotFoundException, InvalidUserPermissionsException;
 
-    CompletableFuture<ShopperGroupDto> changeShopperGroupName(UUID userId, UUID groupId, String newName);
+  CompletableFuture<ShopperGroupDto> changeShopperGroupName(
+      UUID userId, UUID groupId, String newName);
 
-    CompletableFuture<ShopperGroup> updateShopperGroupName(UUID userId, UUID groupId, String newName);
+  CompletableFuture<ShopperGroup> updateShopperGroupName(UUID userId, UUID groupId, String newName);
 
-    CompletableFuture<Boolean> addUserToShopperGroup(UUID groupId, UUID shopperId) throws GroupNotFoundException;
+  CompletableFuture<Boolean> addUserToShopperGroup(UUID groupId, UUID shopperId)
+      throws GroupNotFoundException;
 
-    CompletableFuture<Boolean> addUserToShopperGroup(UUID groupId, User user) throws GroupNotFoundException;
+  CompletableFuture<Boolean> addUserToShopperGroup(UUID groupId, User user)
+      throws GroupNotFoundException;
 
-    CompletableFuture<List<UserDto>> getShopperGroupUsers(UUID userId, UUID groupId);
+  CompletableFuture<List<UserDto>> getShopperGroupUsers(UUID userId, UUID groupId);
 
-    CompletableFuture<UserDto> getShopperGroupUser(UUID userId, UUID groupId, UUID memberId);
+  CompletableFuture<UserDto> getShopperGroupUser(UUID userId, UUID groupId, UUID memberId);
 
-    CompletableFuture<Boolean> removeUserFromShopperGroup(UUID userId, UUID groupId, UUID shopperId) throws GroupNotFoundException, RemoveGroupAdminException;
+  CompletableFuture<Boolean> removeUserFromShopperGroup(UUID userId, UUID groupId, UUID shopperId)
+      throws GroupNotFoundException, RemoveGroupAdminException;
 
-    CompletableFuture<Boolean> userExistsInGroup(UUID userId, UUID groupId);
+  CompletableFuture<Boolean> userExistsInGroup(UUID userId, UUID groupId);
 
-    ShopperGroup verifyUserHasGroup(UUID userId, UUID groupId);
+  ShopperGroup verifyUserHasGroup(UUID userId, UUID groupId);
 }

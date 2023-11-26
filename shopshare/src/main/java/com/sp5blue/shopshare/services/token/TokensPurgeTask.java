@@ -8,16 +8,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TokensPurgeTask {
-    private final TokenRepository tokenRepository;
+  private final TokenRepository tokenRepository;
 
-    @Autowired
-    public TokensPurgeTask(TokenRepository tokenRepository) {
-        this.tokenRepository = tokenRepository;
-    }
+  @Autowired
+  public TokensPurgeTask(TokenRepository tokenRepository) {
+    this.tokenRepository = tokenRepository;
+  }
 
-    @Scheduled(cron = "@daily")
-    @Transactional
-    public void purgeExpired() {
-        tokenRepository.deleteExpiredTokens();
-    }
+  @Scheduled(cron = "@daily")
+  @Transactional
+  public void purgeExpired() {
+    tokenRepository.deleteExpiredTokens();
+  }
 }

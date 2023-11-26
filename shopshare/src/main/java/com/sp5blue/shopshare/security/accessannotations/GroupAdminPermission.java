@@ -1,11 +1,10 @@
 package com.sp5blue.shopshare.security.accessannotations;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasRole('ADMIN') or (authentication.principal.getId() == #userId and hasRole('GROUP_ADMIN-' + #groupId))")
-public @interface GroupAdminPermission {
-}
+@PreAuthorize(
+    "hasRole('ADMIN') or (authentication.principal.getId() == #userId and hasRole('GROUP_ADMIN-' + #groupId))")
+public @interface GroupAdminPermission {}
