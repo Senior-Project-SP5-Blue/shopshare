@@ -3,6 +3,7 @@ package com.sp5blue.shopshare.controllers.shoppergroup;
 import com.sp5blue.shopshare.dtos.shoppergroup.CreateEditShopperGroupRequest;
 import com.sp5blue.shopshare.dtos.shoppergroup.InvitationDto;
 import com.sp5blue.shopshare.dtos.shoppergroup.ShopperGroupDto;
+import com.sp5blue.shopshare.dtos.shoppergroup.SlimShopperGroupDto;
 import com.sp5blue.shopshare.dtos.user.UserDto;
 import com.sp5blue.shopshare.services.shoppergroup.IInvitationService;
 import com.sp5blue.shopshare.services.shoppergroup.IShopperGroupService;
@@ -36,7 +37,7 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
 
   @Override
   @GetMapping
-  public ResponseEntity<List<ShopperGroupDto>> getShopperGroups(
+  public ResponseEntity<List<SlimShopperGroupDto>> getShopperGroups(
       @PathVariable("user_id") UUID userId) {
     return ResponseEntity.ok(shopperGroupService.getShopperGroups(userId).join());
   }
@@ -49,7 +50,7 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
 
   @Override
   @PostMapping
-  public ResponseEntity<ShopperGroupDto> addShopperGroup(
+  public ResponseEntity<SlimShopperGroupDto> addShopperGroup(
       @PathVariable("user_id") UUID userId,
       @RequestBody @Valid CreateEditShopperGroupRequest request) {
     return ResponseEntity.ok()
@@ -65,7 +66,7 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
 
   @Override
   @PostMapping("/{group_id}")
-  public ResponseEntity<ShopperGroupDto> acceptShopperGroupInvitation(
+  public ResponseEntity<SlimShopperGroupDto> acceptShopperGroupInvitation(
       @PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId) {
     invitationService.acceptInvite(groupId, userId);
     return ResponseEntity.noContent().build();
@@ -108,12 +109,12 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
   }
 
   @Override
-  @PostMapping("/{group_id}/invitations/{new_member_id}")
+  @PostMapping("/{group_id}/invitations/{new_member_username}")
   public ResponseEntity<?> inviteShopperToGroup(
       @PathVariable("user_id") UUID userId,
       @PathVariable("group_id") UUID groupId,
-      @PathVariable("new_member_id") UUID invitedShopperId) {
-    invitationService.invite(groupId, invitedShopperId);
+      @PathVariable("new_member_username") String username) {
+    invitationService.invite(groupId, username);
     return ResponseEntity.noContent().build();
   }
 

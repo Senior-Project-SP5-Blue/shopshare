@@ -41,6 +41,8 @@ public interface IUserService {
 
   CompletableFuture<Boolean> userExistsByGroup(UUID shopperId, UUID groupId);
 
+  CompletableFuture<Boolean> userExistsByGroup(String username, UUID groupId);
+
   CompletableFuture<Boolean> userExistsByEmail(String email);
 
   CompletableFuture<Boolean> userExistsByUsername(String username);

@@ -13,33 +13,40 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @RestControllerAdvice
 public class MiscExceptionHandler {
-    private final Logger logger = LoggerFactory.getLogger(MiscExceptionHandler.class);
+  private final Logger logger = LoggerFactory.getLogger(MiscExceptionHandler.class);
 
-    @ExceptionHandler
-    public ResponseEntity<ShoppingListErrorResponse> handleException(AccessDeniedException exception) {
-        ShoppingListErrorResponse error = new ShoppingListErrorResponse(HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                LocalDateTime.now());
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-    }
+  @ExceptionHandler
+  public ResponseEntity<ShoppingListErrorResponse> handleException(
+      AccessDeniedException exception) {
+    ShoppingListErrorResponse error =
+        new ShoppingListErrorResponse(
+            HttpStatus.NOT_FOUND.value(),
+            HttpStatus.NOT_FOUND.getReasonPhrase(),
+            LocalDateTime.now());
+    return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+  }
 
-    @ExceptionHandler
-    public ResponseEntity<ShoppingListErrorResponse> handleException(MethodArgumentTypeMismatchException exception) {
-//        exception.printStackTrace();
-//        logger.warn(exception.getMessage());
-        ShoppingListErrorResponse error = new ShoppingListErrorResponse(HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                LocalDateTime.now());
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
+  @ExceptionHandler
+  public ResponseEntity<ShoppingListErrorResponse> handleException(
+      MethodArgumentTypeMismatchException exception) {
+    //        exception.printStackTrace();
+    //        logger.warn(exception.getMessage());
+    ShoppingListErrorResponse error =
+        new ShoppingListErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.BAD_REQUEST.getReasonPhrase(),
+            LocalDateTime.now());
+    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+  }
 
-//    @ExceptionHandler
-//    public ResponseEntity<ShoppingListErrorResponse> handleException(Exception exception) {
-//        exception.printStackTrace();
-//        logger.warn(exception.getMessage());
-//        ShoppingListErrorResponse error = new ShoppingListErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-//                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-//                LocalDateTime.now());
-//        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+  //    @ExceptionHandler
+  //    public ResponseEntity<ShoppingListErrorResponse> handleException(Exception exception) {
+  //        exception.printStackTrace();
+  //        logger.warn(exception.getMessage());
+  //        ShoppingListErrorResponse error = new
+  // ShoppingListErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+  //                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+  //                LocalDateTime.now());
+  //        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+  //    }
 }

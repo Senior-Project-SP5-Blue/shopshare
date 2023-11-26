@@ -90,6 +90,30 @@ public class InvitationService implements IInvitationService {
   }
 
   @Override
+  @Async
+  @Transactional(rollbackFor = Exception.class)
+  public CompletableFuture<Void> invite(UUID groupId, String username)
+      throws UserAlreadyInGroupException {
+    boolean userInGroup = shopperGroupService.userExistsInGroup(username, groupId).join();
+
+    CompletableFuture<User> getUser = userService.getUserByUsername(username);
+    CompletableFuture<ShopperGroup> getGroup = shopperGroupService.findShopperGroupById(groupId);
+
+    CompletableFuture.allOf(getUser, getGroup).join();
+
+    User user = getUser.join();
+    ShopperGroup group = getGroup.join();
+
+    if (userInGroup) throw new UserAlreadyInGroupException("User is already a member of group");
+
+    Invitation invitation = new Invitation(group, user);
+    invitationRepository.save(invitation);
+
+    eventPublisher.publishEvent(new OnInvitationCompleteEvent(this, user, group));
+    return null;
+  }
+
+  @Override
   @Transactional
   @Async
   public CompletableFuture<Void> acceptInvite(UUID groupId, UUID userId) {

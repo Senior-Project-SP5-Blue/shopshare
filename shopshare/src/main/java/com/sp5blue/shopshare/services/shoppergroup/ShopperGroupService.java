@@ -1,6 +1,7 @@
 package com.sp5blue.shopshare.services.shoppergroup;
 
 import com.sp5blue.shopshare.dtos.shoppergroup.ShopperGroupDto;
+import com.sp5blue.shopshare.dtos.shoppergroup.SlimShopperGroupDto;
 import com.sp5blue.shopshare.dtos.user.UserDto;
 import com.sp5blue.shopshare.exceptions.shoppergroup.GroupNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsException;
@@ -36,11 +37,11 @@ public class ShopperGroupService implements IShopperGroupService {
   @Override
   @Transactional
   @Async
-  public CompletableFuture<ShopperGroupDto> addShopperGroup(UUID adminId, String groupName) {
+  public CompletableFuture<SlimShopperGroupDto> addShopperGroup(UUID adminId, String groupName) {
     User user = userService.getUserById(adminId).join();
     ShopperGroup shopperGroup = new ShopperGroup(groupName, user);
     var addedGroup = shopperGroupRepository.save(shopperGroup);
-    return CompletableFuture.completedFuture(new ShopperGroupDto(addedGroup));
+    return CompletableFuture.completedFuture(new SlimShopperGroupDto(addedGroup));
   }
 
   @Override
@@ -56,9 +57,9 @@ public class ShopperGroupService implements IShopperGroupService {
   @Override
   @Transactional
   @Async
-  public CompletableFuture<List<ShopperGroupDto>> getShopperGroups(UUID userId) {
+  public CompletableFuture<List<SlimShopperGroupDto>> getShopperGroups(UUID userId) {
     var _groups = shopperGroupRepository.findAllByUserId(userId);
-    var groups = _groups.stream().map(ShopperGroupDto::new).toList();
+    var groups = _groups.stream().map(SlimShopperGroupDto::new).toList();
     return CompletableFuture.completedFuture(groups);
   }
 
@@ -128,7 +129,7 @@ public class ShopperGroupService implements IShopperGroupService {
   @Override
   @Transactional
   @Async
-  public CompletableFuture<ShopperGroupDto> changeShopperGroupName(
+  public CompletableFuture<SlimShopperGroupDto> changeShopperGroupName(
       UUID userId, UUID groupId, String newName) {
     ShopperGroup shopperGroup =
         shopperGroupRepository
@@ -139,7 +140,7 @@ public class ShopperGroupService implements IShopperGroupService {
       throw new InvalidUserPermissionsException(
           "User - " + userId + " does not have permission to modify group");
     shopperGroup.setName(newName);
-    return CompletableFuture.completedFuture(new ShopperGroupDto(shopperGroup));
+    return CompletableFuture.completedFuture(new SlimShopperGroupDto(shopperGroup));
   }
 
   @Override
@@ -231,6 +232,13 @@ public class ShopperGroupService implements IShopperGroupService {
   @Async
   public CompletableFuture<Boolean> userExistsInGroup(UUID userId, UUID groupId) {
     return CompletableFuture.completedFuture(userService.userExistsByGroup(userId, groupId).join());
+  }
+
+  @Override
+  @Async
+  public CompletableFuture<Boolean> userExistsInGroup(String username, UUID groupId) {
+    return CompletableFuture.completedFuture(
+        userService.userExistsByGroup(username, groupId).join());
   }
 
   private boolean userIsAdmin(UUID userId, UUID groupId) throws InvalidUserPermissionsException {

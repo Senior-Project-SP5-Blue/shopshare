@@ -3,6 +3,7 @@ package com.sp5blue.shopshare.controllers.shoppergroup;
 import com.sp5blue.shopshare.dtos.shoppergroup.CreateEditShopperGroupRequest;
 import com.sp5blue.shopshare.dtos.shoppergroup.InvitationDto;
 import com.sp5blue.shopshare.dtos.shoppergroup.ShopperGroupDto;
+import com.sp5blue.shopshare.dtos.shoppergroup.SlimShopperGroupDto;
 import com.sp5blue.shopshare.dtos.user.UserDto;
 import com.sp5blue.shopshare.security.accessannotations.GroupAdminPermission;
 import com.sp5blue.shopshare.security.accessannotations.GroupPermission;
@@ -23,11 +24,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface ShopperGroupControllerBase {
   @UserPermission
   @Operation(summary = "Get all groups that the user is a part of")
-  ResponseEntity<List<ShopperGroupDto>> getShopperGroups(@PathVariable("user_id") UUID userId);
+  ResponseEntity<List<SlimShopperGroupDto>> getShopperGroups(@PathVariable("user_id") UUID userId);
 
   @UserPermission
   @Operation(summary = "Accepts an invitation. User will now have access to group")
-  ResponseEntity<ShopperGroupDto> acceptShopperGroupInvitation(
+  ResponseEntity<SlimShopperGroupDto> acceptShopperGroupInvitation(
       @PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId);
 
   @UserPermission
@@ -36,7 +37,7 @@ public interface ShopperGroupControllerBase {
 
   @UserPermission
   @Operation(summary = "Creates a new group, user will be admin")
-  ResponseEntity<ShopperGroupDto> addShopperGroup(
+  ResponseEntity<SlimShopperGroupDto> addShopperGroup(
       @PathVariable("user_id") UUID userId, @RequestBody CreateEditShopperGroupRequest request);
 
   @GroupPermission
@@ -68,12 +69,19 @@ public interface ShopperGroupControllerBase {
       @PathVariable("group_id") UUID groupId,
       @PathVariable("member_id") UUID memberId);
 
+  //    @GroupAdminPermission
+  //    @Operation(summary = "Used to invite a user to group")
+  //    ResponseEntity<?> inviteShopperToGroupById(
+  //            @PathVariable("user_id") UUID userId,
+  //            @PathVariable("group_id") UUID groupId,
+  //            @PathVariable("new_member_id") UUID invitedShopperId);
+
   @GroupAdminPermission
   @Operation(summary = "Used to invite a user to group")
   ResponseEntity<?> inviteShopperToGroup(
       @PathVariable("user_id") UUID userId,
       @PathVariable("group_id") UUID groupId,
-      @PathVariable("new_member_id") UUID invitedShopperId);
+      @PathVariable("new_member_username") String username);
 
   @GroupAdminPermission
   @Operation(summary = "Remove a user from a group - MUST be admin of group to do so")

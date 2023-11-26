@@ -1,6 +1,7 @@
 package com.sp5blue.shopshare.services.shoppergroup;
 
 import com.sp5blue.shopshare.dtos.shoppergroup.ShopperGroupDto;
+import com.sp5blue.shopshare.dtos.shoppergroup.SlimShopperGroupDto;
 import com.sp5blue.shopshare.dtos.user.UserDto;
 import com.sp5blue.shopshare.exceptions.shoppergroup.GroupNotFoundException;
 import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsException;
@@ -12,11 +13,11 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface IShopperGroupService {
-  CompletableFuture<ShopperGroupDto> addShopperGroup(UUID adminId, String groupName);
+  CompletableFuture<SlimShopperGroupDto> addShopperGroup(UUID adminId, String groupName);
 
   CompletableFuture<ShopperGroup> createShopperGroup(UUID adminId, String groupName);
 
-  CompletableFuture<List<ShopperGroupDto>> getShopperGroups(UUID userId);
+  CompletableFuture<List<SlimShopperGroupDto>> getShopperGroups(UUID userId);
 
   CompletableFuture<ShopperGroup> findShopperGroupById(UUID groupId);
 
@@ -31,7 +32,7 @@ public interface IShopperGroupService {
   void deleteShopperGroup(UUID userId, UUID groupId)
       throws GroupNotFoundException, InvalidUserPermissionsException;
 
-  CompletableFuture<ShopperGroupDto> changeShopperGroupName(
+  CompletableFuture<SlimShopperGroupDto> changeShopperGroupName(
       UUID userId, UUID groupId, String newName);
 
   CompletableFuture<ShopperGroup> updateShopperGroupName(UUID userId, UUID groupId, String newName);
@@ -50,6 +51,8 @@ public interface IShopperGroupService {
       throws GroupNotFoundException, RemoveGroupAdminException;
 
   CompletableFuture<Boolean> userExistsInGroup(UUID userId, UUID groupId);
+
+  CompletableFuture<Boolean> userExistsInGroup(String username, UUID groupId);
 
   ShopperGroup verifyUserHasGroup(UUID userId, UUID groupId);
 }

@@ -24,6 +24,19 @@ public interface InvitationRepository extends JpaRepository<Invitation, Invitati
     """)
   List<Invitation> findAllByUserId(@Param("user_id") UUID userId);
 
+  @Query(
+      value =
+          """
+   SELECT EXISTS (SELECT * FROM group_invitations gi JOIN users u ON gi.user_id = u.id
+   WHERE u.username = :username AND gi.shopper_group_id = :group_id)
+   """,
+      nativeQuery = true)
+  boolean existsByUsernameAndGroup(
+      @Param("group_id") UUID groupId, @Param("username") String username);
+
+  //  Optional<Invitation> findByUsernameAndGroup(@Param("group_id") UUID groupId,
+  // @Param("username") String username);
+
   //    @Query("""
   //    SELECT i FROM Invitation i WHERE i.id.userId = :user_id
   //    """)

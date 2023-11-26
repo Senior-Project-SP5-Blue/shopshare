@@ -10,15 +10,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ValidationExceptionHandler {
-    @ExceptionHandler
-    public ResponseEntity<?> handleException(MethodArgumentNotValidException exception) {
-        Map<String, String> errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
+  @ExceptionHandler
+  public ResponseEntity<?> handleException(MethodArgumentNotValidException exception) {
+    Map<String, String> errors = new HashMap<>();
+    exception
+        .getBindingResult()
+        .getAllErrors()
+        .forEach(
+            (error) -> {
+              String fieldName = ((FieldError) error).getField();
+              String errorMessage = error.getDefaultMessage();
+              errors.put(fieldName, errorMessage);
+            });
 
-        return ResponseEntity.badRequest().body(errors);
-    }
+    return ResponseEntity.badRequest().body(errors);
+  }
 }
