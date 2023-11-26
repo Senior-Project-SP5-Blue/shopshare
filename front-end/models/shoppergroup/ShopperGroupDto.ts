@@ -2,7 +2,7 @@ type ShopperGroupDto = {
   id: string;
   name: string;
   admin: string;
-  users: number;
+  users: string[];
   lists: SlimList[];
 };
 

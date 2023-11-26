@@ -1,4 +1,5 @@
 import ShopperGroupDto from '../../models/shoppergroup/ShopperGroupDto';
+import SlimShopperGroupDto from '../../models/shoppergroup/SlimShopperGroupDto';
 import UserDto from '../../models/user/UserDto';
 import {
   ShopperGroupApiAcceptInvitation,
@@ -7,6 +8,7 @@ import {
   ShopperGroupApiDeleteGroupReq,
   ShopperGroupApiGetGroupMemberReq,
   ShopperGroupApiGetGroupMembersReq,
+  ShopperGroupApiGetGroupReq,
   ShopperGroupApiGetGroupsReq,
   ShopperGroupApiInviteUserToGroupReq,
   ShopperGroupApiRemoveMemberReq,
@@ -15,7 +17,10 @@ import {apiSlice} from './shopshareApiSlice';
 
 export const shopperGroupApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
-    getGroups: builder.query<ShopperGroupDto[], ShopperGroupApiGetGroupsReq>({
+    getGroups: builder.query<
+      SlimShopperGroupDto[],
+      ShopperGroupApiGetGroupsReq
+    >({
       query: ({userId}) => ({
         url: `/users/${userId}/groups`,
         method: 'GET',
@@ -27,6 +32,13 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
         })),
         {type: 'ShopperGroup', id: 'LIST'},
       ],
+    }),
+    getGroup: builder.query<ShopperGroupDto, ShopperGroupApiGetGroupReq>({
+      query: ({userId, groupId}) => ({
+        url: `/users/${userId}/groups/${groupId}`,
+        method: 'GET',
+      }),
+      providesTags: result => [{type: 'ShopperGroup' as const, id: result?.id}],
     }),
     getGroupMembers: builder.query<
       UserDto[],
@@ -49,6 +61,7 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
         url: `/users/${userId}/groups/${groupId}/members${memberId}`,
         method: 'GET',
       }),
+      providesTags: result => [{type: 'User' as const, id: result?.id}],
     }),
     inviteUserToGroup: builder.mutation<
       void,

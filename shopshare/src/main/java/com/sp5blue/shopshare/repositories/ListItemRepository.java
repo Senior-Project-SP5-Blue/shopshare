@@ -1,33 +1,36 @@
 package com.sp5blue.shopshare.repositories;
 
 import com.sp5blue.shopshare.models.listitem.ListItem;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 public interface ListItemRepository extends JpaRepository<ListItem, UUID> {
-    Page<ListItem> findAllByName (String name, Pageable pageable);
+  Page<ListItem> findAllByName(String name, Pageable pageable);
 
-    List<ListItem> findAllByName (String name);
+  List<ListItem> findAllByName(String name);
 
-    Page<ListItem> findAllByCreatedBy_Id(UUID listId, Pageable pageable);
+  Page<ListItem> findAllByCreatedBy_Id(UUID listId, Pageable pageable);
 
-    List<ListItem> findAllByCreatedBy_Id(UUID listId);
+  List<ListItem> findAllByCreatedBy_Id(UUID listId);
 
-    @Query(nativeQuery = true, value = """
+  @Query(
+      nativeQuery = true,
+      value =
+          """
     SELECT li.* FROM list_items li JOIN shopping_lists sl ON sl.id = :list_id WHERE li.id = :item_id""")
-//    @Query("SELECT li FROM ListItem li JOIN li.list l WHERE l.id= :list_id AND li.id= :item_id")
-    Optional<ListItem> findByList_IdAndId(@Param("list_id") UUID listId, @Param("item_id") UUID itemId);
+  //    @Query("SELECT li FROM ListItem li JOIN li.list l WHERE l.id= :list_id AND li.id= :item_id")
+  Optional<ListItem> findByList_IdAndId(
+      @Param("list_id") UUID listId, @Param("item_id") UUID itemId);
 
-    long countByCreatedBy_Id(UUID listId);
+  long countByCreatedBy_Id(UUID listId);
 
-    boolean existsByName(String name);
+  boolean existsByName(String name);
 
-    boolean existsByCreatedBy_Id(UUID listId);
+  boolean existsByCreatedBy_Id(UUID listId);
 }

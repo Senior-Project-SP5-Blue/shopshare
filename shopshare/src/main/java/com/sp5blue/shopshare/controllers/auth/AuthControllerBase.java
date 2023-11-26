@@ -13,23 +13,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Tag(name = "Authorization", description = "Signin, Signup, and refreshing Signin")
 public interface AuthControllerBase {
 
-    @Operation(
-            summary = "Logs in users, returns tokens"
-    )
-    ResponseEntity<?> authenticateAndGetToken(@RequestBody SignInRequest authRequest);
+  @Operation(summary = "Logs in users, returns tokens")
+  ResponseEntity<?> authenticateAndGetToken(@RequestBody SignInRequest authRequest);
 
-    @Operation(
-            summary = "Creates new user account, returns tokens"
-    )
-    ResponseEntity<?> authenticateAndGetToken(@RequestBody SignUpRequest authRequest);
+  @Operation(summary = "Creates new user account, returns tokens")
+  ResponseEntity<?> authenticateAndGetToken(@RequestBody SignUpRequest authRequest);
 
-    @Operation(
-            summary = "Confirms user's email address"
-    )
-    ResponseEntity<?> confirmEmail(@RequestParam("token") String token);
+  @Operation(summary = "Confirms user's email address")
+  ResponseEntity<?> confirmEmail(@RequestParam("token") String token);
 
-    @Operation(
-            summary = "Refreshes login by providing new access token"
-    )
-    void refreshToken(HttpServletRequest request, HttpServletResponse response);
+  @Operation(summary = "Refreshes login by providing new access token")
+  void refreshToken(HttpServletRequest request, HttpServletResponse response);
 }
