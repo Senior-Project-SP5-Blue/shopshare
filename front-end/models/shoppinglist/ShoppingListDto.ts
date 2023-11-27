@@ -1,4 +1,4 @@
-import ListItemDto from "../listitem/ListItemDto";
+import ListItemDto from '../listitem/ListItemDto';
 
 type ShoppingListDto = {
   id: string;

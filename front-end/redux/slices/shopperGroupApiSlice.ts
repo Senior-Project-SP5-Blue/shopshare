@@ -136,6 +136,7 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useGetGroupsQuery,
+  useGetGroupQuery,
   useGetGroupMembersQuery,
   useGetGroupMemberQuery,
   useCreateNewGroupMutation,

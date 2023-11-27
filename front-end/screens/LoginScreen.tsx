@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import {
   Image,
   ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
   StatusBar,
   Text,
   TextInput,
@@ -14,6 +16,10 @@ import {useSignInMutation} from '../redux/slices/authApiSlice';
 import {useAppDispatch} from '../redux/store';
 import {setAuthContext} from '../redux/slices/authSlice';
 import Button from '../components/Button';
+import SSTextInput from '../components/SSTextInput';
+import SSPasswordInput from '../components/SSPasswordInput';
+import KeyboardAvoidingContainer from '../components/KeyboardAvoidingContainer';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 interface LoginScreenProps {
   navigation: any;
@@ -21,21 +27,22 @@ interface LoginScreenProps {
 
 const LoginScreen = (props: LoginScreenProps) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
-  const lists = () => props.navigation.navigate('Lists');
   const home = () => props.navigation.navigate('Welcome');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>();
+  const [password, setPassword] = useState<string>();
   const dispatch = useAppDispatch();
   const [signIn] = useSignInMutation();
 
-  const handleSignIn = (email: string, password: string) => {
+  const handleSignIn = (email?: string, password?: string) => {
+    if (!(email && password)) {
+      return;
+    }
     signIn({email, password})
       .unwrap()
       .then(userData => {
         dispatch(setAuthContext({...userData, user: userData.userContext}));
         setEmail('');
         setPassword('');
-        lists();
       })
       .catch(err => {
         console.log('ERROR!! ');
@@ -44,139 +51,88 @@ const LoginScreen = (props: LoginScreenProps) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.white}}>
-      <StatusBar barStyle="light-content" />
+    <>
       <ImageBackground
-        style={{flex: 1, position: 'absolute', height: '100%', width: '100%'}}
+        style={{
+          flex: 1,
+          position: 'absolute',
+          // right: 0,
+          // top: 0,
+          // zIndex: 1,
+          height: '100%',
+          width: '100%',
+        }}
         source={require('../assets/background.png')}
       />
-      <View style={{flex: 1, marginHorizontal: 18}}>
+      <KeyboardAvoidingContainer
+        scrollEnabled={false}
+        style={{overflow: 'hidden'}}>
         <View>
-          <TouchableOpacity onPress={home}>
-            <Text
-              style={{
-                fontSize: 20,
-                color: COLORS.white,
-                fontWeight: 'bold',
-                marginLeft: 8,
-              }}>
-              Back
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{justifyContent: 'center', top: 100}}>
-          <Text
-            style={{
-              fontSize: 50,
-              fontWeight: '800',
-              color: COLORS.white,
-              textAlign: 'center',
-            }}>
-            Welcome Back
-          </Text>
-        </View>
-        <View style={{top: 350}}>
-          <Text style={{fontSize: 16, fontWeight: '400', marginVertical: 10}}>
-            Email or Username
-          </Text>
-          <View
-            style={{
-              width: '100%',
-              height: 60,
-              borderColor: COLORS.black,
-              borderWidth: 1,
-              borderRadius: 8,
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 22,
-            }}>
-            <TextInput
-              placeholder="Enter your username or email"
-              defaultValue={email}
-              onChangeText={newEmail => setEmail(newEmail)}
-              placeholderTextColor={COLORS.black}
-              style={{width: '100%', fontSize: 15}}
-            />
-          </View>
-        </View>
-        <View style={{marginBottom: 12, marginTop: 380}}>
-          <Text style={{fontSize: 16, fontWeight: '400', marginVertical: 10}}>
-            Password
-          </Text>
-          <View
-            style={{
-              width: '100%',
-              height: 60,
-              borderColor: COLORS.black,
-              borderWidth: 1,
-              borderRadius: 8,
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 22,
-            }}>
-            <TextInput
-              placeholder="Enter your password"
-              placeholderTextColor={COLORS.black}
-              defaultValue={password}
-              autoCapitalize="none"
-              onChangeText={newPassword => setPassword(newPassword)}
-              secureTextEntry={isPasswordShown}
-              style={{width: '100%', fontSize: 15}}
-            />
-            <TouchableOpacity
-              onPress={() => setIsPasswordShown(!isPasswordShown)}
-              style={{position: 'absolute', right: 12}}>
-              {isPasswordShown ? (
-                <Image
-                  source={require('../assets/eye2.png')}
-                  style={{
-                    height: 33,
-                    resizeMode: 'contain',
-                    width: 40,
-                    borderRadius: 20,
-                    position: 'absolute',
-                    top: -20,
-                    right: -5,
-                  }}
-                />
-              ) : (
-                <Image
-                  source={require('../assets/eye.png')}
-                  style={{
-                    height: 33,
-                    resizeMode: 'contain',
-                    width: 40,
-                    borderRadius: 20,
-                    position: 'absolute',
-                    top: -20,
-                    right: -5,
-                  }}
-                />
-              )}
+          <View>
+            <TouchableOpacity onPress={home}>
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: COLORS.white,
+                  fontWeight: 'bold',
+                  marginLeft: 8,
+                  marginTop: Platform.OS === 'android' ? 25 : 0,
+                }}>
+                Back
+              </Text>
             </TouchableOpacity>
           </View>
+          <View style={{justifyContent: 'center', top: 100, marginBottom: 250}}>
+            <Text
+              style={{
+                fontSize: 50,
+                fontWeight: '800',
+                color: COLORS.white,
+                textAlign: 'center',
+              }}>
+              Welcome Back
+            </Text>
+          </View>
         </View>
-        <Button
-          title="Login"
-          filled
-          style={{marginTop: 20, marginBottom: 4}}
-          onPress={() => handleSignIn(email, password)}
-        />
         <View>
-          <Image
-            style={{
-              top: -4,
-              width: 445,
-              height: 300,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            resizeMode="cover"
-            source={require('../assets/loginpic2.jpg')}
+          <SSTextInput
+            label="Email"
+            placeholder="Enter your email"
+            onChangeText={setEmail}
+            placeholderTextColor={COLORS.black}
           />
+          <SSPasswordInput
+            label="Password"
+            placeholder="Enter your password"
+            placeholderTextColor={COLORS.black}
+            defaultValue={password}
+            autoCapitalize="none"
+            onChangeText={setPassword}
+            secureTextEntry={isPasswordShown}
+            onShowPasswordPress={setIsPasswordShown}
+          />
+          <Button
+            title="Login"
+            filled
+            style={{marginTop: 20, marginBottom: 4}}
+            onPress={() => handleSignIn(email, password)}
+          />
+          <View style={{flex: 1, zIndex: 0}}>
+            <Image
+              style={{
+                top: -4,
+                width: '100%',
+                height: 300,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              resizeMode="cover"
+              source={require('../assets/loginpic2.jpg')}
+            />
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </KeyboardAvoidingContainer>
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -14,11 +14,16 @@ interface CreateListModalProps {
   navigation: any;
 }
 
-const CreateListsScreen = (props: CreateListModalProps) => {
+const CreateListScreen = (props: CreateListModalProps) => {
   const lists = () => props.navigation.navigate('Lists');
   const Shop = () => props.navigation.navigate('ShopScreen');
+
+  const [selectedColor, setSelectedColor] = useState<number>(0);
   //const name = ""
 
+  const handleSelectColor = (idx: number) => {
+    setSelectedColor(idx);
+  };
   const backgroundColors = [
     '#5CD859',
     '#24A6D9',
@@ -28,23 +33,23 @@ const CreateListsScreen = (props: CreateListModalProps) => {
     '#D85963',
     '#D88559',
   ];
-  const bgColors = backgroundColors[0];
   function renderColors() {
-    return backgroundColors.map(color => {
+    return backgroundColors.map((color, idx) => {
       return (
         <TouchableOpacity
           key={color}
           style={{
             backgroundColor: color,
-            width: 30,
-            height: 30,
+            width: idx === selectedColor ? 35 : 30,
+            height: idx === selectedColor ? 35 : 30,
             borderRadius: 4,
           }}
-          onPress={() => ({color})}
+          onPress={() => handleSelectColor(idx)}
         />
       );
     });
   }
+
   return (
     <KeyboardAvoidingView
       behavior="padding"
@@ -93,6 +98,7 @@ const CreateListsScreen = (props: CreateListModalProps) => {
             flexDirection: 'row',
             justifyContent: 'space-between',
             marginTop: 14,
+            alignItems: 'flex-end',
           }}>
           {renderColors()}
         </View>
@@ -119,4 +125,4 @@ const CreateListsScreen = (props: CreateListModalProps) => {
     </KeyboardAvoidingView>
   );
 };
-export default CreateListsScreen;
+export default CreateListScreen;

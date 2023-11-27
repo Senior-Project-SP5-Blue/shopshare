@@ -4,7 +4,7 @@ type SlimShoppingListDto = {
   modifiedOn: string;
   completed: number;
   total: number;
-  groupid: string;
+  groupId: string;
 };
 
 export default SlimShoppingListDto;

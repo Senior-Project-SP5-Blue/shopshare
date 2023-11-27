@@ -11,22 +11,30 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 //import {useSelector} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useSelector} from 'react-redux';
-import {selectCurrentUserId} from '../redux/slices/authSlice';
-import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
-import ListCard from '../components/ListCard';
+import GroupCard from '../components/GroupCard';
 import ListItemDto from '../models/listitem/ListItemDto';
+import {selectCurrentUserId} from '../redux/slices/authSlice';
+import {useGetGroupsQuery} from '../redux/slices/shopperGroupApiSlice';
+import {GroupStackParamList} from './types';
 
 interface ListScreenProps {
   navigation: any;
 }
 
-const ListsScreen: React.FC<ListScreenProps> = props => {
+type GroupScreenProps = NativeStackScreenProps<GroupStackParamList, 'Group'>;
+
+export type GroupScreenNavigationProp = GroupScreenProps['navigation'];
+
+const GroupsScreen: React.FC<ListScreenProps> = props => {
   const [selectedItem, setSelectedItem] = useState<ListItemDto>();
-  const createList = () => props.navigation.navigate('CreateListScreen');
+  const navigation = useNavigation<GroupScreenNavigationProp>();
+  // const createList = () => props.navigation.navigate('CreateListScreen');
   const _userId = useSelector(selectCurrentUserId); //this is the signed in user
 
-  const {data: lists, isLoading: isLoadingLists} = useGetShoppingListsQuery({
+  const {data: groups, isLoading: isLoadingLists} = useGetGroupsQuery({
     userId: _userId!,
   }); //"lists" is all the users lists
 
@@ -45,27 +53,28 @@ const ListsScreen: React.FC<ListScreenProps> = props => {
         <Text style={styles.title}>
           Your{' '}
           <Text style={{fontWeight: '400', color: COLORS.secondary}}>
-            Lists
+            Groups
           </Text>
         </Text>
         <View style={styles.divider} />
       </View>
       <View style={{marginVertical: 48}}>
-        <TouchableOpacity style={styles.addButton} onPress={createList}>
+        <TouchableOpacity style={styles.addButton}>
           <Image
             source={require('../assets/add.png')}
             style={styles.addImage}
           />
         </TouchableOpacity>
-        <Text style={styles.addList}>Add List</Text>
+        <Text style={styles.addList}>Add Groups</Text>
       </View>
       <View style={{height: 275, paddingLeft: 32}}>
         <FlatList
-          data={lists}
+          style={{width: '100%'}}
+          data={groups}
           keyExtractor={item => item.id}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          renderItem={({item}) => <ListCard list={item} />}
+          renderItem={({item}) => <GroupCard group={item} />}
         />
       </View>
     </SafeAreaView>
@@ -78,6 +87,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 0,
   },
   divider: {
     backgroundColor: COLORS.secondary,
@@ -112,4 +122,4 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 });
-export default ListsScreen;
+export default GroupsScreen;
