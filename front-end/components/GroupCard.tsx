@@ -1,26 +1,28 @@
-import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import COLORS from '../constants/colors';
 import {useNavigation} from '@react-navigation/native';
-import ShopperGroupDto from '../models/shoppergroup/ShopperGroupDto';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import React from 'react';
+import {Text, TouchableHighlight, View} from 'react-native';
+import COLORS from '../constants/colors';
+import SlimShopperGroupDto from '../models/shoppergroup/SlimShopperGroupDto';
+import {GroupStackParamList} from '../screens/types';
 
 interface GroupCardProps {
-  group: ShopperGroupDto;
+  group: SlimShopperGroupDto;
 }
 
-const GroupCard: React.FC<GroupCardProps> = props => {
-  // const {
-  // const navigation = useNavigation<ListScreenNavigationProp>();
+type GroupScreenProps = NativeStackScreenProps<GroupStackParamList, 'Group'>;
 
-  // const handleOnListPress = () => {
-  //   navigation.navigate('List', {groupId: groupId, listId: id});
-  // };
+export type GroupScreenNavigationProp = GroupScreenProps['navigation'];
+
+const GroupCard: React.FC<GroupCardProps> = ({group}) => {
+  const {id} = group;
+  const navigation = useNavigation<GroupScreenNavigationProp>();
+
+  const handleOnListPress = () => {
+    navigation.navigate('Group', {groupId: id});
+  };
+
+  const {name, userCount, listCount, admin} = group;
 
   return (
     <TouchableHighlight
@@ -33,7 +35,7 @@ const GroupCard: React.FC<GroupCardProps> = props => {
         marginHorizontal: 12,
         alignItems: 'center',
         width: 200,
-        backgroundColor: color || COLORS.grey,
+        backgroundColor: COLORS.grey,
       }}>
       <View>
         <Text
@@ -58,7 +60,19 @@ const GroupCard: React.FC<GroupCardProps> = props => {
             color: COLORS.white,
             marginBottom: 18,
           }}>
-          {`${completed}/${total} Completed`}
+          {`${userCount} Users`}
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            paddingHorizontal: 16,
+            borderRadius: 6,
+            color: COLORS.white,
+            marginBottom: 18,
+          }}>
+          {`${listCount} Lists`}
         </Text>
         <Text
           numberOfLines={1}
@@ -71,13 +85,8 @@ const GroupCard: React.FC<GroupCardProps> = props => {
             marginBottom: 18,
             marginTop: 100,
           }}>
-          {`Edited ${modifiedOn}`}
+          {`Admin ${admin}`}
         </Text>
-        <View>
-          <View style={{alignItems: 'center'}}>
-            <Text style={{}}></Text>
-          </View>
-        </View>
       </View>
     </TouchableHighlight>
   );

@@ -36,6 +36,9 @@ export type AccountStackParamList = {
   Accounts: undefined;
 };
 export type GroupStackParamList = {
+  Group: {
+    groupId: string;
+  };
   Groups: undefined;
 };
 

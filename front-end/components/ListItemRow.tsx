@@ -1,11 +1,12 @@
-import React, {PropsWithChildren, useState} from 'react';
-import {StyleSheet, Text, TextInput, View} from 'react-native';
-import ListItemDto from '../models/listitem/ListItemDto';
-import COLORS from '../constants/colors';
 import CheckBox from '@react-native-community/checkbox';
-import ListItemStatus from '../models/listitem/ListItemStatus';
-import {Svg, SvgFromUri, SvgUri, SvgXml} from 'react-native-svg';
+import React, {PropsWithChildren, useState} from 'react';
+import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
+import LockClosedIcon from 'react-native-heroicons/mini/LockClosedIcon';
+import LockOpenIcon from 'react-native-heroicons/mini/LockOpenIcon';
 import {useSelector} from 'react-redux';
+import COLORS from '../constants/colors';
+import ListItemDto from '../models/listitem/ListItemDto';
+import ListItemStatus from '../models/listitem/ListItemStatus';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 
 interface ListItemRowProps {
@@ -22,6 +23,7 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
   const [completed, setCompleted] = useState<boolean>(
     item.status === ListItemStatus.COMPLETED,
   );
+  const [locked, setLocked] = useState<boolean>(item.locked);
   return (
     <View style={styles.wrapper}>
       <TextInput
@@ -41,7 +43,15 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
         style={styles.checkbox}
         disabled={item.locked && userId !== item.createdBy}
       />
-      <Text style={styles.locked}>{item.locked ? 'O' : 'X'}</Text>
+      <TouchableOpacity
+        onPress={() => setLocked(!locked)}
+        style={styles.locked}>
+        {locked ? (
+          <LockClosedIcon color={COLORS.primary} />
+        ) : (
+          <LockOpenIcon color={COLORS.primary} />
+        )}
+      </TouchableOpacity>
     </View>
   );
 };
@@ -52,13 +62,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // height: '100%',
     paddingHorizontal: 22,
-    paddingVertical: 10,
-    borderBlockColor: 'black',
-    // borderRadius: 8,
-    marginBottom: 10,
-    borderBottomColor: '#eee',
+    paddingVertical: 12,
+    borderBottomColor: '#dbdbdb',
     borderBottomWidth: 1,
     borderStyle: 'solid',
     overflow: 'hidden',
@@ -66,21 +72,19 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: '500',
-    flexBasis: '75%',
+    flexBasis: '70%',
     flexGrow: 0,
     textAlign: 'left',
-    // paddingLeft: 22,
-    // flexShrink: 0,
   },
   checkbox: {
     alignSelf: 'center',
   },
   locked: {
-    fontSize: 18,
-    flexBasis: '10%',
+    flex: 1,
+    alignItems: 'center',
+    flexBasis: 10,
     flexGrow: 0,
-    textAlign: 'center',
-    // flexShrink: 0,
+    alignContent: 'center',
   },
 });
 export default ListItemRow;

@@ -1,25 +1,22 @@
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
   Keyboard,
-  ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useGetGroupShoppingListQuery} from '../redux/slices/shoppingListApiSlice';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {ListStackParamList} from './types';
 import {useSelector} from 'react-redux';
-import {selectCurrentUserId} from '../redux/slices/authSlice';
-import COLORS from '../constants/colors';
 import ListItemRow from '../components/ListItemRow';
-import {useNavigation} from '@react-navigation/native';
+import COLORS from '../constants/colors';
 import ListItemDto from '../models/listitem/ListItemDto';
+import {selectCurrentUserId} from '../redux/slices/authSlice';
+import {useGetGroupShoppingListQuery} from '../redux/slices/shoppingListApiSlice';
+import {ListStackParamList} from './types';
 
 type ListScreenProps = NativeStackScreenProps<ListStackParamList, 'List'>;
 
@@ -37,8 +34,10 @@ const ListScreen: React.FC<ListScreenProps> = props => {
   });
 
   useEffect(() => {
-    navigation.setOptions({title: list?.name});
-  }, [list]);
+    navigation.setOptions({
+      title: list?.name,
+    });
+  }, [list, navigation]);
 
   return (
     <TouchableWithoutFeedback
@@ -48,15 +47,17 @@ const ListScreen: React.FC<ListScreenProps> = props => {
       {isLoadingList ? (
         <ActivityIndicator size="large" color={COLORS.primary} />
       ) : (
-        // <>
-        // <Text>{list?.name}</Text>
-        <FlatList
-          style={{flex: 1}}
-          data={list!.items}
-          renderItem={({item}) => <ListItemRow item={item} />}
-          keyExtractor={item => item.id}
-          showsVerticalScrollIndicator={false}
-        />
+        <View>
+          <View style={styles.wrapper}>
+            <TextInput style={[styles.name]} placeholder="Add New Item" />
+          </View>
+          <FlatList
+            data={list!.items}
+            renderItem={({item}) => <ListItemRow item={item} />}
+            keyExtractor={item => item.id}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
       )}
     </TouchableWithoutFeedback>
   );
@@ -67,6 +68,32 @@ const styles = StyleSheet.create({
     color: COLORS.black,
     fontSize: 20,
     marginBottom: 20,
+  },
+  wrapper: {
+    marginTop: 20,
+    height: '8%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 22,
+    paddingVertical: 10,
+    borderBlockColor: 'black',
+    marginBottom: 10,
+    borderStyle: 'solid',
+    overflow: 'hidden',
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: '500',
+    flexBasis: '90%',
+    flexGrow: 0,
+    textAlign: 'left',
+  },
+  locked: {
+    fontSize: 18,
+    flexBasis: '10%',
+    flexGrow: 0,
+    textAlign: 'center',
   },
 });
 
