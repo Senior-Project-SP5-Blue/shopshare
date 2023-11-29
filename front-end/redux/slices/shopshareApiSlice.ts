@@ -4,18 +4,13 @@ import {
   fetchBaseQuery,
 } from '@reduxjs/toolkit/query/react';
 // import {RootState} from '../store';
-import Config from 'react-native-config';
+// import Config from 'react-native-config';
+//@ts-ignore
+import {REACT_APP_API_URL} from '@env';
 import {setAuthContext, clearAuthContext} from './authSlice';
 
-// build.mutation<ReturnType, ArgType>. I
-// const headers: HeadersInit = {
-//   'Content-Type': 'application/json',
-//   'X-Request-Id': uuidv4(),
-//   Authorization: `Bearer <API_TOKEN>`,
-// };
-
 const baseQuery = fetchBaseQuery({
-  baseUrl: Config.API_URL ?? '',
+  baseUrl: REACT_APP_API_URL,
   prepareHeaders: (headers, {getState}) => {
     const state = getState() as any;
     const token = state.auth.accessToken;

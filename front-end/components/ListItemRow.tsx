@@ -44,12 +44,25 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
         disabled={item.locked && userId !== item.createdBy}
       />
       <TouchableOpacity
+        disabled={item.locked && userId !== item.createdBy}
         onPress={() => setLocked(!locked)}
         style={styles.locked}>
         {locked ? (
-          <LockClosedIcon color={COLORS.primary} />
+          <LockClosedIcon
+            color={
+              item.locked && userId !== item.createdBy
+                ? COLORS.grey
+                : COLORS.primary
+            }
+          />
         ) : (
-          <LockOpenIcon color={COLORS.primary} />
+          <LockOpenIcon
+            color={
+              item.locked && userId !== item.createdBy
+                ? COLORS.grey
+                : COLORS.primary
+            }
+          />
         )}
       </TouchableOpacity>
     </View>

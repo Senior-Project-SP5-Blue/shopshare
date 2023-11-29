@@ -1,12 +1,17 @@
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Keyboard,
+  Modal,
+  Pressable,
   StyleSheet,
+  Text,
   TextInput,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -17,6 +22,8 @@ import ListItemDto from '../models/listitem/ListItemDto';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {useGetGroupShoppingListQuery} from '../redux/slices/shoppingListApiSlice';
 import {ListStackParamList} from './types';
+import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
+import EditListModal from '../components/EditListModal';
 
 type ListScreenProps = NativeStackScreenProps<ListStackParamList, 'List'>;
 
@@ -24,20 +31,41 @@ export type ListScreenNavigationProp = ListScreenProps['navigation'];
 
 const ListScreen: React.FC<ListScreenProps> = props => {
   const [editItem, setEditItem] = useState<ListItemDto>();
+  const [editListModalVisible, setEditListModalVisible] =
+    useState<boolean>(false);
   const navigation = useNavigation<ListScreenNavigationProp>();
   const _userId = useSelector(selectCurrentUserId);
   const {groupId, listId} = props.route.params;
-  const {data: list, isLoading: isLoadingList} = useGetGroupShoppingListQuery({
+  const {
+    data: list,
+    isLoading: isLoadingList,
+    isFetching,
+    refetch,
+  } = useGetGroupShoppingListQuery({
     userId: _userId!,
     groupId,
     listId,
   });
 
+  const renderEditButton = useCallback(
+    () => (
+      <TouchableOpacity onPress={() => setEditListModalVisible(true)}>
+        {<PencilSquare color={COLORS.primary1} />}
+      </TouchableOpacity>
+    ),
+    [],
+  );
+
+  const onEditCancel = useCallback(() => {
+    setEditListModalVisible(false);
+  }, []);
+
   useEffect(() => {
     navigation.setOptions({
       title: list?.name,
+      headerRight: renderEditButton,
     });
-  }, [list, navigation]);
+  }, [list, navigation, renderEditButton]);
 
   return (
     <TouchableWithoutFeedback
@@ -47,17 +75,29 @@ const ListScreen: React.FC<ListScreenProps> = props => {
       {isLoadingList ? (
         <ActivityIndicator size="large" color={COLORS.primary} />
       ) : (
-        <View>
-          <View style={styles.wrapper}>
-            <TextInput style={[styles.name]} placeholder="Add New Item" />
-          </View>
+        <>
+          <EditListModal
+            list={list!}
+            visible={editListModalVisible}
+            onSave={() => {}}
+            onCancel={onEditCancel}
+          />
           <FlatList
+            onRefresh={refetch}
+            refreshing={isFetching}
+            ListHeaderComponent={
+              <TextInput style={styles.name} placeholder="Add New Item" />
+            }
+            ListHeaderComponentStyle={{
+              marginTop: 10,
+              paddingHorizontal: 22,
+            }}
             data={list!.items}
             renderItem={({item}) => <ListItemRow item={item} />}
             keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
           />
-        </View>
+        </>
       )}
     </TouchableWithoutFeedback>
   );

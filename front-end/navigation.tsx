@@ -3,7 +3,14 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
 import {useSelector} from 'react-redux';
 import COLORS from './constants/colors';
@@ -48,7 +55,7 @@ export const ScreenTitle: React.FC<ScreenTitleProps> = props => {
 };
 
 const renderEditButton = () => (
-  <TouchableOpacity>
+  <TouchableOpacity onPress={() => Alert.alert('You clicked')}>
     {<PencilSquare color={COLORS.primary1} />}
   </TouchableOpacity>
 );

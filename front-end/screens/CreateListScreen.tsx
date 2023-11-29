@@ -58,7 +58,7 @@ const CreateListScreen = (props: CreateListModalProps) => {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      <TouchableOpacity
+      {/*<TouchableOpacity
         onPress={lists}
         style={{position: 'absolute', top: 64, left: 32}}>
         <Text
@@ -69,7 +69,7 @@ const CreateListScreen = (props: CreateListModalProps) => {
           }}>
           Back
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity>*/}
       <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
         <Text
           style={{
