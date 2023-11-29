@@ -23,11 +23,14 @@ public class ShoppingList {
 
   @NonNull
   @Column(name = "modified_on")
-  private LocalDateTime modifiedOn;
+  private LocalDateTime modifiedOn = LocalDateTime.now();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "modified_by")
   private User modifiedBy;
+
+  @Column(name = "color")
+  private String color;
 
   @OneToMany(
       mappedBy = "list",
@@ -43,14 +46,27 @@ public class ShoppingList {
   }
 
   public ShoppingList(String name) {
-    modifiedOn = LocalDateTime.now();
+    //    modifiedOn = LocalDateTime.now();
     this.name = name;
   }
 
+  public ShoppingList(String name, String color) {
+    //    modifiedOn = LocalDateTime.now();
+    this.name = name;
+    this.color = color;
+  }
+
   public ShoppingList(String name, ShopperGroup group) {
-    modifiedOn = LocalDateTime.now();
+    //    modifiedOn = LocalDateTime.now();
     this.name = name;
     this.group = group;
+  }
+
+  public ShoppingList(String name, ShopperGroup group, String color) {
+    //    modifiedOn = LocalDateTime.now();
+    this.name = name;
+    this.group = group;
+    this.color = color;
   }
 
   public UUID getId() {
@@ -59,6 +75,14 @@ public class ShoppingList {
 
   public String getName() {
     return name;
+  }
+
+  public String getColor() {
+    return color;
+  }
+
+  public void setColor(String color) {
+    this.color = color;
   }
 
   public void setName(String name) {

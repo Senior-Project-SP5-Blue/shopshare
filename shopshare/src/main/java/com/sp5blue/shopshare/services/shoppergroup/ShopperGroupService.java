@@ -37,6 +37,17 @@ public class ShopperGroupService implements IShopperGroupService {
   @Override
   @Transactional
   @Async
+  public CompletableFuture<SlimShopperGroupDto> addShopperGroup(
+      UUID adminId, String groupName, String groupColor) {
+    User user = userService.getUserById(adminId).join();
+    ShopperGroup shopperGroup = new ShopperGroup(groupName, user, groupColor);
+    var addedGroup = shopperGroupRepository.save(shopperGroup);
+    return CompletableFuture.completedFuture(new SlimShopperGroupDto(addedGroup));
+  }
+
+  @Override
+  @Transactional
+  @Async
   public CompletableFuture<SlimShopperGroupDto> addShopperGroup(UUID adminId, String groupName) {
     User user = userService.getUserById(adminId).join();
     ShopperGroup shopperGroup = new ShopperGroup(groupName, user);

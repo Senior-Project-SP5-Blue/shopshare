@@ -15,14 +15,12 @@ type GroupScreenProps = NativeStackScreenProps<GroupStackParamList, 'Group'>;
 export type GroupScreenNavigationProp = GroupScreenProps['navigation'];
 
 const GroupCard: React.FC<GroupCardProps> = ({group}) => {
-  const {id} = group;
+  const {id, name, userCount, listCount, admin, color} = group;
   const navigation = useNavigation<GroupScreenNavigationProp>();
 
   const handleOnListPress = () => {
     navigation.navigate('Group', {groupId: id});
   };
-
-  const {name, userCount, listCount, admin} = group;
 
   return (
     <TouchableHighlight
@@ -35,7 +33,7 @@ const GroupCard: React.FC<GroupCardProps> = ({group}) => {
         marginHorizontal: 12,
         alignItems: 'center',
         width: 200,
-        backgroundColor: COLORS.grey,
+        backgroundColor: color || COLORS.grey,
       }}>
       <View>
         <Text

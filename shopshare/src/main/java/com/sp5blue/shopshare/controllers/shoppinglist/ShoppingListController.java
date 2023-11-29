@@ -46,7 +46,10 @@ public class ShoppingListController implements ShoppingListControllerBase {
       @PathVariable("user_id") UUID userId,
       @PathVariable("group_id") UUID groupId,
       @RequestBody @Valid CreateEditShoppingListRequest request) {
-    var addedList = shoppingListService.addShoppingList(userId, groupId, request.name()).join();
+    var addedList =
+        shoppingListService
+            .addShoppingList(userId, groupId, request.name(), request.color())
+            .join();
     return ResponseEntity.ok().body(addedList);
   }
 

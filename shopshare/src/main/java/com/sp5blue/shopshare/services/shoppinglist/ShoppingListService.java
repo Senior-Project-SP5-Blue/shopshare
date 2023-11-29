@@ -43,6 +43,17 @@ public class ShoppingListService implements IShoppingListService {
   @Override
   @Transactional
   @Async
+  public CompletableFuture<SlimShoppingListDto> addShoppingList(
+      UUID userId, UUID groupId, String name, String color) {
+    ShopperGroup group = shopperGroupService.readShopperGroupById(userId, groupId).join();
+    ShoppingList shoppingList = new ShoppingList(name, group, color);
+    return CompletableFuture.completedFuture(
+        new SlimShoppingListDto(shoppingListRepository.save(shoppingList)));
+  }
+
+  @Override
+  @Transactional
+  @Async
   public CompletableFuture<ShoppingList> createShoppingList(
       UUID userId, UUID groupId, String name) {
     ShopperGroup group = shopperGroupService.readShopperGroupById(userId, groupId).join();

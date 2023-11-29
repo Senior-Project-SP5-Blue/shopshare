@@ -1,18 +1,12 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Text, TouchableHighlight, View} from 'react-native';
 import COLORS from '../constants/colors';
 import SlimShoppingListDto from '../models/shoppinglist/SlimShoppingListDto';
 import {useNavigation} from '@react-navigation/native';
 import {ListScreenNavigationProp} from '../screens/ListScreen';
 
 interface ListCardProps {
-  list: SlimShoppingListDto & {color?: string};
+  list: SlimShoppingListDto;
 }
 
 const ListCard: React.FC<ListCardProps> = props => {

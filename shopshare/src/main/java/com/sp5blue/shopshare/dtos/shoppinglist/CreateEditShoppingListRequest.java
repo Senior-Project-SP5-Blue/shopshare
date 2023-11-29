@@ -6,4 +6,5 @@ import jakarta.validation.constraints.Size;
 public record CreateEditShoppingListRequest(
     @NotBlank(message = "Name cannot be blank")
         @Size(max = 500, message = "Name cannot exceed 500 characters")
-        String name) {}
+        String name,
+    String color) {}

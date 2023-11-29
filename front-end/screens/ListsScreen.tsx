@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -29,6 +29,10 @@ const ListsScreen: React.FC<ListScreenProps> = props => {
   const {data: lists, isLoading: isLoadingLists} = useGetShoppingListsQuery({
     userId: _userId!,
   }); //"lists" is all the users lists
+
+  useEffect(() => {
+    lists?.forEach(console.log);
+  }, []);
 
   if (isLoadingLists) {
     return (
