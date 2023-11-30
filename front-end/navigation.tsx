@@ -26,6 +26,7 @@ import {
   MainTabParamList,
   RootStackParamList,
 } from './screens/types';
+import Requests from './screens/Requests';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const MainTab = createBottomTabNavigator<MainTabParamList>();
@@ -78,7 +79,8 @@ const ListStackScreen: React.FC = () => {
 const AccountStackScreen: React.FC = () => {
   return (
     <AccountStack.Navigator screenOptions={{headerShown: false}}>
-      <AccountStack.Screen name="Accounts" component={AccountsScreen} />
+      <AccountStack.Screen name="Settings" component={AccountsScreen} options={{headerShown: true, headerTitleStyle:{ fontSize: 21}}} /> 
+      <AccountStack.Screen name="Requests" component={Requests} />
     </AccountStack.Navigator>
   );
 };
@@ -171,3 +173,4 @@ const styles = StyleSheet.create({
   },
 });
 export default AppNavigator;
+

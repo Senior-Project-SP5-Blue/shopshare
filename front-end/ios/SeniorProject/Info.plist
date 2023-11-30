@@ -28,7 +28,7 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>ec2-3-85-3-37.compute-1.amazonaws.com</key>
+			<key>sp5-shopshare.com</key>
 			<dict>
 				<key>NSIncludesSubdomains</key>
 				<true/>
