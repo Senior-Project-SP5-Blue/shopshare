@@ -3,14 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  ToastAndroid,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
 import {useSelector} from 'react-redux';
 import COLORS from './constants/colors';
@@ -68,7 +61,7 @@ const ListStackScreen: React.FC = () => {
         name="Lists"
         component={ListsScreen}
       />
-      <ListsStack.Screen name="CreateListScreen" component={CreateListScreen} />
+      <ListsStack.Screen name="Create List" component={CreateListScreen} />
       <ListsStack.Screen
         name="List"
         component={ListScreen}

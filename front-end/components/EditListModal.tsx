@@ -1,5 +1,6 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -19,15 +20,25 @@ interface EditListModalProps {
   visible: boolean;
   list: ShoppingListDto;
   onSave: Function;
-  onCancel: Function;
+  closeModal: Function;
 }
 
 const EditListModal: React.FC<EditListModalProps> = ({
   visible,
   list,
   onSave,
-  onCancel,
+  closeModal,
 }) => {
+  const [newName, setNewName] = useState<string>();
+  const [selectedColor, setSelectedColor] = useState<number>(0);
+
+  const handleSelectColor = (idx: number) => {
+    setSelectedColor(idx);
+  };
+  const handleSave = () => {
+    onSave(newName);
+    closeModal();
+  };
   const backgroundColors = useMemo(
     () => [
       '#5CD859',
@@ -47,11 +58,11 @@ const EditListModal: React.FC<EditListModalProps> = ({
           key={color}
           style={{
             backgroundColor: color,
-            width: 30,
-            height: 30,
+            width: idx === selectedColor ? 35 : 30,
+            height: idx === selectedColor ? 35 : 30,
             borderRadius: 4,
           }}
-          //   onPress={() => handleSelectColor(idx)}
+          onPress={() => handleSelectColor(idx)}
         />
       );
     });
@@ -61,10 +72,7 @@ const EditListModal: React.FC<EditListModalProps> = ({
       animationType="slide"
       transparent={true}
       visible={visible}
-      onRequestClose={() => {
-        //   Alert.alert('Modal has been closed.');
-        //   setModalVisible(!modalVisible);
-      }}>
+      onRequestClose={() => closeModal}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <KeyboardAvoidingView
@@ -86,9 +94,9 @@ const EditListModal: React.FC<EditListModalProps> = ({
                 Edit List
               </Text>
               <TextInput
-                placeholder="New List Name"
-                defaultValue={list.name}
-                onChangeText={text => ({name: text})}
+                onBlur={() => Alert.alert('Finished editing')}
+                placeholder={list.name}
+                onChangeText={name => setNewName(name)}
                 style={{
                   borderWidth: 1,
                   borderColor: COLORS.secondary,
@@ -110,7 +118,7 @@ const EditListModal: React.FC<EditListModalProps> = ({
               </View>
               <View style={styles.modalActions}>
                 <TouchableOpacity
-                  onPress={() => onCancel()}
+                  onPress={() => closeModal()}
                   style={{
                     marginTop: 24,
                     height: 50,
@@ -129,7 +137,7 @@ const EditListModal: React.FC<EditListModalProps> = ({
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  // onPress={Shop}
+                  onPress={handleSave}
                   style={{
                     marginTop: 24,
                     height: 50,

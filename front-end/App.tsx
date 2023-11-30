@@ -7,14 +7,17 @@ import store from './redux/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import {persistor} from './redux/store';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const App = () => {
   return (
     <Provider store={store}>
       <PersistGate loading={<Text>Loading...</Text>} persistor={persistor}>
-        <SafeAreaProvider>
-          <AppNavigator />
-        </SafeAreaProvider>
+        <GestureHandlerRootView style={{flex: 1}}>
+          <SafeAreaProvider>
+            <AppNavigator />
+          </SafeAreaProvider>
+        </GestureHandlerRootView>
       </PersistGate>
     </Provider>
   );

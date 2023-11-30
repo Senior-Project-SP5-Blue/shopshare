@@ -1,25 +1,14 @@
-import React, {useState} from 'react';
-import {
-  View,
-  ImageBackground,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {StatusBar} from 'react-native';
-import COLORS from '../constants/colors';
-import Button from '../components/Button';
+import React, {useEffect} from 'react';
+import {Text, View} from 'react-native';
 import {MultipleSelectList} from 'react-native-dropdown-select-list';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import COLORS from '../constants/colors';
 
 interface ShopScreenProps {
   navigation: any;
 }
 
 const ShopScreen = (props: ShopScreenProps) => {
-  const create = () => props.navigation.navigate('CreateListsScreen');
-
   const [selected, setSelected] = React.useState([]);
 
   const data = [
@@ -31,22 +20,11 @@ const ShopScreen = (props: ShopScreenProps) => {
     {key: '7', value: 'Pasta'},
   ];
 
+  useEffect(() => {
+    console.log(selected);
+  }, [selected]);
   return (
     <SafeAreaView>
-      <View>
-        <TouchableOpacity
-          onPress={create}
-          style={{paddingLeft: 10, marginBottom: 20}}>
-          <Text
-            style={{
-              fontSize: 18,
-              color: COLORS.black,
-              fontWeight: 'bold',
-            }}>
-            Back
-          </Text>
-        </TouchableOpacity>
-      </View>
       <View
         style={{
           alignSelf: 'center',

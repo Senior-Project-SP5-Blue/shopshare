@@ -15,24 +15,18 @@ import {useSelector} from 'react-redux';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
 import ListCard from '../components/ListCard';
-import ListItemDto from '../models/listitem/ListItemDto';
 
 interface ListScreenProps {
   navigation: any;
 }
 
 const ListsScreen: React.FC<ListScreenProps> = props => {
-  const [selectedItem, setSelectedItem] = useState<ListItemDto>();
-  const createList = () => props.navigation.navigate('CreateListScreen');
-  const _userId = useSelector(selectCurrentUserId); //this is the signed in user
+  const createList = () => props.navigation.navigate('Create List');
+  const _userId = useSelector(selectCurrentUserId);
 
   const {data: lists, isLoading: isLoadingLists} = useGetShoppingListsQuery({
     userId: _userId!,
-  }); //"lists" is all the users lists
-
-  useEffect(() => {
-    lists?.forEach(console.log);
-  }, []);
+  });
 
   if (isLoadingLists) {
     return (

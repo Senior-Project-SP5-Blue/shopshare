@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -8,33 +8,48 @@ import {
   StyleSheet,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import COLORS from '../constants/colors';
+import COLORS, {BackGroundColors} from '../constants/colors';
+import {SelectList} from 'react-native-dropdown-select-list';
+import CreateEditShoppingListRequest from '../models/shoppinglist/CreateEditShoppingListRequest';
+import {ShoppingListApiCreateShoppingListReq} from '../redux/types';
+import {useGetGroupsQuery} from '../redux/slices/shopperGroupApiSlice';
+import {useSelector} from 'react-redux';
+import {selectCurrentUserId} from '../redux/slices/authSlice';
 
 interface CreateListModalProps {
   navigation: any;
 }
 
 const CreateListScreen = (props: CreateListModalProps) => {
-  const lists = () => props.navigation.navigate('Lists');
   const Shop = () => props.navigation.navigate('ShopScreen');
+  const _userId = useSelector(selectCurrentUserId); //this is the signed in user
+  const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery({
+    userId: _userId!,
+  });
+  // const {data: groups} = useGetGroupsQuery();
+  const [newList, setNewList] = useState<ShoppingListApiCreateShoppingListReq>({
+    userId: '',
+    groupId: '',
+    body: {
+      name: '',
+      color: '',
+    },
+  });
 
   const [selectedColor, setSelectedColor] = useState<number>(0);
-  //const name = ""
-
   const handleSelectColor = (idx: number) => {
+    setNewList({
+      ...newList,
+      body: {
+        ...newList.body,
+        color: BackGroundColors[idx],
+      },
+    });
     setSelectedColor(idx);
   };
-  const backgroundColors = [
-    '#5CD859',
-    '#24A6D9',
-    '#595BD9',
-    '#8021D9',
-    '#D159D8',
-    '#D85963',
-    '#D88559',
-  ];
+
   function renderColors() {
-    return backgroundColors.map((color, idx) => {
+    return BackGroundColors.map((color, idx) => {
       return (
         <TouchableOpacity
           key={color}
@@ -49,6 +64,16 @@ const CreateListScreen = (props: CreateListModalProps) => {
       );
     });
   }
+
+  const groupChoices = useMemo(() => {
+    if (!groups) {
+      return [{}];
+    }
+    return groups.map(x => ({
+      key: `${x.id}`,
+      value: x.name,
+    }));
+  }, [groups]);
 
   return (
     <KeyboardAvoidingView
@@ -83,7 +108,15 @@ const CreateListScreen = (props: CreateListModalProps) => {
         </Text>
         <TextInput
           placeholder="New List Name"
-          onChangeText={text => ({name: text})}
+          onChangeText={text =>
+            setNewList({
+              ...newList,
+              body: {
+                ...newList.body,
+                name: text,
+              },
+            })
+          }
           style={{
             borderWidth: 1,
             borderColor: COLORS.secondary,
@@ -92,7 +125,30 @@ const CreateListScreen = (props: CreateListModalProps) => {
             marginTop: 8,
             paddingHorizontal: 18,
             fontSize: 18,
-          }}></TextInput>
+          }}
+        />
+        <SelectList
+          placeholder="Select Group"
+          search={false}
+          searchPlaceholder="Select Group"
+          boxStyles={{
+            borderWidth: 1,
+            borderColor: COLORS.secondary,
+            borderRadius: 6,
+            height: 50,
+            marginTop: 8,
+            paddingHorizontal: 18,
+          }}
+          inputStyles={{fontSize: 18}}
+          data={groupChoices}
+          setSelected={(val: string) =>
+            setNewList({
+              ...newList,
+              groupId: val,
+            })
+          }
+          save="key"
+        />
         <View
           style={{
             flexDirection: 'row',

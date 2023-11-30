@@ -1,36 +1,33 @@
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useLayoutEffect, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Keyboard,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View,
 } from 'react-native';
+import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
 import {useSelector} from 'react-redux';
+import CreateButton from '../components/CreateButton';
+import EditListModal from '../components/EditListModal';
 import ListItemRow from '../components/ListItemRow';
 import COLORS from '../constants/colors';
-import ListItemDto from '../models/listitem/ListItemDto';
+import EditListItemRequest from '../models/listitem/EditListItemRequest';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
-import {useGetGroupShoppingListQuery} from '../redux/slices/shoppingListApiSlice';
+import {useChangeItemMutation} from '../redux/slices/listItemApiSlice';
+import {
+  useChangeShoppingListNameMutation,
+  useGetGroupShoppingListQuery,
+} from '../redux/slices/shoppingListApiSlice';
 import {ListStackParamList} from './types';
-import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
-import EditListModal from '../components/EditListModal';
 
 type ListScreenProps = NativeStackScreenProps<ListStackParamList, 'List'>;
 
 export type ListScreenNavigationProp = ListScreenProps['navigation'];
 
 const ListScreen: React.FC<ListScreenProps> = props => {
-  const [editItem, setEditItem] = useState<ListItemDto>();
   const [editListModalVisible, setEditListModalVisible] =
     useState<boolean>(false);
   const navigation = useNavigation<ListScreenNavigationProp>();
@@ -46,6 +43,8 @@ const ListScreen: React.FC<ListScreenProps> = props => {
     groupId,
     listId,
   });
+  const [saveListChanges] = useChangeShoppingListNameMutation();
+  const [saveItemChange] = useChangeItemMutation();
 
   const renderEditButton = useCallback(
     () => (
@@ -56,11 +55,60 @@ const ListScreen: React.FC<ListScreenProps> = props => {
     [],
   );
 
-  const onEditCancel = useCallback(() => {
+  const sortedItems = useMemo(() => {
+    if (isLoadingList) {
+      return [];
+    }
+    const listCopy = [...list!.items];
+    listCopy.sort((a, b) => {
+      if (new Date(a.createdOn) < new Date(b.createdOn)) return -1;
+      else if (new Date(a.createdOn) > new Date(b.createdOn)) return 1;
+      else {
+        return 0;
+      }
+    });
+    return listCopy;
+  }, [isLoadingList, list]);
+
+  const handleOnCreateButtonPress = useCallback(() => {
+    // navigation.push('ShopScreen');
+    navigation.replace('ShopScreen');
+
+    // navigation.navigate('ShopScreen');
+  }, [navigation]);
+
+  const handleChangeListSave = useCallback(
+    async (newName: string) => {
+      saveListChanges({
+        userId: _userId!,
+        groupId,
+        listId,
+        body: {
+          name: newName,
+        },
+      });
+    },
+    [_userId, groupId, listId, saveListChanges],
+  );
+
+  const handleChangeItemSave = useCallback(
+    async (itemId: string, editedItem: EditListItemRequest) => {
+      saveItemChange({
+        userId: _userId!,
+        groupId,
+        listId,
+        itemId,
+        body: editedItem,
+      });
+    },
+    [_userId, groupId, listId, saveItemChange],
+  );
+
+  const closeModal = useCallback(() => {
     setEditListModalVisible(false);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       title: list?.name,
       headerRight: renderEditButton,
@@ -76,65 +124,30 @@ const ListScreen: React.FC<ListScreenProps> = props => {
         <ActivityIndicator size="large" color={COLORS.primary} />
       ) : (
         <>
-          <EditListModal
-            list={list!}
-            visible={editListModalVisible}
-            onSave={() => {}}
-            onCancel={onEditCancel}
-          />
           <FlatList
             onRefresh={refetch}
             refreshing={isFetching}
-            ListHeaderComponent={
-              <TextInput style={styles.name} placeholder="Add New Item" />
-            }
-            ListHeaderComponentStyle={{
-              marginTop: 10,
-              paddingHorizontal: 22,
-            }}
-            data={list!.items}
-            renderItem={({item}) => <ListItemRow item={item} />}
+            data={sortedItems}
+            renderItem={({item}) => (
+              <ListItemRow
+                onSaveItemChanges={handleChangeItemSave}
+                item={item}
+              />
+            )}
             keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
           />
+          <EditListModal
+            list={list!}
+            visible={editListModalVisible}
+            closeModal={closeModal}
+            onSave={handleChangeListSave}
+          />
+          <CreateButton onPress={handleOnCreateButtonPress} />
         </>
       )}
     </TouchableWithoutFeedback>
   );
 };
-
-const styles = StyleSheet.create({
-  listTitle: {
-    color: COLORS.black,
-    fontSize: 20,
-    marginBottom: 20,
-  },
-  wrapper: {
-    marginTop: 20,
-    height: '8%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 22,
-    paddingVertical: 10,
-    borderBlockColor: 'black',
-    marginBottom: 10,
-    borderStyle: 'solid',
-    overflow: 'hidden',
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: '500',
-    flexBasis: '90%',
-    flexGrow: 0,
-    textAlign: 'left',
-  },
-  locked: {
-    fontSize: 18,
-    flexBasis: '10%',
-    flexGrow: 0,
-    textAlign: 'center',
-  },
-});
 
 export default ListScreen;

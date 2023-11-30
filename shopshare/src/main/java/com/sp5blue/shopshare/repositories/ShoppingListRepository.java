@@ -41,7 +41,7 @@ public interface ShoppingListRepository extends JpaRepository<ShoppingList, UUID
   List<ShoppingList> findAllByGroup_Id(UUID groupId);
 
   @Query(
-      "SELECT sl FROM ShoppingList sl LEFT JOIN FETCH sl.items WHERE sl.group.id= :group_id AND sl.id= :list_id")
+      "SELECT sl FROM ShoppingList sl LEFT JOIN FETCH sl.items i WHERE sl.group.id= :group_id AND sl.id= :list_id ORDER BY i.createdOn DESC")
   Optional<ShoppingList> findByGroup_IdAndId(
       @Param("group_id") UUID groupId, @Param("list_id") UUID listId);
 

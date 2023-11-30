@@ -28,7 +28,7 @@ export type ListStackParamList = {
     listId: string;
   };
   Lists: undefined;
-  CreateListScreen: undefined;
+  'Create List': undefined;
   ShopScreen: undefined;
 };
 

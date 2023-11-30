@@ -29,16 +29,15 @@ type GroupScreenProps = NativeStackScreenProps<GroupStackParamList, 'Group'>;
 export type GroupScreenNavigationProp = GroupScreenProps['navigation'];
 
 const GroupsScreen: React.FC<ListScreenProps> = props => {
-  const [selectedItem, setSelectedItem] = useState<ListItemDto>();
-  const navigation = useNavigation<GroupScreenNavigationProp>();
-  // const createList = () => props.navigation.navigate('CreateListScreen');
-  const _userId = useSelector(selectCurrentUserId); //this is the signed in user
+  // const [selectedItem, setSelectedItem] = useState<ListItemDto>();
+  // const navigation = useNavigation<GroupScreenNavigationProp>();
+  const _userId = useSelector(selectCurrentUserId);
 
-  const {data: groups, isLoading: isLoadingLists} = useGetGroupsQuery({
+  const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery({
     userId: _userId!,
-  }); //"lists" is all the users lists
+  });
 
-  if (isLoadingLists) {
+  if (isLoadingGroups) {
     return (
       <SafeAreaView style={styles.container}>
         <ActivityIndicator size="large" color={COLORS.primary} />
