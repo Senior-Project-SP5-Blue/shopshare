@@ -6,7 +6,13 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record SlimShoppingListDto(
-    UUID id, String name, LocalDateTime modifiedOn, Number completed, int total, UUID groupId) {
+    UUID id,
+    String name,
+    LocalDateTime modifiedOn,
+    Number completed,
+    int total,
+    UUID groupId,
+    String color) {
 
   public SlimShoppingListDto(ShoppingList shoppingList) {
     this(
@@ -15,6 +21,7 @@ public record SlimShoppingListDto(
         shoppingList.getModifiedOn(),
         shoppingList.getItems().stream().filter(i -> i.getStatus() == ItemStatus.COMPLETED).count(),
         shoppingList.getItems().size(),
-        shoppingList.getGroup().getId());
+        shoppingList.getGroup().getId(),
+        shoppingList.getColor());
   }
 }

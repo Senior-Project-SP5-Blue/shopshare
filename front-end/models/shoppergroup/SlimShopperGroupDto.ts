@@ -4,6 +4,7 @@ type SlimShopperGroupDto = {
   admin: string;
   userCount: number;
   listCount: number;
+  color: string | null;
 };
 
 export default SlimShopperGroupDto;

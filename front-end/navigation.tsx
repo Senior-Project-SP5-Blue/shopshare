@@ -3,7 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
 import {useSelector} from 'react-redux';
 import COLORS from './constants/colors';
@@ -23,18 +23,23 @@ import {
   AuthStackParamList,
   GroupStackParamList,
   ListStackParamList,
+  ListsStackParamList,
   MainTabParamList,
   RootStackParamList,
 } from './screens/types';
 import Requests from './screens/Requests';
+import AddItemsToListScreen from './screens/AddItemsToListScreen';
+import EditListScreen from './screens/EditListScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const MainTab = createBottomTabNavigator<MainTabParamList>();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
-const ListsStack = createNativeStackNavigator<ListStackParamList>();
+const ListsStack = createNativeStackNavigator<ListsStackParamList>();
 const AccountStack = createNativeStackNavigator();
 const GroupsStack = createNativeStackNavigator<GroupStackParamList>();
+
+const ListStack = createNativeStackNavigator<ListStackParamList>();
 
 interface ScreenTitleProps {
   title?: string;
@@ -49,12 +54,12 @@ export const ScreenTitle: React.FC<ScreenTitleProps> = props => {
 };
 
 const renderEditButton = () => (
-  <TouchableOpacity>
+  <TouchableOpacity onPress={() => Alert.alert('You clicked')}>
     {<PencilSquare color={COLORS.primary1} />}
   </TouchableOpacity>
 );
 
-const ListStackScreen: React.FC = () => {
+const ListsStackScreen: React.FC = () => {
   return (
     <ListsStack.Navigator>
       <ListsStack.Screen
@@ -62,13 +67,14 @@ const ListStackScreen: React.FC = () => {
         name="Lists"
         component={ListsScreen}
       />
-      <ListsStack.Screen name="CreateListScreen" component={CreateListScreen} />
+      <ListsStack.Screen name="Create List" component={CreateListScreen} />
       <ListsStack.Screen
-        name="List"
-        component={ListScreen}
+        name="ListStack"
+        component={ListStackScreen}
         options={{
           presentation: 'modal',
           headerRight: renderEditButton,
+          headerShown: false,
         }}
       />
       <ListsStack.Screen name="ShopScreen" component={ShopScreen} />
@@ -76,10 +82,24 @@ const ListStackScreen: React.FC = () => {
   );
 };
 
+const ListStackScreen: React.FC = () => {
+  return (
+    <ListStack.Navigator>
+      <ListStack.Screen name="List" component={ListScreen} />
+      <ListStack.Screen name="Add Items" component={AddItemsToListScreen} />
+      <ListStack.Screen name="Edit List" component={EditListScreen} />
+    </ListStack.Navigator>
+  );
+};
+
 const AccountStackScreen: React.FC = () => {
   return (
     <AccountStack.Navigator screenOptions={{headerShown: false}}>
-      <AccountStack.Screen name="Settings" component={AccountsScreen} options={{headerShown: true, headerTitleStyle:{ fontSize: 21}}} /> 
+      <AccountStack.Screen
+        name="Settings"
+        component={AccountsScreen}
+        options={{headerShown: true, headerTitleStyle: {fontSize: 21}}}
+      />
       <AccountStack.Screen name="Requests" component={Requests} />
     </AccountStack.Navigator>
   );
@@ -123,7 +143,7 @@ const MainStackScreens: React.FC = () => {
     <MainTab.Navigator screenOptions={{headerShown: false}}>
       <MainTab.Screen
         name="ListsStack"
-        component={ListStackScreen}
+        component={ListsStackScreen}
         options={{tabBarLabel: 'Lists'}}
       />
       <MainTab.Screen
@@ -173,4 +193,3 @@ const styles = StyleSheet.create({
   },
 });
 export default AppNavigator;
-

@@ -1,14 +1,23 @@
-import React, {useEffect} from 'react';
-import {Text, View} from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import React, {useEffect, useLayoutEffect} from 'react';
+import {SafeAreaView, Text, View} from 'react-native';
 import {MultipleSelectList} from 'react-native-dropdown-select-list';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
+import {ListStackParamList} from './types';
 
-interface ShopScreenProps {
-  navigation: any;
-}
+// export interface AddItemsToListScreenProps {
+//   navigation: any;
+//   listId: string;
+// }
 
-const ShopScreen = (props: ShopScreenProps) => {
+type AddItemsToListScreenProps = NativeStackScreenProps<
+  ListStackParamList,
+  'Add Items'
+>;
+
+export type AddItemsToListScreenNavigationProp =
+  AddItemsToListScreenProps['navigation'];
+const AddItemsToListScreen: React.FC<AddItemsToListScreenProps> = _props => {
   const [selected, setSelected] = React.useState([]);
 
   const data = [
@@ -20,13 +29,15 @@ const ShopScreen = (props: ShopScreenProps) => {
     {key: '7', value: 'Pasta'},
   ];
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     console.log(selected);
   }, [selected]);
   return (
     <SafeAreaView>
       <View
         style={{
+          paddingTop: 50,
+          paddingHorizontal: 22,
           alignSelf: 'center',
         }}>
         <Text
@@ -38,7 +49,7 @@ const ShopScreen = (props: ShopScreenProps) => {
             alignItems: 'center',
             marginBottom: 20,
           }}>
-          Build your List
+          Add to Your List
         </Text>
       </View>
       <View>
@@ -53,4 +64,5 @@ const ShopScreen = (props: ShopScreenProps) => {
     </SafeAreaView>
   );
 };
-export default ShopScreen;
+
+export default AddItemsToListScreen;

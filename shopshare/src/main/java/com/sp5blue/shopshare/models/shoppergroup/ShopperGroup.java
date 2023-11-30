@@ -16,6 +16,9 @@ public class ShopperGroup {
   @Column(name = "name")
   private String name;
 
+  @Column(name = "color")
+  private String color;
+
   @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
   @JoinTable(
       name = "users_shopper_groups",
@@ -36,6 +39,21 @@ public class ShopperGroup {
     this.name = name;
     this.admin = createdBy;
     this.users.add(createdBy);
+  }
+
+  public ShopperGroup(String name, User createdBy, String color) {
+    this.name = name;
+    this.admin = createdBy;
+    this.users.add(createdBy);
+    this.color = color;
+  }
+
+  public String getColor() {
+    return color;
+  }
+
+  public void setColor(String color) {
+    this.color = color;
   }
 
   public User getAdmin() {

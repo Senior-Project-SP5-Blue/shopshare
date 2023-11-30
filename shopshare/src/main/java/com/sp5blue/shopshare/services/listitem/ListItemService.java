@@ -3,6 +3,7 @@ package com.sp5blue.shopshare.services.listitem;
 import com.sp5blue.shopshare.dtos.listitem.CreateListItemRequest;
 import com.sp5blue.shopshare.dtos.listitem.EditListItemRequest;
 import com.sp5blue.shopshare.dtos.listitem.ListItemDto;
+import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsException;
 import com.sp5blue.shopshare.exceptions.shoppinglist.ListItemNotFoundException;
 import com.sp5blue.shopshare.models.listitem.ItemStatus;
 import com.sp5blue.shopshare.models.listitem.ListItem;
@@ -134,6 +135,7 @@ public class ListItemService implements IListItemService {
             .findByList_IdAndId(listId, itemId)
             .orElseThrow(
                 () -> new ListItemNotFoundException("List item does not exist - " + itemId));
+    if (listItem.getCreatedBy().getId().equals(userId)) throw new InvalidUserPermissionsException("Cannot lock an item not created by yourself");
     listItem.setLocked(true);
   }
 
@@ -149,6 +151,7 @@ public class ListItemService implements IListItemService {
             .findByList_IdAndId(listId, itemId)
             .orElseThrow(
                 () -> new ListItemNotFoundException("List item does not exist - " + itemId));
+    if (!listItem.getCreatedBy().getId().equals(userId)) throw new InvalidUserPermissionsException("Cannot unlock an item not created by yourself");
     listItem.setLocked(false);
   }
 

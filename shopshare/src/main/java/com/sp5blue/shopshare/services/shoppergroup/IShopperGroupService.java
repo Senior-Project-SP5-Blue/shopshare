@@ -8,12 +8,18 @@ import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsExcep
 import com.sp5blue.shopshare.exceptions.shoppergroup.RemoveGroupAdminException;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.user.User;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface IShopperGroupService {
   CompletableFuture<SlimShopperGroupDto> addShopperGroup(UUID adminId, String groupName);
+
+  CompletableFuture<SlimShopperGroupDto> addShopperGroup(
+      UUID adminId, String groupName, String groupColor);
 
   CompletableFuture<ShopperGroup> createShopperGroup(UUID adminId, String groupName);
 

@@ -1,28 +1,25 @@
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Text, TouchableHighlight, View} from 'react-native';
 import COLORS from '../constants/colors';
 import SlimShoppingListDto from '../models/shoppinglist/SlimShoppingListDto';
-import {useNavigation} from '@react-navigation/native';
-import {ListScreenNavigationProp} from '../screens/ListScreen';
+import {ListsScreenNavigationProp} from '../screens/ListsScreen';
 
 interface ListCardProps {
-  list: SlimShoppingListDto & {color?: string};
+  list: SlimShoppingListDto;
 }
 
 const ListCard: React.FC<ListCardProps> = props => {
   const {
-    list: {id, name, modifiedOn, completed, total, groupId, color},
+    list: {id: listId, name, modifiedOn, completed, total, groupId, color},
   } = props;
-  const navigation = useNavigation<ListScreenNavigationProp>();
+  const navigation = useNavigation<ListsScreenNavigationProp>();
 
   const handleOnListPress = () => {
-    navigation.navigate('List', {groupId: groupId, listId: id});
+    navigation.navigate('ListStack' as any, {
+      screen: 'List',
+      params: {groupId, listId},
+    });
   };
 
   return (

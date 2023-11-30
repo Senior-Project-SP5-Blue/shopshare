@@ -5,6 +5,7 @@ type SlimShoppingListDto = {
   completed: number;
   total: number;
   groupId: string;
+  color: string | null;
 };
 
 export default SlimShoppingListDto;

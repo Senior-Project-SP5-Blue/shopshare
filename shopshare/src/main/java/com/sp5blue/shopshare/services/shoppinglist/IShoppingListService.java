@@ -12,6 +12,9 @@ public interface IShoppingListService {
 
   CompletableFuture<SlimShoppingListDto> addShoppingList(UUID userId, UUID groupId, String name);
 
+  CompletableFuture<SlimShoppingListDto> addShoppingList(
+          UUID userId, UUID groupId, String name, String color);
+
   CompletableFuture<ShoppingList> createShoppingList(UUID userId, UUID groupId, String name);
 
   CompletableFuture<SlimShoppingListDto> changeShoppingListName(
