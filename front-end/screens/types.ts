@@ -1,6 +1,4 @@
-import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
-import {CompositeNavigationProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import ShoppingListDto from '../models/shoppinglist/ShoppingListDto';
 
 // ListStack
 export type RootStackParamList = {
@@ -22,14 +20,26 @@ export type MainTabParamList = {
   AccountStack: undefined;
 };
 
+export type ListsStackParamList = {
+  ListStack: undefined;
+  Lists: undefined;
+  'Create List': undefined;
+  ShopScreen: undefined;
+};
+
 export type ListStackParamList = {
   List: {
     groupId: string;
     listId: string;
   };
-  Lists: undefined;
-  'Create List': undefined;
-  ShopScreen: undefined;
+  'Add Items': {
+    listId: string;
+  };
+  'Edit List': {
+    list: ShoppingListDto;
+    groupId: string;
+    saveHandler: Function;
+  };
 };
 
 export type AccountStackParamList = {
@@ -41,11 +51,3 @@ export type GroupStackParamList = {
   };
   Groups: undefined;
 };
-
-export type ListScreenNavigationProp = CompositeNavigationProp<
-  NativeStackNavigationProp<ListStackParamList, 'List'>,
-  CompositeNavigationProp<
-    BottomTabNavigationProp<MainTabParamList>,
-    NativeStackNavigationProp<RootStackParamList>
-  >
->;

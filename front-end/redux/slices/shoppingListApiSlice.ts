@@ -53,7 +53,13 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
         method: 'GET',
       }),
       providesTags: result =>
-        result ? [{type: 'ShoppingList', id: result!.id}] : [],
+        result
+          ? [
+              ...result.items.map(x => ({type: 'ListItem' as const, id: x.id})),
+              {type: 'ShoppingList', id: result!.id},
+              {type: 'ListItem', id: 'LIST'},
+            ]
+          : [],
     }),
     addShoppingList: builder.mutation<
       ShoppingListDto,

@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
+import HomeIcon from 'react-native-heroicons/mini/HomeIcon';
 import {useSelector} from 'react-redux';
 import CreateButton from '../components/CreateButton';
 import EditListModal from '../components/EditListModal';
@@ -46,6 +47,24 @@ const ListScreen: React.FC<ListScreenProps> = props => {
   const [saveListChanges] = useChangeShoppingListNameMutation();
   const [saveItemChange] = useChangeItemMutation();
 
+  const handleOnCreateButtonPress = useCallback(() => {
+    navigation.navigate('Add Items', {listId: list!.id});
+  }, [list, navigation]);
+
+  const handleChangeListSave = useCallback(
+    async (newName: string) => {
+      saveListChanges({
+        userId: _userId!,
+        groupId,
+        listId,
+        body: {
+          name: newName,
+        },
+      });
+    },
+    [_userId, groupId, listId, saveListChanges],
+  );
+
   const renderEditButton = useCallback(
     () => (
       <TouchableOpacity onPress={() => setEditListModalVisible(true)}>
@@ -69,27 +88,6 @@ const ListScreen: React.FC<ListScreenProps> = props => {
     });
     return listCopy;
   }, [isLoadingList, list]);
-
-  const handleOnCreateButtonPress = useCallback(() => {
-    // navigation.push('ShopScreen');
-    navigation.replace('ShopScreen');
-
-    // navigation.navigate('ShopScreen');
-  }, [navigation]);
-
-  const handleChangeListSave = useCallback(
-    async (newName: string) => {
-      saveListChanges({
-        userId: _userId!,
-        groupId,
-        listId,
-        body: {
-          name: newName,
-        },
-      });
-    },
-    [_userId, groupId, listId, saveListChanges],
-  );
 
   const handleChangeItemSave = useCallback(
     async (itemId: string, editedItem: EditListItemRequest) => {

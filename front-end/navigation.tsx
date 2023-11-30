@@ -23,17 +23,22 @@ import {
   AuthStackParamList,
   GroupStackParamList,
   ListStackParamList,
+  ListsStackParamList,
   MainTabParamList,
   RootStackParamList,
 } from './screens/types';
+import AddItemsToListScreen from './screens/AddItemsToListScreen';
+import EditListScreen from './screens/EditListScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const MainTab = createBottomTabNavigator<MainTabParamList>();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
-const ListsStack = createNativeStackNavigator<ListStackParamList>();
+const ListsStack = createNativeStackNavigator<ListsStackParamList>();
 const AccountStack = createNativeStackNavigator();
 const GroupsStack = createNativeStackNavigator<GroupStackParamList>();
+
+const ListStack = createNativeStackNavigator<ListStackParamList>();
 
 interface ScreenTitleProps {
   title?: string;
@@ -53,7 +58,7 @@ const renderEditButton = () => (
   </TouchableOpacity>
 );
 
-const ListStackScreen: React.FC = () => {
+const ListsStackScreen: React.FC = () => {
   return (
     <ListsStack.Navigator>
       <ListsStack.Screen
@@ -63,15 +68,26 @@ const ListStackScreen: React.FC = () => {
       />
       <ListsStack.Screen name="Create List" component={CreateListScreen} />
       <ListsStack.Screen
-        name="List"
-        component={ListScreen}
+        name="ListStack"
+        component={ListStackScreen}
         options={{
           presentation: 'modal',
           headerRight: renderEditButton,
+          headerShown: false,
         }}
       />
       <ListsStack.Screen name="ShopScreen" component={ShopScreen} />
     </ListsStack.Navigator>
+  );
+};
+
+const ListStackScreen: React.FC = () => {
+  return (
+    <ListStack.Navigator>
+      <ListStack.Screen name="List" component={ListScreen} />
+      <ListStack.Screen name="Add Items" component={AddItemsToListScreen} />
+      <ListStack.Screen name="Edit List" component={EditListScreen} />
+    </ListStack.Navigator>
   );
 };
 
@@ -121,7 +137,7 @@ const MainStackScreens: React.FC = () => {
     <MainTab.Navigator screenOptions={{headerShown: false}}>
       <MainTab.Screen
         name="ListsStack"
-        component={ListStackScreen}
+        component={ListsStackScreen}
         options={{tabBarLabel: 'Lists'}}
       />
       <MainTab.Screen

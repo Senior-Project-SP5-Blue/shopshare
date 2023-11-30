@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,16 +11,22 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 //import {useSelector} from 'react-redux';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useSelector} from 'react-redux';
+import ListCard from '../components/ListCard';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
-import ListCard from '../components/ListCard';
+import {ListsStackParamList} from './types';
 
-interface ListScreenProps {
-  navigation: any;
-}
+// interface ListScreenProps {
+//   navigation: any;
+// }
 
-const ListsScreen: React.FC<ListScreenProps> = props => {
+type ListsScreenProps = NativeStackScreenProps<ListsStackParamList, 'Lists'>;
+
+export type ListsScreenNavigationProp = ListsScreenProps['navigation'];
+
+const ListsScreen: React.FC<ListsScreenProps> = props => {
   const createList = () => props.navigation.navigate('Create List');
   const _userId = useSelector(selectCurrentUserId);
 

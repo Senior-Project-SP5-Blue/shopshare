@@ -1,32 +1,31 @@
-import React, {useMemo, useState} from 'react';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import React, {useCallback, useState} from 'react';
 import {
-  View,
-  Text,
   KeyboardAvoidingView,
-  TouchableOpacity,
+  Text,
   TextInput,
-  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import COLORS, {BackGroundColors} from '../constants/colors';
-import {SelectList} from 'react-native-dropdown-select-list';
-import CreateEditShoppingListRequest from '../models/shoppinglist/CreateEditShoppingListRequest';
-import {ShoppingListApiCreateShoppingListReq} from '../redux/types';
-import {useGetGroupsQuery} from '../redux/slices/shopperGroupApiSlice';
 import {useSelector} from 'react-redux';
+import COLORS, {BackGroundColors} from '../constants/colors';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
+import {ShoppingListApiCreateShoppingListReq} from '../redux/types';
+import {ListStackParamList} from './types';
 
-interface CreateListModalProps {
-  navigation: any;
-}
+type EditListScreenProps = NativeStackScreenProps<
+  ListStackParamList,
+  'Edit List'
+>;
 
-const CreateListScreen: React.FC<CreateListModalProps> = props => {
-  const Shop = () => props.navigation.navigate('ShopScreen');
+type EditListScreenNavigationProp = EditListScreenProps['navigation'];
+
+const EditListScreen: React.FC<EditListScreenProps> = props => {
+  // const Shop = () => props.navigation.navigate('ShopScreen');
   const _userId = useSelector(selectCurrentUserId); //this is the signed in user
-  const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery({
-    userId: _userId!,
-  });
-  // const {data: groups} = useGetGroupsQuery();
+  const {
+    list: {id: listId, groupId},
+  } = props.route.params;
   const [newList, setNewList] = useState<ShoppingListApiCreateShoppingListReq>({
     userId: '',
     groupId: '',
@@ -35,6 +34,20 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
       color: '',
     },
   });
+
+  const handleChangeListSave = useCallback(
+    async (newName: string) => {
+      saveListChanges({
+        userId: _userId!,
+        groupId,
+        listId,
+        body: {
+          name: newName,
+        },
+      });
+    },
+    [_userId, groupId, listId, saveListChanges],
+  );
 
   const [selectedColor, setSelectedColor] = useState<number>(0);
   const handleSelectColor = (idx: number) => {
@@ -65,16 +78,6 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
     });
   }
 
-  const groupChoices = useMemo(() => {
-    if (!groups) {
-      return [{}];
-    }
-    return groups.map(x => ({
-      key: `${x.id}`,
-      value: x.name,
-    }));
-  }, [groups]);
-
   return (
     <KeyboardAvoidingView
       behavior="padding"
@@ -83,18 +86,6 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      {/*<TouchableOpacity
-        onPress={lists}
-        style={{position: 'absolute', top: 64, left: 32}}>
-        <Text
-          style={{
-            fontSize: 18,
-            color: COLORS.black,
-            fontWeight: 'bold',
-          }}>
-          Back
-        </Text>
-      </TouchableOpacity>*/}
       <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
         <Text
           style={{
@@ -127,28 +118,6 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
             fontSize: 18,
           }}
         />
-        <SelectList
-          placeholder="Select Group"
-          search={false}
-          searchPlaceholder="Select Group"
-          boxStyles={{
-            borderWidth: 1,
-            borderColor: COLORS.secondary,
-            borderRadius: 6,
-            height: 50,
-            marginTop: 8,
-            paddingHorizontal: 18,
-          }}
-          inputStyles={{fontSize: 18}}
-          data={groupChoices}
-          setSelected={(val: string) =>
-            setNewList({
-              ...newList,
-              groupId: val,
-            })
-          }
-          save="key"
-        />
         <View
           style={{
             flexDirection: 'row',
@@ -159,7 +128,7 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
           {renderColors()}
         </View>
         <TouchableOpacity
-          onPress={Shop}
+          // onPress={Shop}
           style={{
             marginTop: 24,
             height: 50,
@@ -181,4 +150,4 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
     </KeyboardAvoidingView>
   );
 };
-export default CreateListScreen;
+export default EditListScreen;
