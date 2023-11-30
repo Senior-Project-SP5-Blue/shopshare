@@ -15,7 +15,7 @@ import {setAuthContext, clearAuthContext} from './authSlice';
 // };
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: Config.API_URL ?? '',
+  baseUrl:'http://sp5-shopshare.com:8080/api/v1',
   prepareHeaders: (headers, {getState}) => {
     const state = getState() as any;
     const token = state.auth.accessToken;
