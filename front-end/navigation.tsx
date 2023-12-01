@@ -16,7 +16,6 @@ import GroupsScreen from './screens/GroupsScreen';
 import ListScreen from './screens/ListScreen';
 import ListsScreen from './screens/ListsScreen';
 import LoginScreen from './screens/LoginScreen';
-import ShopScreen from './screens/ShopScreen';
 import SignupScreen from './screens/SignupScreen';
 import Welcome from './screens/WelcomeScreen';
 import {
@@ -77,7 +76,6 @@ const ListsStackScreen: React.FC = () => {
           headerShown: false,
         }}
       />
-      <ListsStack.Screen name="ShopScreen" component={ShopScreen} />
     </ListsStack.Navigator>
   );
 };

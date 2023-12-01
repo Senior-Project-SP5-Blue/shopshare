@@ -24,7 +24,6 @@ export type ListsStackParamList = {
   ListStack: undefined;
   Lists: undefined;
   'Create List': undefined;
-  ShopScreen: undefined;
 };
 
 export type ListStackParamList = {

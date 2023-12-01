@@ -25,7 +25,7 @@ const ListCard: React.FC<ListCardProps> = props => {
   return (
     <TouchableHighlight
       onPress={handleOnListPress}
-      underlayColor={COLORS.blue}
+      underlayColor={COLORS.grey}
       style={{
         paddingVertical: 32,
         paddingHorizontal: 16,

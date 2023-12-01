@@ -66,6 +66,7 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
       ShoppingListApiCreateShoppingListReq
     >({
       query: ({userId, groupId, body}) => ({
+        // {{public_url}}/users/{{user_id}}/groups/{{group_id}}/lists
         url: `/users/${userId}/groups/${groupId}/lists`,
         method: 'POST',
         body: JSON.stringify(body),
