@@ -3,21 +3,25 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useLayoutEffect, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Keyboard,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  View,
 } from 'react-native';
+import {TextInput} from 'react-native-gesture-handler';
 import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
-import HomeIcon from 'react-native-heroicons/mini/HomeIcon';
 import {useSelector} from 'react-redux';
 import CreateButton from '../components/CreateButton';
-import EditListModal from '../components/EditListModal';
 import ListItemRow from '../components/ListItemRow';
 import COLORS from '../constants/colors';
 import EditListItemRequest from '../models/listitem/EditListItemRequest';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
-import {useChangeItemMutation} from '../redux/slices/listItemApiSlice';
+import {
+  useChangeItemMutation,
+  useRemoveItemMutation,
+} from '../redux/slices/listItemApiSlice';
 import {
   useChangeShoppingListNameMutation,
   useGetGroupShoppingListQuery,
@@ -29,8 +33,9 @@ type ListScreenProps = NativeStackScreenProps<ListStackParamList, 'List'>;
 export type ListScreenNavigationProp = ListScreenProps['navigation'];
 
 const ListScreen: React.FC<ListScreenProps> = props => {
-  const [editListModalVisible, setEditListModalVisible] =
-    useState<boolean>(false);
+  // const [editListModalVisible, setEditListModalVisible] =
+  //   useState<boolean>(false);
+  const [isAddMode, setIsAddMode] = useState<boolean>(false);
   const navigation = useNavigation<ListScreenNavigationProp>();
   const _userId = useSelector(selectCurrentUserId);
   const {groupId, listId} = props.route.params;
@@ -46,10 +51,11 @@ const ListScreen: React.FC<ListScreenProps> = props => {
   });
   const [saveListChanges] = useChangeShoppingListNameMutation();
   const [saveItemChange] = useChangeItemMutation();
+  const [deleteListItem] = useRemoveItemMutation();
 
   const handleOnCreateButtonPress = useCallback(() => {
-    navigation.navigate('Add Items', {listId: list!.id});
-  }, [list, navigation]);
+    Alert.alert('Not implemented yet baby. 😝😝');
+  }, []);
 
   const handleChangeListSave = useCallback(
     async (newName: string) => {
@@ -67,11 +73,17 @@ const ListScreen: React.FC<ListScreenProps> = props => {
 
   const renderEditButton = useCallback(
     () => (
-      <TouchableOpacity onPress={() => setEditListModalVisible(true)}>
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('Edit List', {
+            list: list!,
+            groupId: groupId,
+          })
+        }>
         {<PencilSquare color={COLORS.primary1} />}
       </TouchableOpacity>
     ),
-    [],
+    [handleChangeListSave, list, navigation],
   );
 
   const sortedItems = useMemo(() => {
@@ -101,10 +113,21 @@ const ListScreen: React.FC<ListScreenProps> = props => {
     },
     [_userId, groupId, listId, saveItemChange],
   );
+  const handleDeleteItem = useCallback(
+    async (itemId: string) => {
+      deleteListItem({
+        userId: _userId!,
+        groupId,
+        listId,
+        itemId,
+      });
+    },
+    [_userId, deleteListItem, groupId, listId],
+  );
 
-  const closeModal = useCallback(() => {
-    setEditListModalVisible(false);
-  }, []);
+  // const closeModal = useCallback(() => {
+  //   setEditListModalVisible(false);
+  // }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -128,6 +151,7 @@ const ListScreen: React.FC<ListScreenProps> = props => {
             data={sortedItems}
             renderItem={({item}) => (
               <ListItemRow
+                onDeleteItem={handleDeleteItem}
                 onSaveItemChanges={handleChangeItemSave}
                 item={item}
               />
@@ -135,12 +159,17 @@ const ListScreen: React.FC<ListScreenProps> = props => {
             keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
           />
-          <EditListModal
+          {isAddMode && (
+            <View>
+              <TextInput placeholder="Add Item"></TextInput>
+            </View>
+          )}
+          {/* <EditListModal
             list={list!}
             visible={editListModalVisible}
             closeModal={closeModal}
             onSave={handleChangeListSave}
-          />
+          /> */}
           <CreateButton onPress={handleOnCreateButtonPress} />
         </>
       )}

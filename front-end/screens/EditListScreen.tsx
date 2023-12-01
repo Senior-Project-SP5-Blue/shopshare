@@ -1,5 +1,6 @@
+import {useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import {
   KeyboardAvoidingView,
   Text,
@@ -10,6 +11,7 @@ import {
 import {useSelector} from 'react-redux';
 import COLORS, {BackGroundColors} from '../constants/colors';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
+import {useChangeShoppingListNameMutation} from '../redux/slices/shoppingListApiSlice';
 import {ShoppingListApiCreateShoppingListReq} from '../redux/types';
 import {ListStackParamList} from './types';
 
@@ -18,45 +20,44 @@ type EditListScreenProps = NativeStackScreenProps<
   'Edit List'
 >;
 
-type EditListScreenNavigationProp = EditListScreenProps['navigation'];
+export type EditListScreenNavigationProp = EditListScreenProps['navigation'];
 
 const EditListScreen: React.FC<EditListScreenProps> = props => {
-  // const Shop = () => props.navigation.navigate('ShopScreen');
   const _userId = useSelector(selectCurrentUserId); //this is the signed in user
+  const navigation = useNavigation<EditListScreenNavigationProp>();
   const {
-    list: {id: listId, groupId},
+    list: {id: listId, name},
+    groupId,
   } = props.route.params;
-  const [newList, setNewList] = useState<ShoppingListApiCreateShoppingListReq>({
-    userId: '',
-    groupId: '',
-    body: {
-      name: '',
-      color: '',
-    },
+  const [newListBody, setNewListBody] = useState<{
+    name: string;
+    color?: string;
+  }>({
+    name: name,
+    color: undefined,
   });
+  const [saveListChanges] = useChangeShoppingListNameMutation();
 
-  const handleChangeListSave = useCallback(
-    async (newName: string) => {
-      saveListChanges({
-        userId: _userId!,
-        groupId,
-        listId,
-        body: {
-          name: newName,
-        },
-      });
-    },
-    [_userId, groupId, listId, saveListChanges],
-  );
+  const handleChangeListSave = async () => {
+    console.log(newListBody);
+    saveListChanges({
+      userId: _userId!,
+      groupId,
+      listId,
+      body: {
+        name: newListBody.name,
+        color: newListBody.color,
+      },
+    })
+      .unwrap()
+      .then(() => navigation.pop());
+  };
 
   const [selectedColor, setSelectedColor] = useState<number>(0);
   const handleSelectColor = (idx: number) => {
-    setNewList({
-      ...newList,
-      body: {
-        ...newList.body,
-        color: BackGroundColors[idx],
-      },
+    setNewListBody({
+      ...newListBody,
+      color: BackGroundColors[idx],
     });
     setSelectedColor(idx);
   };
@@ -95,19 +96,12 @@ const EditListScreen: React.FC<EditListScreenProps> = props => {
             alignSelf: 'center',
             marginBottom: 16,
           }}>
-          Create Your New List
+          Edit List
         </Text>
         <TextInput
-          placeholder="New List Name"
-          onChangeText={text =>
-            setNewList({
-              ...newList,
-              body: {
-                ...newList.body,
-                name: text,
-              },
-            })
-          }
+          placeholder="Rename List"
+          defaultValue={newListBody.name}
+          onChangeText={text => setNewListBody({...newListBody, name: text})}
           style={{
             borderWidth: 1,
             borderColor: COLORS.secondary,
@@ -128,7 +122,7 @@ const EditListScreen: React.FC<EditListScreenProps> = props => {
           {renderColors()}
         </View>
         <TouchableOpacity
-          // onPress={Shop}
+          onPress={handleChangeListSave}
           style={{
             marginTop: 24,
             height: 50,
@@ -143,7 +137,7 @@ const EditListScreen: React.FC<EditListScreenProps> = props => {
               fontWeight: '600',
               fontSize: 18,
             }}>
-            Continue
+            Save Changes
           </Text>
         </TouchableOpacity>
       </View>

@@ -10,17 +10,12 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
-//import {useSelector} from 'react-redux';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useSelector} from 'react-redux';
 import ListCard from '../components/ListCard';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
 import {ListsStackParamList} from './types';
-
-// interface ListScreenProps {
-//   navigation: any;
-// }
 
 type ListsScreenProps = NativeStackScreenProps<ListsStackParamList, 'Lists'>;
 

@@ -35,9 +35,8 @@ export type ListStackParamList = {
     listId: string;
   };
   'Edit List': {
-    list: ShoppingListDto;
     groupId: string;
-    saveHandler: Function;
+    list: ShoppingListDto;
   };
 };
 

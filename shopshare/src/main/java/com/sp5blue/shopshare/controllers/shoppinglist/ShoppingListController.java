@@ -71,7 +71,7 @@ public class ShoppingListController implements ShoppingListControllerBase {
       @PathVariable("list_id") UUID listId,
       @RequestBody @Valid CreateEditShoppingListRequest request) {
     var editedList =
-        shoppingListService.changeShoppingListName(userId, groupId, listId, request.name()).join();
+        shoppingListService.changeShoppingList(userId, groupId, listId, request.name(), request.color()).join();
     return ResponseEntity.ok().body(editedList);
   }
 
