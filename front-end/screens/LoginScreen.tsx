@@ -28,8 +28,6 @@ interface LoginScreenProps {
 const LoginScreen = (props: LoginScreenProps) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const home = () => props.navigation.navigate('Welcome');
-  const list = () => props.navigation.navigate('Lists')
-  const account = () => props.navigation.navigate('Settings')
 
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();

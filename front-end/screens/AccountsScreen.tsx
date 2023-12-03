@@ -16,8 +16,9 @@ interface SettingsProps {
 const AccountsScreen = (props:SettingsProps) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const yourFriends = () => props.navigation.navigate('YourFriends')
   const requests = () => props.navigation.navigate('Requests')
+  const password = () => props.navigation.navigate('Change Password')
+
 
   const user = useSelector (selectCurrentUser)
 
@@ -51,8 +52,23 @@ const AccountsScreen = (props:SettingsProps) => {
         <Modal transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <View style={{ backgroundColor: 'white', padding: 20, height:200, width: 350, borderWidth:2, borderColor:COLORS.secondary, borderRadius:10, justifyContent:"center", alignContent:"center", alignItems:"center"}}>
-            <Text style={{fontSize:18, justifyContent:"center", alignContent:"center", alignItems:"center"}}>Enter their email address</Text>
-            <Button title="Close" onPress={() => setModalVisible(false)} />
+            <Text style={{fontSize:18, justifyContent:"center", alignContent:"center", alignItems:"center"}}>Enter their username</Text>
+            <TextInput 
+            placeholder='Enter their username'
+            style={{    
+              width: '100%',
+              height: 40,
+              borderColor: COLORS.black,
+              borderWidth: 1,
+              borderRadius: 8,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop:20, 
+              marginBottom:15, 
+              paddingLeft:10, 
+              paddingRight:10 }}>
+            </TextInput>
+            <Button title="Send Request" onPress={() => setModalVisible(false)} />
           </View>
         </View>
         </Modal>
@@ -63,17 +79,14 @@ const AccountsScreen = (props:SettingsProps) => {
         </View>
         <View style={{marginTop:2, marginBottom: 2}}>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Text style={{fontSize:18, fontWeight:'700', color:COLORS.primary, marginTop: 10}}>Add Friends</Text>
+            <Text style={{fontSize:18, fontWeight:'700', color:COLORS.primary, marginTop: 10}}>Invite People</Text>
           </TouchableOpacity>
         </View>
         <View>
-        <TouchableOpacity onPress={yourFriends}>
-            <Text style={{fontSize:18, fontWeight:'700', color:COLORS.primary, marginTop: 10}}>Your Friends</Text>
-          </TouchableOpacity>
         </View>
         <View>
         <TouchableOpacity onPress={requests}>
-            <Text style={{fontSize:18, fontWeight:'700', color:COLORS.primary, marginTop: 10}}>Friend Requests</Text>
+            <Text style={{fontSize:18, fontWeight:'700', color:COLORS.primary, marginTop: 10}}>Invites</Text>
           </TouchableOpacity>
         </View>
       <View >
@@ -88,58 +101,10 @@ const AccountsScreen = (props:SettingsProps) => {
       {/* Email Address */}
       <SSTextInput
         label="Email Address"
-        placeholder="user9first@email.com"
+        placeholder={user?.email}
         placeholderTextColor={COLORS.black}
         keyboardType="email-address"
       />
-      {/* Mobile Number */}
-      <View
-        style={{
-          marginBottom: 12,
-        }}>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: '400',
-            marginVertical: 10,
-          }}>
-          Mobile Number
-        </Text>
-
-        <View
-          style={{
-            width: '100%',
-            height: 60,
-            borderColor: COLORS.black,
-            borderWidth: 1,
-            borderRadius: 8,
-            alignItems: 'center',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingLeft: 22,
-          }}>
-          <TextInput
-            placeholder="+1"
-            placeholderTextColor={COLORS.black}
-            keyboardType="number-pad"
-            style={{
-              width: '12%',
-              fontSize: 15,
-              borderRightWidth: 1,
-              height: '100%',
-            }}
-          />
-          <TextInput
-            placeholder="4703335555"
-            placeholderTextColor={COLORS.black}
-            keyboardType="numeric"
-            style={{
-              width: '80%',
-            }}
-            //onChangeText={number => setSignUpReq({...signUpReq, number})}
-          />
-        </View>
-      </View>
       <SSPasswordInput
         label="Password"
         placeholder="user9pass"
@@ -149,11 +114,39 @@ const AccountsScreen = (props:SettingsProps) => {
         onShowPasswordPress={setIsPasswordShown}
         // onChangeText={password => setSignUpReq({...signUpReq, password})}
       />
-      <View>
-      <View>
-      <Button title="Log Out" onPress={handleSignOut} />
-      </View> 
+      <View style={{paddingLeft: 5}}>
+        <TouchableOpacity onPress={password}>
+          <Text 
+            style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color:COLORS.red
+          }}>
+            Change Password
+            </Text>
+        </TouchableOpacity>
       </View>
+      <View style={{marginTop:90}}>
+        <TouchableOpacity
+        onPress={handleSignOut}
+        style={{
+          marginTop: 24,
+          height: 50,
+          borderRadius: 6,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: COLORS.secondary,
+        }}>
+          <Text
+            style={{
+              color: COLORS.white,
+              fontWeight: '600',
+              fontSize: 20,
+            }}>
+            Log Out
+            </Text>
+        </TouchableOpacity>
+      </View> 
 
     </SafeAreaView>
   );

@@ -63,7 +63,7 @@ const ListsScreen: React.FC<ListsScreenProps> = props => {
         </TouchableOpacity>
         <Text style={styles.addList}>Add List</Text>
       </View>
-      <View style={{height: 275, paddingLeft: 32}}>
+      <View style={{height: 275, justifyContent:"center"}}>
         <FlatList
           data={lists}
           keyExtractor={item => item.id}

@@ -16,12 +16,13 @@ import {useGetGroupsQuery} from '../redux/slices/shopperGroupApiSlice';
 import {useSelector} from 'react-redux';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 
-interface CreateListModalProps {
+interface CreateGroupModalProps {
   navigation: any;
 }
 
-const CreateListScreen: React.FC<CreateListModalProps> = props => {
-  const list = () => props.navigation.navigate('Lists');
+const CreateGroupScreen: React.FC<CreateGroupModalProps> = props => {
+  const group = () => props.navigation.navigate('Groups');
+
   const _userId = useSelector(selectCurrentUserId); //this is the signed in user
   const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery({
     userId: _userId!,
@@ -104,10 +105,10 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
             alignSelf: 'center',
             marginBottom: 16,
           }}>
-          Create Your New List
+          Create Your New Group
         </Text>
         <TextInput
-          placeholder="New List Name"
+          placeholder="New Group Name"
           onChangeText={text =>
             setNewList({
               ...newList,
@@ -127,7 +128,7 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
             fontSize: 18,
           }}
         />
-        <SelectList
+        {/* <SelectList
           placeholder="Select Group"
           search={false}
           searchPlaceholder="Select Group"
@@ -148,7 +149,7 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
             })
           }
           save="key"
-        />
+        /> */}
         <View
           style={{
             flexDirection: 'row',
@@ -159,7 +160,7 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
           {renderColors()}
         </View>
         <TouchableOpacity
-          onPress={list}
+          onPress={group}
           style={{
             marginTop: 24,
             height: 50,
@@ -181,4 +182,4 @@ const CreateListScreen: React.FC<CreateListModalProps> = props => {
     </KeyboardAvoidingView>
   );
 };
-export default CreateListScreen;
+export default CreateGroupScreen;

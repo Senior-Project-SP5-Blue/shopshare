@@ -50,4 +50,6 @@ export type GroupStackParamList = {
     groupId: string;
   };
   Groups: undefined;
+  'Create Group': undefined;
+
 };

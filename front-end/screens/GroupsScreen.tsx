@@ -33,6 +33,9 @@ const GroupsScreen: React.FC<ListScreenProps> = props => {
   // const navigation = useNavigation<GroupScreenNavigationProp>();
   const _userId = useSelector(selectCurrentUserId);
 
+  const createGroup = () => props.navigation.navigate('Create Group');
+
+
   const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery({
     userId: _userId!,
   });
@@ -57,8 +60,8 @@ const GroupsScreen: React.FC<ListScreenProps> = props => {
         </Text>
         <View style={styles.divider} />
       </View>
-      <View style={{marginVertical: 48}}>
-        <TouchableOpacity style={styles.addButton}>
+      <View style={{marginVertical: 48, justifyContent:'center', alignItems:'center'}}>
+        <TouchableOpacity onPress={createGroup} style={styles.addButton}>
           <Image
             source={require('../assets/add.png')}
             style={styles.addImage}
@@ -66,7 +69,7 @@ const GroupsScreen: React.FC<ListScreenProps> = props => {
         </TouchableOpacity>
         <Text style={styles.addList}>Add Groups</Text>
       </View>
-      <View style={{height: 275, paddingLeft: 32}}>
+      <View style={{height: 275, justifyContent:"center"}}>
         <FlatList
           style={{width: '100%'}}
           data={groups}
@@ -104,6 +107,7 @@ const styles = StyleSheet.create({
     height: 30,
     resizeMode: 'contain',
     width: 30,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   addButton: {
@@ -113,12 +117,15 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     justifyContent: 'center',
+    width: 62,
   },
   addList: {
     color: COLORS.secondary,
     fontWeight: '600',
     fontSize: 16,
     marginTop: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 export default GroupsScreen;
