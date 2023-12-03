@@ -1,4 +1,6 @@
-import React from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import React, {useMemo} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -9,14 +11,12 @@ import {
   View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import COLORS from '../../constants/colors';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useSelector} from 'react-redux';
 import ListCard from '../../components/ListCard';
+import COLORS from '../../constants/colors';
 import {selectCurrentUserId} from '../../redux/slices/authSlice';
 import {useGetShoppingListsQuery} from '../../redux/slices/shoppingListApiSlice';
 import {ListsStackParamList} from '../types';
-import {useNavigation} from '@react-navigation/native';
 
 type ListsScreenPropsType = NativeStackScreenProps<
   ListsStackParamList,
@@ -35,6 +35,10 @@ const ListsScreen: React.FC<ListsScreenPropsType> = _props => {
     },
     {pollingInterval: 3000},
   );
+
+  const renderEmptyListComponent = useMemo(() => {
+    return <Text style={{fontSize: 20}}>No lists added</Text>;
+  }, []);
 
   if (isLoadingLists) {
     return (
@@ -75,6 +79,7 @@ const ListsScreen: React.FC<ListsScreenPropsType> = _props => {
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           renderItem={({item}) => <ListCard list={item} />}
+          ListEmptyComponent={renderEmptyListComponent}
         />
       </View>
     </SafeAreaView>

@@ -104,97 +104,100 @@ const CreateListScreen: React.FC<CreateListScreenPropsType> = props => {
   );
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
-        <Text
-          style={{
-            fontSize: 28,
-            fontWeight: '800',
-            color: COLORS.black,
-            alignSelf: 'center',
-            marginBottom: 16,
-          }}>
-          Create Your New List
-        </Text>
-        <TextInput
-          placeholder="New List Name"
-          onChangeText={text =>
-            setNewListReq({
-              ...newListReq,
-              body: {
-                ...newListReq.body,
-                name: text,
-              },
-            })
-          }
-          style={{
-            borderWidth: 1,
-            borderColor: COLORS.secondary,
-            borderRadius: 6,
-            height: 50,
-            marginTop: 8,
-            paddingHorizontal: 18,
-            fontSize: 18,
-          }}
-        />
-        <SelectList
-          placeholder="Select Group"
-          search={false}
-          defaultOption={defaultSelectedGroup}
-          boxStyles={{
-            borderWidth: 1,
-            borderColor: COLORS.secondary,
-            borderRadius: 6,
-            height: 50,
-            marginTop: 8,
-            paddingHorizontal: 18,
-          }}
-          inputStyles={{fontSize: 18}}
-          data={groupChoices}
-          setSelected={(val: string) =>
-            setNewListReq({
-              ...newListReq,
-              groupId: val,
-            })
-          }
-          save="key"
-        />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 14,
-            alignItems: 'flex-end',
-          }}>
-          {renderColors()}
-        </View>
-        <TouchableOpacity
-          onPress={handleCreateList}
-          style={{
-            marginTop: 24,
-            height: 50,
-            borderRadius: 6,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: COLORS.secondary,
-          }}>
+    <>
+      <Toast />
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
           <Text
             style={{
-              color: COLORS.white,
-              fontWeight: '600',
-              fontSize: 18,
+              fontSize: 28,
+              fontWeight: '800',
+              color: COLORS.black,
+              alignSelf: 'center',
+              marginBottom: 16,
             }}>
-            Save
+            Create Your New List
           </Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+          <TextInput
+            placeholder="New List Name"
+            onChangeText={text =>
+              setNewListReq({
+                ...newListReq,
+                body: {
+                  ...newListReq.body,
+                  name: text,
+                },
+              })
+            }
+            style={{
+              borderWidth: 1,
+              borderColor: COLORS.secondary,
+              borderRadius: 6,
+              height: 50,
+              marginTop: 8,
+              paddingHorizontal: 18,
+              fontSize: 18,
+            }}
+          />
+          <SelectList
+            placeholder="Select Group"
+            search={false}
+            defaultOption={defaultSelectedGroup}
+            boxStyles={{
+              borderWidth: 1,
+              borderColor: COLORS.secondary,
+              borderRadius: 6,
+              height: 50,
+              marginTop: 8,
+              paddingHorizontal: 18,
+            }}
+            inputStyles={{fontSize: 18}}
+            data={groupChoices}
+            setSelected={(val: string) =>
+              setNewListReq({
+                ...newListReq,
+                groupId: val,
+              })
+            }
+            save="key"
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 14,
+              alignItems: 'flex-end',
+            }}>
+            {renderColors()}
+          </View>
+          <TouchableOpacity
+            onPress={handleCreateList}
+            style={{
+              marginTop: 24,
+              height: 50,
+              borderRadius: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: COLORS.secondary,
+            }}>
+            <Text
+              style={{
+                color: COLORS.white,
+                fontWeight: '600',
+                fontSize: 18,
+              }}>
+              Save
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </>
   );
 };
 export default CreateListScreen;

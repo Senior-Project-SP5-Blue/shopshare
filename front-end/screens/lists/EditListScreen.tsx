@@ -110,87 +110,90 @@ const EditListScreen: React.FC<EditListScreenPropsType> = props => {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
-        <Text
-          style={{
-            fontSize: 28,
-            fontWeight: '800',
-            color: COLORS.black,
-            alignSelf: 'center',
-            marginBottom: 16,
-          }}>
-          Edit List
-        </Text>
-        <TextInput
-          placeholder="Rename List"
-          defaultValue={newListBody.name}
-          onChangeText={text => setNewListBody({...newListBody, name: text})}
-          style={{
-            borderWidth: 1,
-            borderColor: COLORS.secondary,
-            borderRadius: 6,
-            height: 50,
-            marginTop: 8,
-            paddingHorizontal: 18,
-            fontSize: 18,
-          }}
-        />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 14,
-            alignItems: 'flex-end',
-          }}>
-          {renderColors()}
+    <>
+      <Toast />
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
+          <Text
+            style={{
+              fontSize: 28,
+              fontWeight: '800',
+              color: COLORS.black,
+              alignSelf: 'center',
+              marginBottom: 16,
+            }}>
+            Edit List
+          </Text>
+          <TextInput
+            placeholder="Rename List"
+            defaultValue={newListBody.name}
+            onChangeText={text => setNewListBody({...newListBody, name: text})}
+            style={{
+              borderWidth: 1,
+              borderColor: COLORS.secondary,
+              borderRadius: 6,
+              height: 50,
+              marginTop: 8,
+              paddingHorizontal: 18,
+              fontSize: 18,
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 14,
+              alignItems: 'flex-end',
+            }}>
+            {renderColors()}
+          </View>
+          <TouchableOpacity
+            onPress={handleChangeListSave}
+            style={{
+              marginTop: 24,
+              height: 50,
+              borderRadius: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: COLORS.secondary,
+            }}>
+            <Text
+              style={{
+                color: COLORS.white,
+                fontWeight: '600',
+                fontSize: 18,
+              }}>
+              Save Changes
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleDeleteList}
+            style={{
+              marginTop: 24,
+              height: 50,
+              borderRadius: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'crimson',
+            }}>
+            <Text
+              style={{
+                color: COLORS.white,
+                fontWeight: '600',
+                fontSize: 18,
+              }}>
+              Delete List
+            </Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          onPress={handleChangeListSave}
-          style={{
-            marginTop: 24,
-            height: 50,
-            borderRadius: 6,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: COLORS.secondary,
-          }}>
-          <Text
-            style={{
-              color: COLORS.white,
-              fontWeight: '600',
-              fontSize: 18,
-            }}>
-            Save Changes
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleDeleteList}
-          style={{
-            marginTop: 24,
-            height: 50,
-            borderRadius: 6,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'crimson',
-          }}>
-          <Text
-            style={{
-              color: COLORS.white,
-              fontWeight: '600',
-              fontSize: 18,
-            }}>
-            Delete List
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </>
   );
 };
 export default EditListScreen;

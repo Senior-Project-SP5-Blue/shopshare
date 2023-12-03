@@ -1,3 +1,4 @@
+import InvitationDto from '../../models/shoppergroup/InvitationDto';
 import ShopperGroupDto from '../../models/shoppergroup/ShopperGroupDto';
 import SlimShopperGroupDto from '../../models/shoppergroup/SlimShopperGroupDto';
 import UserDto from '../../models/user/UserDto';
@@ -5,11 +6,13 @@ import {
   ShopperGroupApiAcceptInvitation,
   ShopperGroupApiChangeGroupNameReq,
   ShopperGroupApiCreateGroupReq,
+  ShopperGroupApiDeclineInvitation,
   ShopperGroupApiDeleteGroupReq,
   ShopperGroupApiGetGroupMemberReq,
   ShopperGroupApiGetGroupMembersReq,
   ShopperGroupApiGetGroupReq,
   ShopperGroupApiGetGroupsReq,
+  ShopperGroupApiGetInvitations,
   ShopperGroupApiInviteUserToGroupReq,
   ShopperGroupApiRemoveMemberReq,
 } from '../types';
@@ -67,22 +70,25 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
       void,
       ShopperGroupApiInviteUserToGroupReq
     >({
-      query: ({userId, groupId, memberId}) => ({
-        url: `/users/${userId}/groups/${groupId}/invitations/${memberId}`,
+      query: ({userId, groupId, memberUsername}) => ({
+        url: `/users/${userId}/groups/${groupId}/invitations/${memberUsername}`,
         method: 'POST',
       }),
     }),
-    createNewGroup: builder.mutation<
-      ShopperGroupDto,
-      ShopperGroupApiCreateGroupReq
+    getGroupInvitations: builder.query<
+      InvitationDto[],
+      ShopperGroupApiGetInvitations
     >({
-      query: ({userId, body}) => ({
-        url: `/users/${userId}/groups`,
-        method: 'POST',
-        body: JSON.stringify(body),
+      query: ({userId}) => ({
+        url: `/users/${userId}/groups/invitations`,
+        method: 'GET',
       }),
-      invalidatesTags: (_result, _error, _arg) => [
-        {type: 'ShopperGroup', id: 'LIST'},
+      providesTags: (result = [], _error, req) => [
+        ...result.map(({groupId}) => ({
+          type: 'Invitation' as const,
+          id: `${groupId}-${req.userId}`,
+        })),
+        {type: 'Invitation', id: 'LIST'},
       ],
     }),
     acceptGroupInvitation: builder.mutation<
@@ -92,6 +98,35 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
       query: ({userId, groupId}) => ({
         url: `/users/${userId}/groups/${groupId}`,
         method: 'POST',
+      }),
+      invalidatesTags: (_result, _error, args) => [
+        {type: 'Invitation', id: 'LIST'},
+        {type: 'Invitation', id: `${args.groupId}-${args.userId}`},
+        {type: 'ShopperGroup', id: 'LIST'},
+        {type: 'ShopperGroup', id: args.groupId},
+      ],
+    }),
+    declineGroupInvitation: builder.mutation<
+      void,
+      ShopperGroupApiDeclineInvitation
+    >({
+      query: ({userId, groupId}) => ({
+        url: `/users/${userId}/groups/invitations/${groupId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_result, _error, args) => [
+        {type: 'Invitation', id: 'LIST'},
+        {type: 'Invitation', id: `${args.groupId}-${args.userId}`},
+      ],
+    }),
+    createNewGroup: builder.mutation<
+      ShopperGroupDto,
+      ShopperGroupApiCreateGroupReq
+    >({
+      query: ({userId, body}) => ({
+        url: `/users/${userId}/groups`,
+        method: 'POST',
+        body: JSON.stringify(body),
       }),
       invalidatesTags: (_result, _error, _arg) => [
         {type: 'ShopperGroup', id: 'LIST'},
@@ -141,7 +176,9 @@ export const {
   useGetGroupMemberQuery,
   useCreateNewGroupMutation,
   useInviteUserToGroupMutation,
+  useGetGroupInvitationsQuery,
   useAcceptGroupInvitationMutation,
+  useDeclineGroupInvitationMutation,
   useEditGroupMutation,
   useDeleteShopperGroupMutation,
 } = shopperGroupApiSlice;

@@ -73,6 +73,14 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
   }
 
   @Override
+  @DeleteMapping("/invitations/{group_id}")
+  public ResponseEntity<?> declineShopperGroupInvitation(
+      @PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId) {
+    invitationService.declineInvite(groupId, userId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
   @DeleteMapping("/{group_id}")
   public ResponseEntity<?> deleteShopperGroup(
       @PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId) {

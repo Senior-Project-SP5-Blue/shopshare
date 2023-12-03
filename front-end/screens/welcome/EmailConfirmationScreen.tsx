@@ -1,56 +1,65 @@
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React from 'react';
 import {SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import COLORS from '../../constants/colors';
+import {AuthStackParamList} from '../types';
+import Toast from 'react-native-toast-message';
 
-interface EmailConfirmationScreenProps {
-  navigation: any;
-  // email: string;
-}
+type EmailConfirmationScreenPropsType = NativeStackScreenProps<
+  AuthStackParamList,
+  'EmailConfirmation'
+>;
 
+type EmailConfirmationScreenNavigationProp =
+  EmailConfirmationScreenPropsType['navigation'];
 const EmailConfirmationScreen: React.FC<
-  EmailConfirmationScreenProps
+  EmailConfirmationScreenPropsType
 > = _props => {
-  const back = () => _props.navigation.navigate('SignUp');
+  const navigation = useNavigation<EmailConfirmationScreenNavigationProp>();
   return (
-    <SafeAreaView>
-      <View
-        style={{
-          marginTop: -40,
-          paddingLeft: 15,
-          paddingRight: 15,
-        }}>
-        <Text
+    <>
+      <Toast />
+      <SafeAreaView>
+        <View
           style={{
-            fontSize: 18,
-            fontWeight: '400',
-          }}>
-          A confirmation email has been sent.
-        </Text>
-      </View>
-      <View
-        style={{
-          paddingLeft: 30,
-          paddingRight: 30,
-        }}>
-        <TouchableOpacity
-          onPress={back}
-          style={{
-            marginTop: 24,
-            height: 40,
-            alignItems: 'center',
-            justifyContent: 'center',
+            paddingTop: 20,
+            paddingLeft: 15,
+            paddingRight: 15,
           }}>
           <Text
             style={{
-              color: COLORS.blue,
+              fontSize: 18,
               fontWeight: '400',
-              fontSize: 20,
             }}>
-            Okay
+            A confirmation email has been sent.
           </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+        </View>
+        <View
+          style={{
+            paddingLeft: 30,
+            paddingRight: 30,
+          }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Login')}
+            style={{
+              marginTop: 24,
+              height: 40,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Text
+              style={{
+                color: COLORS.blue,
+                fontWeight: '400',
+                fontSize: 20,
+              }}>
+              Okay
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </>
   );
 };
 export default EmailConfirmationScreen;

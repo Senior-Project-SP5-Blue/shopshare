@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 import COLORS, {BackGroundColors} from '../../constants/colors';
 import CreateEditShopperGroupRequest from '../../models/shoppergroup/CreateEditShopperGroupRequest';
-import {selectCurrentUserId} from '../../redux/slices/authSlice';
+import {selectCurrentUser} from '../../redux/slices/authSlice';
 import {
   useDeleteShopperGroupMutation,
   useEditGroupMutation,
@@ -27,7 +27,8 @@ const EditGroupScreen: React.FC<EditGroupScreenPropsType> = props => {
       ? 0
       : BackGroundColors.indexOf(color),
   );
-  const _userId = useSelector(selectCurrentUserId); //this is the signed in user
+  const _user = useSelector(selectCurrentUser);
+  const [isAdmin] = useState<boolean>(group.admin === _user!.username);
   const navigation = useNavigation<EditGroupScreenNavigationProp>();
   const [newGroupBody, setNewGroupBody] =
     useState<CreateEditShopperGroupRequest>({name: group.name, color});
@@ -36,7 +37,7 @@ const EditGroupScreen: React.FC<EditGroupScreenPropsType> = props => {
 
   const handleChangeGroupSave = async () => {
     saveGroupChanges({
-      userId: _userId!,
+      userId: _user!.id,
       groupId: group.id,
       body: {
         name: newGroupBody.name,
@@ -63,7 +64,7 @@ const EditGroupScreen: React.FC<EditGroupScreenPropsType> = props => {
 
   const handleDeleteGroup = async () => {
     deleteList({
-      userId: _userId!,
+      userId: _user!.id!,
       groupId: group.id,
     })
       .unwrap()
@@ -110,87 +111,92 @@ const EditGroupScreen: React.FC<EditGroupScreenPropsType> = props => {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
-        <Text
-          style={{
-            fontSize: 28,
-            fontWeight: '800',
-            color: COLORS.black,
-            alignSelf: 'center',
-            marginBottom: 16,
-          }}>
-          Edit List
-        </Text>
-        <TextInput
-          placeholder="Rename List"
-          defaultValue={newGroupBody.name}
-          onChangeText={text => setNewGroupBody({...newGroupBody, name: text})}
-          style={{
-            borderWidth: 1,
-            borderColor: COLORS.secondary,
-            borderRadius: 6,
-            height: 50,
-            marginTop: 8,
-            paddingHorizontal: 18,
-            fontSize: 18,
-          }}
-        />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 14,
-            alignItems: 'flex-end',
-          }}>
-          {renderColors()}
+    <>
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Toast />
+        <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
+          <Text
+            style={{
+              fontSize: 28,
+              fontWeight: '800',
+              color: COLORS.black,
+              alignSelf: 'center',
+              marginBottom: 16,
+            }}>
+            Edit Group
+          </Text>
+          <TextInput
+            placeholder="Rename Group"
+            defaultValue={newGroupBody.name}
+            onChangeText={text =>
+              setNewGroupBody({...newGroupBody, name: text})
+            }
+            style={{
+              borderWidth: 1,
+              borderColor: COLORS.secondary,
+              borderRadius: 6,
+              height: 50,
+              marginTop: 8,
+              paddingHorizontal: 18,
+              fontSize: 18,
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 14,
+              alignItems: 'flex-end',
+            }}>
+            {renderColors()}
+          </View>
+          <TouchableOpacity
+            onPress={handleChangeGroupSave}
+            style={{
+              marginTop: 24,
+              height: 50,
+              borderRadius: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: COLORS.secondary,
+            }}>
+            <Text
+              style={{
+                color: COLORS.white,
+                fontWeight: '600',
+                fontSize: 18,
+              }}>
+              Save Changes
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleDeleteGroup}
+            style={{
+              marginTop: 24,
+              height: 50,
+              borderRadius: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'crimson',
+            }}>
+            <Text
+              style={{
+                color: COLORS.white,
+                fontWeight: '600',
+                fontSize: 18,
+              }}>
+              {isAdmin ? 'Delete Group' : 'Leave Group'}
+            </Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          onPress={handleChangeGroupSave}
-          style={{
-            marginTop: 24,
-            height: 50,
-            borderRadius: 6,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: COLORS.secondary,
-          }}>
-          <Text
-            style={{
-              color: COLORS.white,
-              fontWeight: '600',
-              fontSize: 18,
-            }}>
-            Save Changes
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleDeleteGroup}
-          style={{
-            marginTop: 24,
-            height: 50,
-            borderRadius: 6,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'crimson',
-          }}>
-          <Text
-            style={{
-              color: COLORS.white,
-              fontWeight: '600',
-              fontSize: 18,
-            }}>
-            Delete Group
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </>
   );
 };
 export default EditGroupScreen;

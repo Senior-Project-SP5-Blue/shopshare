@@ -1,9 +1,10 @@
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {Text, TouchableHighlight, View} from 'react-native';
+import {Platform, Text, TouchableHighlight, View} from 'react-native';
 import COLORS from '../constants/colors';
 import SlimShoppingListDto from '../models/shoppinglist/SlimShoppingListDto';
 import {ListsScreenNavigationProp} from '../screens/lists/ListsScreen';
+import {NativeModules} from 'react-native';
 
 interface ListCardProps {
   list: SlimShoppingListDto;
@@ -22,10 +23,29 @@ const ListCard: React.FC<ListCardProps> = props => {
     });
   };
 
-  // const renderPrettyDate = (rawDate: string) => {
-  //   const date = new Date(rawDate);
-  //   // DeviceInfo.
-  // };
+  const renderPrettyDate = (rawDate: string) => {
+    const date = new Date(rawDate);
+
+    let locale;
+    if (Platform.OS === 'ios') {
+      // iOS:
+      locale =
+        NativeModules.SettingsManager.settings.AppleLocale ||
+        NativeModules.SettingsManager.settings.AppleLanguages[0];
+    } else if (Platform.OS === 'android') {
+      // Android:
+      locale = NativeModules.I18nManager.localeIdentifier;
+    }
+
+    locale = locale.replace('_', '-');
+
+    return date.toLocaleDateString(locale, {
+      // weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
   return (
     <TouchableHighlight
@@ -105,13 +125,11 @@ const ListCard: React.FC<ListCardProps> = props => {
               fontWeight: '600',
               color: COLORS.white,
             }}>
-            {`${modifiedOn}`}
+            {`${renderPrettyDate(modifiedOn)}`}
           </Text>
         </View>
         <View>
-          <View style={{alignItems: 'center'}}>
-            <Text style={{}}></Text>
-          </View>
+          <View style={{alignItems: 'center'}}></View>
         </View>
       </View>
     </TouchableHighlight>

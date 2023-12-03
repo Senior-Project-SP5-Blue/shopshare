@@ -64,9 +64,16 @@ const GroupScreen: React.FC<GroupScreenPropsType> = props => {
     return (
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionHeaderTitle}>Users</Text>
-        <TouchableOpacity>
+        {/* <TouchableOpacity
+          onPress={() => {
+            navigation.pop();
+            navigation.navigate('AccountStack', {
+              screen: 'Settings',
+              params: {},
+            });
+          }}>
           <UserPlusIcon color={COLORS.primary1} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     );
   };
@@ -97,20 +104,9 @@ const GroupScreen: React.FC<GroupScreenPropsType> = props => {
     return (
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionHeaderTitle}>Lists</Text>
-        {/* <TouchableOpacity>
-          <PlusCircleIcon
-            onPress={() =>
-              navigation.navigate('ListsStack', {
-                screen: 'Create List',
-                params: {groupId: groupId},
-              })
-            }
-            color={COLORS.primary1}
-          />
-        </TouchableOpacity> */}
       </View>
     );
-  }, [groupId, navigation]);
+  }, []);
 
   const DATA = useMemo(() => {
     return isLoadingGroup

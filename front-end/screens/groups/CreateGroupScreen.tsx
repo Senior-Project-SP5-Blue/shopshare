@@ -24,7 +24,7 @@ type CreateGroupScreenPropsType = NativeStackScreenProps<
 export type CreateGroupScreenNavigationProp =
   CreateGroupScreenPropsType['navigation'];
 
-const CreateGroupScreen: React.FC<CreateGroupScreenPropsType> = props => {
+const CreateGroupScreen: React.FC<CreateGroupScreenPropsType> = _props => {
   const _userId = useSelector(selectCurrentUserId);
   const navigation = useNavigation<CreateGroupScreenNavigationProp>();
   const [newGroupReq, setNewGroupReq] = useState<ShopperGroupApiCreateGroupReq>(
@@ -85,76 +85,79 @@ const CreateGroupScreen: React.FC<CreateGroupScreenPropsType> = props => {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
-        <Text
-          style={{
-            fontSize: 28,
-            fontWeight: '800',
-            color: COLORS.black,
-            alignSelf: 'center',
-            marginBottom: 16,
-          }}>
-          Create Your New Group
-        </Text>
-        <TextInput
-          placeholder="New Group Name"
-          onChangeText={text =>
-            setNewGroupReq({
-              ...newGroupReq,
-              body: {
-                ...newGroupReq.body,
-                name: text,
-              },
-            })
-          }
-          style={{
-            borderWidth: 1,
-            borderColor: COLORS.secondary,
-            borderRadius: 6,
-            height: 50,
-            marginTop: 8,
-            paddingHorizontal: 18,
-            fontSize: 18,
-          }}
-        />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 14,
-            alignItems: 'flex-end',
-          }}>
-          {renderColors()}
-        </View>
-        <TouchableOpacity
-          onPress={handleCreateGroup}
-          disabled={!newGroupReq.body.name.trim()}
-          style={{
-            marginTop: 24,
-            height: 50,
-            borderRadius: 6,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: COLORS.secondary,
-          }}>
+    <>
+      <Toast />
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
           <Text
             style={{
-              color: COLORS.white,
-              fontWeight: '600',
-              fontSize: 18,
+              fontSize: 28,
+              fontWeight: '800',
+              color: COLORS.black,
+              alignSelf: 'center',
+              marginBottom: 16,
             }}>
-            Save
+            Create Your New Group
           </Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+          <TextInput
+            placeholder="New Group Name"
+            onChangeText={text =>
+              setNewGroupReq({
+                ...newGroupReq,
+                body: {
+                  ...newGroupReq.body,
+                  name: text,
+                },
+              })
+            }
+            style={{
+              borderWidth: 1,
+              borderColor: COLORS.secondary,
+              borderRadius: 6,
+              height: 50,
+              marginTop: 8,
+              paddingHorizontal: 18,
+              fontSize: 18,
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 14,
+              alignItems: 'flex-end',
+            }}>
+            {renderColors()}
+          </View>
+          <TouchableOpacity
+            onPress={handleCreateGroup}
+            disabled={!newGroupReq.body.name.trim()}
+            style={{
+              marginTop: 24,
+              height: 50,
+              borderRadius: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: COLORS.secondary,
+            }}>
+            <Text
+              style={{
+                color: COLORS.white,
+                fontWeight: '600',
+                fontSize: 18,
+              }}>
+              Save
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </>
   );
 };
 export default CreateGroupScreen;

@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -37,6 +37,9 @@ const GroupsScreen: React.FC<GroupsScreenPropsType> = _props => {
       pollingInterval: 3000,
     },
   );
+  const renderEmptyListComponent = useMemo(() => {
+    return <Text style={{fontSize: 20}}>No groups added</Text>;
+  }, []);
 
   if (isLoadingGroups) {
     return (
@@ -83,6 +86,7 @@ const GroupsScreen: React.FC<GroupsScreenPropsType> = _props => {
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           renderItem={({item}) => <GroupCard group={item} />}
+          ListEmptyComponent={renderEmptyListComponent}
         />
       </View>
     </SafeAreaView>

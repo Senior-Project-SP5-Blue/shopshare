@@ -59,11 +59,10 @@ const styles = StyleSheet.create({
   },
   inputWrapperView: {
     width: '100%',
-    height: 60,
+    height: 50,
     borderColor: COLORS.black,
     borderWidth: 1,
     borderRadius: 8,
-    // alignItems: 'center',
     justifyContent: 'center',
     paddingLeft: 22,
   },

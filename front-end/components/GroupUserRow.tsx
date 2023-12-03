@@ -11,9 +11,9 @@ const GroupUserRow: React.FC<GroupUserRowProps> = ({username}) => {
   return (
     <View style={styles.wrapper}>
       <Text style={styles.name}>{username}</Text>
-      <TouchableOpacity style={styles.trash}>
+      {/* <TouchableOpacity style={styles.trash}>
         <UserMinusIcon color={COLORS.primary} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

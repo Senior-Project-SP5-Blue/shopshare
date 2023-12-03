@@ -1,26 +1,21 @@
 import React, {useState} from 'react';
 import {
-  Alert,
   Image,
   ImageBackground,
-  KeyboardAvoidingView,
   Platform,
-  StatusBar,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
+import Button from '../../components/Button';
+import KeyboardAvoidingContainer from '../../components/KeyboardAvoidingContainer';
+import SSPasswordInput from '../../components/SSPasswordInput';
+import SSTextInput from '../../components/SSTextInput';
 import COLORS from '../../constants/colors';
 import {useSignInMutation} from '../../redux/slices/authApiSlice';
-import {useAppDispatch} from '../../redux/store';
 import {setAuthContext} from '../../redux/slices/authSlice';
-import Button from '../../components/Button';
-import SSTextInput from '../../components/SSTextInput';
-import SSPasswordInput from '../../components/SSPasswordInput';
-import KeyboardAvoidingContainer from '../../components/KeyboardAvoidingContainer';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {useAppDispatch} from '../../redux/store';
 
 interface LoginScreenProps {
   navigation: any;
@@ -46,20 +41,21 @@ const LoginScreen = (props: LoginScreenProps) => {
         setEmail('');
         setPassword('');
       })
-      .catch(err => {
-        Alert.alert('Error logging in');
+      .catch(_err => {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid username or password',
+        });
       });
   };
 
   return (
     <>
+      <Toast />
       <ImageBackground
         style={{
           flex: 1,
           position: 'absolute',
-          // right: 0,
-          // top: 0,
-          // zIndex: 1,
           height: '100%',
           width: '100%',
         }}

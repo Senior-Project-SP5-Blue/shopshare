@@ -51,8 +51,11 @@ export type ListStackParamList = {
 };
 
 export type AccountStackParamList = {
-  Settings: undefined;
-  Requests: undefined;
+  Settings: {
+    _modalVisible?: boolean;
+    _selectedGroup?: string;
+  };
+  Invitations: undefined;
   'Change Password': undefined;
 };
 export type GroupsStackParamList = {
@@ -107,6 +110,11 @@ export type EditGroupScreenPropsType = CompositeScreenProps<
     NativeStackScreenProps<GroupsStackParamList, 'GroupStack'>,
     BottomTabScreenProps<MainTabParamList, 'GroupsStack'>
   >
+>;
+
+export type ChangePasswordScreenPropsType = CompositeScreenProps<
+  NativeStackScreenProps<AccountStackParamList, 'Change Password'>,
+  BottomTabScreenProps<MainTabParamList, 'AccountStack'>
 >;
 
 export type RootNavigationPropType =

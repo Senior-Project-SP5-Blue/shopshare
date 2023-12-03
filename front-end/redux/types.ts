@@ -10,6 +10,7 @@ export type apiPathParams = {
   memberId: string;
   listId: string;
   itemId: string;
+  memberUsername: string;
 };
 
 // Auth Api
@@ -74,12 +75,17 @@ export type ShopperGroupApiGetGroupMemberReq = Pick<
 
 export type ShopperGroupApiInviteUserToGroupReq = Pick<
   apiPathParams,
-  'userId' | 'groupId' | 'memberId'
+  'userId' | 'groupId' | 'memberUsername'
 >;
 export type ShopperGroupApiCreateGroupReq = Pick<apiPathParams, 'userId'> & {
   body: CreateEditShopperGroupRequest;
 };
+export type ShopperGroupApiGetInvitations = Pick<apiPathParams, 'userId'>;
 export type ShopperGroupApiAcceptInvitation = Pick<
+  apiPathParams,
+  'userId' | 'groupId'
+>;
+export type ShopperGroupApiDeclineInvitation = Pick<
   apiPathParams,
   'userId' | 'groupId'
 >;

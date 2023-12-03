@@ -25,7 +25,7 @@ import ListBulletIcon from 'react-native-heroicons/mini/ListBulletIcon';
 import UserGroupIcon from 'react-native-heroicons/mini/UserGroupIcon';
 import UserIcon from 'react-native-heroicons/mini/UserIcon';
 
-import ChangePassword from './screens/account/ChangePassword';
+import ChangePasswordScreen from './screens/account/ChangePasswordScreen';
 import CreateGroup from './screens/groups/CreateGroupScreen';
 import EditListScreen from './screens/lists/EditListScreen';
 import {
@@ -140,13 +140,13 @@ const AccountStackScreen: React.FC = () => {
         options={{headerShown: true, headerTitleStyle: {fontSize: 19}}}
       />
       <AccountStack.Screen
-        name="Requests"
+        name="Invitations"
         component={InvitationsScreen}
         options={{headerShown: true, headerTitleStyle: {fontSize: 19}}}
       />
       <AccountStack.Screen
         name="Change Password"
-        component={ChangePassword}
+        component={ChangePasswordScreen}
         options={{headerShown: true, headerTitleStyle: {fontSize: 19}}}
       />
     </AccountStack.Navigator>

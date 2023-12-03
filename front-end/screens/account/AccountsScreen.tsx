@@ -1,23 +1,30 @@
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   Button,
   Modal,
+  Platform,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import {SelectList} from 'react-native-dropdown-select-list';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
+import SSTextInput from '../../components/SSTextInput';
 import COLORS from '../../constants/colors';
 import {useSignOutMutation} from '../../redux/slices/authApiSlice';
 import {
   clearAuthContext,
   selectCurrentUser,
 } from '../../redux/slices/authSlice';
+import {
+  useGetGroupsQuery,
+  useInviteUserToGroupMutation,
+} from '../../redux/slices/shopperGroupApiSlice';
 import {useAppDispatch} from '../../redux/store';
 import {AccountStackParamList} from '../types';
 
@@ -30,14 +37,22 @@ export type AccountsScreenNavigationProp =
   AccountsScreenPropsType['navigation'];
 
 const AccountsScreen: React.FC<AccountsScreenPropsType> = props => {
-  const [isPasswordShown, setIsPasswordShown] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
+  const user = useSelector(selectCurrentUser);
+  const {_selectedGroup, _modalVisible} = props.route.params;
+
+  const [modalVisible, setModalVisible] = useState(_modalVisible);
+  const [newMemberUsername, setNewMemberUsername] = useState<string>();
+  const [selectedGroup, setSelectedGroup] = useState<string | undefined>(
+    _selectedGroup,
+  );
   const navigation = useNavigation<AccountsScreenNavigationProp>();
 
-  const user = useSelector(selectCurrentUser);
-
+  const {data: groups} = useGetGroupsQuery({
+    userId: user?.id!,
+  });
   const dispatch = useAppDispatch();
   const [signOut] = useSignOutMutation();
+  const [sendInvite] = useInviteUserToGroupMutation();
 
   const handleSignOut = () => {
     signOut()
@@ -52,14 +67,68 @@ const AccountsScreen: React.FC<AccountsScreenPropsType> = props => {
       });
   };
 
+  const groupChoices = useMemo(() => {
+    if (!groups) {
+      return [];
+    }
+    return groups.map(x => ({
+      key: `${x.id}`,
+      value: x.name,
+    }));
+  }, [groups]);
+
+  const getDefaultSelectedGroup = groupChoices.find(
+    x => x.key === selectedGroup,
+  );
+
+  const handleInviteUser = async () => {
+    if (!selectedGroup) {
+      Toast.show({
+        type: 'error',
+        text1: 'Must select a group!',
+      });
+      return;
+    }
+    if (!newMemberUsername) {
+      Toast.show({
+        type: 'error',
+        text1: 'Must enter a username!',
+      });
+      return;
+    }
+
+    sendInvite({
+      userId: user!.id,
+      groupId: selectedGroup,
+      memberUsername: newMemberUsername,
+    })
+      .then(() => {
+        Toast.show({
+          type: 'success',
+          text1: 'Successfully invited!',
+          text2: `You invited ${newMemberUsername} to group ${
+            groupChoices.find(x => x.key === selectedGroup)?.value
+          }`,
+        });
+        setModalVisible(false);
+      })
+      .catch(() => {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Permissions',
+          text2: 'You must be group admin to invite to group',
+        });
+      });
+  };
+
   return (
     <SafeAreaView
       style={{
-        backgroundColor: COLORS.white,
         flex: 1,
+        backgroundColor: COLORS.white,
         paddingLeft: 10,
         paddingRight: 10,
-        marginTop: -30,
+        paddingTop: Platform.OS === 'ios' ? -30 : 20,
       }}>
       <Modal
         transparent={true}
@@ -68,6 +137,7 @@ const AccountsScreen: React.FC<AccountsScreenPropsType> = props => {
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <View
             style={{
+              flexBasis: '70%',
               backgroundColor: 'white',
               padding: 20,
               height: 200,
@@ -75,38 +145,40 @@ const AccountsScreen: React.FC<AccountsScreenPropsType> = props => {
               borderWidth: 2,
               borderColor: COLORS.secondary,
               borderRadius: 10,
-              justifyContent: 'center',
-              alignContent: 'center',
-              alignItems: 'center',
             }}>
-            <Text
-              style={{
-                fontSize: 18,
-                justifyContent: 'center',
-                alignContent: 'center',
-                alignItems: 'center',
-              }}>
-              Enter their username
-            </Text>
-            <TextInput
-              placeholder="Enter their username"
-              style={{
-                width: '100%',
-                height: 40,
+            <Text style={{fontSize: 24, fontWeight: '700'}}>Invite User</Text>
+            <SSTextInput
+              label="Enter username"
+              placeholder="Username"
+              onChangeText={setNewMemberUsername}
+              placeholderTextColor={COLORS.black}
+            />
+            <Text style={styles.label}>Group</Text>
+            <SelectList
+              placeholder="Select Group"
+              search={false}
+              defaultOption={getDefaultSelectedGroup}
+              boxStyles={{
                 borderColor: COLORS.black,
                 borderWidth: 1,
-                borderRadius: 8,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: 20,
-                marginBottom: 15,
-                paddingLeft: 10,
-                paddingRight: 10,
-              }}></TextInput>
-            <Button
-              title="Send Request"
-              onPress={() => setModalVisible(false)}
+                borderRadius: 6,
+                height: 50,
+                paddingHorizontal: 18,
+              }}
+              inputStyles={{fontSize: 18}}
+              data={groupChoices}
+              setSelected={(val: string) => setSelectedGroup(val)}
+              save="key"
             />
+            <View
+              style={{
+                justifyContent: 'space-evenly',
+                gap: 10,
+                marginTop: 12,
+              }}>
+              <Button title="Send Invite" onPress={handleInviteUser} />
+              <Button title="Cancel" onPress={() => setModalVisible(false)} />
+            </View>
           </View>
         </View>
       </Modal>
@@ -137,7 +209,7 @@ const AccountsScreen: React.FC<AccountsScreenPropsType> = props => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('Requests');
+            navigation.navigate('Invitations');
           }}>
           <Text
             style={{
@@ -224,7 +296,7 @@ const styles = StyleSheet.create({
   },
   inputWrapperView: {
     width: '100%',
-    height: 60,
+    height: 50,
     borderColor: COLORS.black,
     borderWidth: 1,
     borderRadius: 8,
