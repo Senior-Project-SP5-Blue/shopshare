@@ -50,7 +50,8 @@ public interface ShopperGroupControllerBase {
   ResponseEntity<?> deleteShopperGroup(
       @PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId);
 
-  @GroupAdminPermission
+//  @GroupAdminPermission
+  @GroupPermission
   @Operation(summary = "Changes a group's name")
   ResponseEntity<?> modifyShopperGroup(
       @PathVariable("user_id") UUID userId,

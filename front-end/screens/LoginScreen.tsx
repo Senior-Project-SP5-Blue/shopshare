@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Alert,
   Image,
   ImageBackground,
   KeyboardAvoidingView,
@@ -28,8 +29,8 @@ interface LoginScreenProps {
 const LoginScreen = (props: LoginScreenProps) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const home = () => props.navigation.navigate('Welcome');
-  const list = () => props.navigation.navigate('Lists')
-  const account = () => props.navigation.navigate('Settings')
+  const list = () => props.navigation.navigate('Lists');
+  const account = () => props.navigation.navigate('Settings');
 
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
@@ -48,8 +49,7 @@ const LoginScreen = (props: LoginScreenProps) => {
         setPassword('');
       })
       .catch(err => {
-        console.log('ERROR!! ');
-        console.log(err);
+        Alert.alert('Error logging in');
       });
   };
 
@@ -86,7 +86,13 @@ const LoginScreen = (props: LoginScreenProps) => {
             </TouchableOpacity>
           </View>
           <View style={{justifyContent: 'center', top: 100, marginBottom: 250}}>
-            <Text style={{fontSize: 50, fontWeight: '800', color: COLORS.white, textAlign: 'center'}}>
+            <Text
+              style={{
+                fontSize: 50,
+                fontWeight: '800',
+                color: COLORS.white,
+                textAlign: 'center',
+              }}>
               Welcome Back
             </Text>
           </View>
@@ -112,7 +118,6 @@ const LoginScreen = (props: LoginScreenProps) => {
             title="Login"
             filled
             style={{marginTop: 20, marginBottom: 4}}
-            //onPress={account}
             onPress={() => handleSignIn(email, password)}
           />
           <View style={{flex: 1, zIndex: 0}}>

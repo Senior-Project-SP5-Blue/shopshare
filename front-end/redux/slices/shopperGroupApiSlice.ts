@@ -97,7 +97,7 @@ export const shopperGroupApiSlice = apiSlice.injectEndpoints({
         {type: 'ShopperGroup', id: 'LIST'},
       ],
     }),
-    changeGroupName: builder.mutation<void, ShopperGroupApiChangeGroupNameReq>({
+    editGroup: builder.mutation<void, ShopperGroupApiChangeGroupNameReq>({
       query: ({userId, groupId, body}) => ({
         url: `/users/${userId}/groups/${groupId}`,
         method: 'PATCH',
@@ -142,6 +142,6 @@ export const {
   useCreateNewGroupMutation,
   useInviteUserToGroupMutation,
   useAcceptGroupInvitationMutation,
-  useChangeGroupNameMutation,
+  useEditGroupMutation,
   useDeleteShopperGroupMutation,
 } = shopperGroupApiSlice;

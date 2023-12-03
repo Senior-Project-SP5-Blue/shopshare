@@ -1,6 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
 import {
   ActivityIndicator,
   Keyboard,
@@ -12,31 +11,32 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import PlusCircleIcon from 'react-native-heroicons/mini/PlusCircleIcon';
+import PencilSquareIcon from 'react-native-heroicons/mini/PencilSquareIcon';
 import UserPlusIcon from 'react-native-heroicons/mini/UserPlusIcon';
 import {useSelector} from 'react-redux';
 import GroupListRow from '../components/GroupListRow';
 import GroupUserRow from '../components/GroupUserRow';
 import COLORS from '../constants/colors';
-import ListItemDto from '../models/listitem/ListItemDto';
 import SlimList from '../models/shoppinglist/SlimList';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {useGetGroupQuery} from '../redux/slices/shopperGroupApiSlice';
-import {GroupStackParamList} from './types';
+import {GroupScreenPropsType} from './types';
 
-type GroupScreenProps = NativeStackScreenProps<GroupStackParamList, 'Group'>;
+export type GroupScreenNavigationProp = GroupScreenPropsType['navigation'];
 
-export type GroupScreenNavigationProp = GroupScreenProps['navigation'];
-
-const GroupScreen: React.FC<GroupScreenProps> = props => {
-  const [editItem, setEditItem] = useState<ListItemDto>();
+const GroupScreen: React.FC<GroupScreenPropsType> = props => {
   const navigation = useNavigation<GroupScreenNavigationProp>();
   const _userId = useSelector(selectCurrentUserId);
-  const {groupId} = props.route.params;
-  const {data: group, isLoading: isLoadingGroup} = useGetGroupQuery({
-    userId: _userId!,
-    groupId,
-  });
+  const {groupId, color} = props.route.params;
+  const {data: group, isLoading: isLoadingGroup} = useGetGroupQuery(
+    {
+      userId: _userId!,
+      groupId,
+    },
+    {
+      pollingInterval: 3000,
+    },
+  );
 
   useEffect(() => {
     navigation.setOptions({
@@ -71,16 +71,46 @@ const GroupScreen: React.FC<GroupScreenProps> = props => {
     );
   };
 
-  const renderGroupListsHeader = () => {
+  const renderEditButton = useCallback(
+    () => (
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('Edit Group', {
+            group: group!,
+            color,
+          })
+        }>
+        {<PencilSquareIcon color={COLORS.primary1} />}
+      </TouchableOpacity>
+    ),
+    [color, group, navigation],
+  );
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: group?.name,
+      headerRight: renderEditButton,
+    });
+  }, [group?.name, navigation, renderEditButton]);
+
+  const renderGroupListsHeader = useCallback(() => {
     return (
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionHeaderTitle}>Lists</Text>
-        <TouchableOpacity>
-          <PlusCircleIcon color={COLORS.primary1} />
-        </TouchableOpacity>
+        {/* <TouchableOpacity>
+          <PlusCircleIcon
+            onPress={() =>
+              navigation.navigate('ListsStack', {
+                screen: 'Create List',
+                params: {groupId: groupId},
+              })
+            }
+            color={COLORS.primary1}
+          />
+        </TouchableOpacity> */}
       </View>
     );
-  };
+  }, [groupId, navigation]);
 
   const DATA = useMemo(() => {
     return isLoadingGroup
@@ -99,7 +129,7 @@ const GroupScreen: React.FC<GroupScreenProps> = props => {
             header: renderGroupListsHeader,
           },
         ];
-  }, [group, isLoadingGroup]);
+  }, [group?.lists, group?.users, isLoadingGroup, renderGroupListsHeader]);
 
   return (
     <TouchableWithoutFeedback

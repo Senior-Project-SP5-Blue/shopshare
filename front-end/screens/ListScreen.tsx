@@ -1,18 +1,15 @@
 import {useNavigation} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useLayoutEffect, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Keyboard,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View,
 } from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
 import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
 import {useSelector} from 'react-redux';
+import AddItemView from '../components/AddItemView';
 import CreateButton from '../components/CreateButton';
 import ListItemRow from '../components/ListItemRow';
 import COLORS from '../constants/colors';
@@ -22,54 +19,34 @@ import {
   useChangeItemMutation,
   useRemoveItemMutation,
 } from '../redux/slices/listItemApiSlice';
-import {
-  useChangeShoppingListNameMutation,
-  useGetGroupShoppingListQuery,
-} from '../redux/slices/shoppingListApiSlice';
-import {ListStackParamList} from './types';
+import {useGetGroupShoppingListQuery} from '../redux/slices/shoppingListApiSlice';
+import {ListScreenPropsType} from './types';
 
-type ListScreenProps = NativeStackScreenProps<ListStackParamList, 'List'>;
+export type ListScreenNavigationProp = ListScreenPropsType['navigation'];
 
-export type ListScreenNavigationProp = ListScreenProps['navigation'];
-
-const ListScreen: React.FC<ListScreenProps> = props => {
-  // const [editListModalVisible, setEditListModalVisible] =
-  //   useState<boolean>(false);
+const ListScreen: React.FC<ListScreenPropsType> = props => {
   const [isAddMode, setIsAddMode] = useState<boolean>(false);
   const navigation = useNavigation<ListScreenNavigationProp>();
   const _userId = useSelector(selectCurrentUserId);
-  const {groupId, listId} = props.route.params;
-  const {
-    data: list,
-    isLoading: isLoadingList,
-    isFetching,
-    refetch,
-  } = useGetGroupShoppingListQuery({
-    userId: _userId!,
-    groupId,
-    listId,
-  });
-  const [saveListChanges] = useChangeShoppingListNameMutation();
+  // const _username = useSelector(selectCurrentUser)?.username;
+  const {groupId, listId, color} = props.route.params;
+  const {data: list, isLoading: isLoadingList} = useGetGroupShoppingListQuery(
+    {
+      userId: _userId!,
+      groupId,
+      listId,
+    },
+    {
+      pollingInterval: 3000,
+    },
+  );
+  const [_list, _setList] = useState(list);
   const [saveItemChange] = useChangeItemMutation();
   const [deleteListItem] = useRemoveItemMutation();
 
   const handleOnCreateButtonPress = useCallback(() => {
-    Alert.alert('Not implemented yet baby. 😝😝');
-  }, []);
-
-  const handleChangeListSave = useCallback(
-    async (newName: string) => {
-      saveListChanges({
-        userId: _userId!,
-        groupId,
-        listId,
-        body: {
-          name: newName,
-        },
-      });
-    },
-    [_userId, groupId, listId, saveListChanges],
-  );
+    setIsAddMode(() => !isAddMode);
+  }, [isAddMode]);
 
   const renderEditButton = useCallback(
     () => (
@@ -78,28 +55,14 @@ const ListScreen: React.FC<ListScreenProps> = props => {
           navigation.navigate('Edit List', {
             list: list!,
             groupId: groupId,
+            color,
           })
         }>
         {<PencilSquare color={COLORS.primary1} />}
       </TouchableOpacity>
     ),
-    [handleChangeListSave, list, navigation],
+    [color, groupId, list, navigation],
   );
-
-  const sortedItems = useMemo(() => {
-    if (isLoadingList) {
-      return [];
-    }
-    const listCopy = [...list!.items];
-    listCopy.sort((a, b) => {
-      if (new Date(a.createdOn) < new Date(b.createdOn)) return -1;
-      else if (new Date(a.createdOn) > new Date(b.createdOn)) return 1;
-      else {
-        return 0;
-      }
-    });
-    return listCopy;
-  }, [isLoadingList, list]);
 
   const handleChangeItemSave = useCallback(
     async (itemId: string, editedItem: EditListItemRequest) => {
@@ -125,9 +88,11 @@ const ListScreen: React.FC<ListScreenProps> = props => {
     [_userId, deleteListItem, groupId, listId],
   );
 
-  // const closeModal = useCallback(() => {
-  //   setEditListModalVisible(false);
-  // }, []);
+  const listHeaderComponent = useMemo(() => {
+    return isAddMode ? (
+      <AddItemView userId={_userId!} groupId={groupId} listId={listId} />
+    ) : null;
+  }, [_userId, groupId, isAddMode, listId]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -146,9 +111,9 @@ const ListScreen: React.FC<ListScreenProps> = props => {
       ) : (
         <>
           <FlatList
-            onRefresh={refetch}
-            refreshing={isFetching}
-            data={sortedItems}
+            // extraData={(() => {})()}
+            ListHeaderComponent={listHeaderComponent}
+            data={list?.items}
             renderItem={({item}) => (
               <ListItemRow
                 onDeleteItem={handleDeleteItem}
@@ -159,18 +124,10 @@ const ListScreen: React.FC<ListScreenProps> = props => {
             keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
           />
-          {isAddMode && (
-            <View>
-              <TextInput placeholder="Add Item"></TextInput>
-            </View>
-          )}
-          {/* <EditListModal
-            list={list!}
-            visible={editListModalVisible}
-            closeModal={closeModal}
-            onSave={handleChangeListSave}
-          /> */}
-          <CreateButton onPress={handleOnCreateButtonPress} />
+          <CreateButton
+            addActive={isAddMode}
+            onPress={handleOnCreateButtonPress}
+          />
         </>
       )}
     </TouchableWithoutFeedback>

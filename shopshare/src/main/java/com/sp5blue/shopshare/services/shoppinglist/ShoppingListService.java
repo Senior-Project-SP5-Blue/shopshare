@@ -73,6 +73,7 @@ public class ShoppingListService implements IShoppingListService {
             .orElseThrow(
                 () -> new ListNotFoundException("Shopping list does not exist - " + listId));
     shoppingList.setName(newName);
+    shoppingList.setColor(color);
     shoppingList.setModifiedOn(LocalDateTime.now());
     return CompletableFuture.completedFuture(new SlimShoppingListDto(shoppingList));
   }

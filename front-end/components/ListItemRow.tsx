@@ -1,6 +1,6 @@
 import CheckBox from '@react-native-community/checkbox';
 import React, {PropsWithChildren, useMemo, useState} from 'react';
-import {Alert, StyleSheet, Text, TextInput, View} from 'react-native';
+import {StyleSheet, Text, TextInput, View} from 'react-native';
 import {TouchableHighlight} from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import TrashIcon from 'react-native-heroicons/mini/TrashIcon';
@@ -28,12 +28,26 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
   const _userId = useSelector(selectCurrentUserId);
   const [name, setName] = useState<string>(item.name);
   const [status, setStatus] = useState<ListItemStatus>(item.status);
-  // const [locked, setLocked] = useState<boolean>(item.locked);
 
   const completed = useMemo(
     () => status === ListItemStatus.COMPLETED,
     [status],
   );
+
+  // console.log(`${name} is ${completed ? 'completed' : 'active'}`);
+  // console.log(`Item completion is ${completed ? 'completed' : 'active'}\n`);
+
+  // useEffect(() => {
+  //   console.log('===== ITEM STATUS =====');
+  // });
+
+  // useEffect(() => {
+  //   console.log(`${name} is ${completed ? 'completed' : 'active'}`);
+  //   console.log('\n\n');
+  // });
+  // useEffect(() => {
+  //   console.log('\n\n');
+  // });
 
   const handleToggleStatus = async (val: any) => {
     const newStatus = val ? ListItemStatus.COMPLETED : ListItemStatus.ACTIVE;
@@ -44,7 +58,7 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
     }).then(() => setStatus(newStatus));
   };
 
-  const renderRightActions = (x: any) => {
+  const renderRightActions = () => {
     return (
       <View
         style={{
@@ -77,22 +91,14 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
     <Swipeable
       rightThreshold={100}
       renderRightActions={renderRightActions}
-      onSwipeableOpen={() => onDeleteItem(item.id)}>
+      onSwipeableWillOpen={() => onDeleteItem(item.id)}>
       <View style={styles.wrapper}>
         <TextInput
           style={[
             styles.name,
-            {
-              color:
-                item.locked && _userId !== item.createdBy
-                  ? COLORS.grey
-                  : COLORS.black,
-            },
             {textDecorationLine: completed ? 'line-through' : 'none'},
           ]}
           defaultValue={item.name}
-          editable={!item.locked || _userId === item.createdBy}
-          selectTextOnFocus={!item.locked || _userId === item.createdBy}
           onChangeText={newName => setName(newName)}
           onSubmitEditing={() =>
             onSaveItemChanges(item.id, {name, status, locked: item.locked})
@@ -104,7 +110,6 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
           value={completed}
           onValueChange={handleToggleStatus}
           style={styles.checkbox}
-          disabled={item.locked && _userId !== item.createdBy}
           onTouchEnd={() =>
             onSaveItemChanges(item.id, {name, status, locked: item.locked})
           }

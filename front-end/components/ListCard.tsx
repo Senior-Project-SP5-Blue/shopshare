@@ -18,7 +18,7 @@ const ListCard: React.FC<ListCardProps> = props => {
   const handleOnListPress = () => {
     navigation.navigate('ListStack' as any, {
       screen: 'List',
-      params: {groupId, listId},
+      params: {groupId, listId, color},
     });
   };
 
@@ -71,7 +71,11 @@ const ListCard: React.FC<ListCardProps> = props => {
             marginBottom: 18,
             marginTop: 100,
           }}>
-          {`Edited ${modifiedOn}`}
+          {`Edited ${new Date(modifiedOn).toLocaleDateString('en-us', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          })}`}
         </Text>
         <View>
           <View style={{alignItems: 'center'}}>

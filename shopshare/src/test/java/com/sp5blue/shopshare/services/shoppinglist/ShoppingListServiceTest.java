@@ -56,7 +56,7 @@ class ShoppingListServiceTest {
         UUID groupId = UUID.randomUUID();
         UUID listId = UUID.randomUUID();
 
-        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.changeShoppingList(userId, groupId, listId, "New Name", ));
+        var exception = assertThrows(ListNotFoundException.class, () -> shoppingListService.changeShoppingList(userId, groupId, listId, "New Name"));
         assertEquals("Shopping list does not exist - " + listId, exception.getMessage());
     }
 
@@ -67,7 +67,7 @@ class ShoppingListServiceTest {
         UUID groupId = UUID.randomUUID();
         when(shoppingListRepository.findByGroup_IdAndId(groupId, shoppingList.getId())).thenReturn(Optional.of(shoppingList));
 
-        shoppingListService.changeShoppingList(userId, groupId, shoppingList.getId(), "New Name", );
+        shoppingListService.changeShoppingList(userId, groupId, shoppingList.getId(), "New Name");
         assertEquals("New Name", shoppingList.getName());
     }
 

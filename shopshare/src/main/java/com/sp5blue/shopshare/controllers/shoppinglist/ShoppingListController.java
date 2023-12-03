@@ -82,6 +82,6 @@ public class ShoppingListController implements ShoppingListControllerBase {
       @PathVariable("group_id") UUID groupId,
       @PathVariable("list_id") UUID listId) {
     shoppingListService.deleteShoppingList(userId, groupId, listId);
-    return ResponseEntity.ok().body("Successfully deleted shopping list");
+    return ResponseEntity.noContent().build();
   }
 }

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,31 +11,31 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
 //import {useSelector} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useSelector} from 'react-redux';
 import GroupCard from '../components/GroupCard';
-import ListItemDto from '../models/listitem/ListItemDto';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {useGetGroupsQuery} from '../redux/slices/shopperGroupApiSlice';
-import {GroupStackParamList} from './types';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {GroupsStackParamList} from './types';
 
-interface ListScreenProps {
-  navigation: any;
-}
+type GroupsScreenPropsType = NativeStackScreenProps<
+  GroupsStackParamList,
+  'Groups'
+>;
 
-type GroupScreenProps = NativeStackScreenProps<GroupStackParamList, 'Group'>;
+export type GroupsScreenNavigationProp = GroupsScreenPropsType['navigation'];
 
-export type GroupScreenNavigationProp = GroupScreenProps['navigation'];
-
-const GroupsScreen: React.FC<ListScreenProps> = props => {
-  // const [selectedItem, setSelectedItem] = useState<ListItemDto>();
-  // const navigation = useNavigation<GroupScreenNavigationProp>();
+const GroupsScreen: React.FC<GroupsScreenPropsType> = _props => {
   const _userId = useSelector(selectCurrentUserId);
 
-  const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery({
-    userId: _userId!,
-  });
+  const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery(
+    {
+      userId: _userId!,
+    },
+    {
+      pollingInterval: 3000,
+    },
+  );
 
   if (isLoadingGroups) {
     return (

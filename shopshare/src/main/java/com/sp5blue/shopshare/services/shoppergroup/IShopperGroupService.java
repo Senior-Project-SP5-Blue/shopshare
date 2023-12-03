@@ -38,8 +38,11 @@ public interface IShopperGroupService {
   void deleteShopperGroup(UUID userId, UUID groupId)
       throws GroupNotFoundException, InvalidUserPermissionsException;
 
-  CompletableFuture<SlimShopperGroupDto> changeShopperGroupName(
+  CompletableFuture<SlimShopperGroupDto> modifyShopperGroup(
       UUID userId, UUID groupId, String newName);
+
+  CompletableFuture<SlimShopperGroupDto> modifyShopperGroup(
+          UUID userId, UUID groupId, String newName, String newColor);
 
   CompletableFuture<ShopperGroup> updateShopperGroupName(UUID userId, UUID groupId, String newName);
 

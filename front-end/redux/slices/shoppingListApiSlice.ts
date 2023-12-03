@@ -76,7 +76,7 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
         {type: 'ShopperGroup', id: arg.groupId},
       ],
     }),
-    changeShoppingListName: builder.mutation<
+    editShoppingList: builder.mutation<
       SlimShoppingListDto,
       ShoppingListApiChangeShoppingListNameReq
     >({
@@ -113,6 +113,6 @@ export const {
   useGetGroupShoppingListsQuery,
   useGetGroupShoppingListQuery,
   useAddShoppingListMutation,
-  useChangeShoppingListNameMutation,
+  useEditShoppingListMutation,
   useDeleteShoppingListMutation,
 } = shoppingListApiSlice;
