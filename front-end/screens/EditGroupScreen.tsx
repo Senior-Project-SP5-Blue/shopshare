@@ -58,7 +58,6 @@ const EditGroupScreen: React.FC<EditGroupScreenPropsType> = props => {
           text2: 'Must be group admin to modify group',
           onHide: () => navigation.pop(),
         });
-        navigation.pop();
       });
   };
 

@@ -1,14 +1,16 @@
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {
   Button,
   Modal,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 import SSPasswordInput from '../components/SSPasswordInput';
 import SSTextInput from '../components/SSTextInput';
@@ -16,34 +18,36 @@ import COLORS from '../constants/colors';
 import {useSignOutMutation} from '../redux/slices/authApiSlice';
 import {clearAuthContext, selectCurrentUser} from '../redux/slices/authSlice';
 import {useAppDispatch} from '../redux/store';
+import {AccountStackParamList} from './types';
 
-interface SettingsProps {
-  navigation: any;
-}
+type AccountsScreenPropsType = NativeStackScreenProps<
+  AccountStackParamList,
+  'Settings'
+>;
 
-const AccountsScreen = (props: SettingsProps) => {
+export type AccountsScreenNavigationProp =
+  AccountsScreenPropsType['navigation'];
+
+const AccountsScreen: React.FC<AccountsScreenPropsType> = props => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const yourFriends = () => props.navigation.navigate('YourFriends');
-  const requests = () => props.navigation.navigate('Requests');
+  const navigation = useNavigation<AccountsScreenNavigationProp>();
 
   const user = useSelector(selectCurrentUser);
 
   const dispatch = useAppDispatch();
   const [signOut] = useSignOutMutation();
 
-  // An example of how to logout
   const handleSignOut = () => {
     signOut()
       .unwrap()
       .then(_res => {
+        console.log('signing out...');
         dispatch(clearAuthContext());
       })
-      .catch(_err => {
-        Toast.show({
-          type: 'error',
-          text1: 'There was an error signing out.',
-        });
+      .catch(err => {
+        console.log('There was an error signing out.');
+        console.log(err);
       });
   };
 
@@ -59,7 +63,7 @@ const AccountsScreen = (props: SettingsProps) => {
       <Modal
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
+        onRequestClose={() => setModalVisible(visible => !visible)}>
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <View
             style={{
@@ -81,9 +85,27 @@ const AccountsScreen = (props: SettingsProps) => {
                 alignContent: 'center',
                 alignItems: 'center',
               }}>
-              Enter their email address
+              Enter their username
             </Text>
-            <Button title="Close" onPress={() => setModalVisible(false)} />
+            <TextInput
+              placeholder="Enter their username"
+              style={{
+                width: '100%',
+                height: 40,
+                borderColor: COLORS.black,
+                borderWidth: 1,
+                borderRadius: 8,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 20,
+                marginBottom: 15,
+                paddingLeft: 10,
+                paddingRight: 10,
+              }}></TextInput>
+            <Button
+              title="Send Request"
+              onPress={() => setModalVisible(false)}
+            />
           </View>
         </View>
       </Modal>
@@ -107,12 +129,15 @@ const AccountsScreen = (props: SettingsProps) => {
               color: COLORS.primary,
               marginTop: 10,
             }}>
-            Add Friends
+            Invite People
           </Text>
         </TouchableOpacity>
       </View>
       <View>
-        <TouchableOpacity onPress={yourFriends}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Requests');
+          }}>
           <Text
             style={{
               fontSize: 18,
@@ -120,20 +145,7 @@ const AccountsScreen = (props: SettingsProps) => {
               color: COLORS.primary,
               marginTop: 10,
             }}>
-            Your Friends
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View>
-        <TouchableOpacity onPress={requests}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: '700',
-              color: COLORS.primary,
-              marginTop: 10,
-            }}>
-            Friend Requests
+            Invites
           </Text>
         </TouchableOpacity>
       </View>
@@ -148,82 +160,80 @@ const AccountsScreen = (props: SettingsProps) => {
           Edit Profile
         </Text>
       </View>
-      {/* Username */}
-      <SSTextInput
-        label="Username"
-        placeholder={user?.username}
-        placeholderTextColor={COLORS.black}
-      />
-      {/* Email Address */}
-      <SSTextInput
-        label="Email Address"
-        placeholder="user9first@email.com"
-        placeholderTextColor={COLORS.black}
-        keyboardType="email-address"
-      />
-      {/* Mobile Number */}
-      <View
-        style={{
-          marginBottom: 12,
-        }}>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: '400',
-            marginVertical: 10,
-          }}>
-          Mobile Number
-        </Text>
-
-        <View
-          style={{
-            width: '100%',
-            height: 60,
-            borderColor: COLORS.black,
-            borderWidth: 1,
-            borderRadius: 8,
-            alignItems: 'center',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingLeft: 22,
-          }}>
-          <TextInput
-            placeholder="+1"
-            placeholderTextColor={COLORS.black}
-            keyboardType="number-pad"
-            style={{
-              width: '12%',
-              fontSize: 15,
-              borderRightWidth: 1,
-              height: '100%',
-            }}
-          />
-          <TextInput
-            placeholder="4703335555"
-            placeholderTextColor={COLORS.black}
-            keyboardType="numeric"
-            style={{
-              width: '80%',
-            }}
-            //onChangeText={number => setSignUpReq({...signUpReq, number})}
-          />
+      <View style={styles.wrapperView}>
+        <Text style={styles.label}>Username</Text>
+        <View style={styles.inputWrapperView}>
+          <Text style={styles.input}>{user?.username}</Text>
         </View>
       </View>
-      <SSPasswordInput
-        label="Password"
-        placeholder="user9pass"
-        placeholderTextColor={COLORS.black}
-        //secureTextEntry={isPasswordShown}
-        autoCapitalize="none"
-        onShowPasswordPress={setIsPasswordShown}
-        // onChangeText={password => setSignUpReq({...signUpReq, password})}
-      />
-      <View>
-        <View>
-          <Button title="Log Out" onPress={handleSignOut} />
+      <View style={styles.wrapperView}>
+        <Text style={styles.label}>Email Address</Text>
+        <View style={styles.inputWrapperView}>
+          <Text style={styles.input}>{user?.email}</Text>
         </View>
+      </View>
+      <View style={{paddingLeft: 5}}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Change Password');
+          }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: '600',
+              color: COLORS.red,
+            }}>
+            Change Password
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={{marginTop: 90}}>
+        <TouchableOpacity
+          onPress={handleSignOut}
+          style={{
+            marginTop: 24,
+            height: 50,
+            borderRadius: 6,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: COLORS.secondary,
+          }}>
+          <Text
+            style={{
+              color: COLORS.white,
+              fontWeight: '600',
+              fontSize: 20,
+            }}>
+            Log Out
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  wrapperView: {
+    marginBottom: 12,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '400',
+    marginVertical: 10,
+  },
+  inputWrapperView: {
+    width: '100%',
+    height: 60,
+    borderColor: COLORS.black,
+    borderWidth: 1,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingLeft: 22,
+  },
+  input: {
+    width: '100%',
+    fontSize: 15,
+  },
+});
 export default AccountsScreen;

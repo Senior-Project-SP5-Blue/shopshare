@@ -6,6 +6,7 @@ export const COLORS = {
   primary: '#007260',
   primary1: '#2A8EC7',
   secondary: '#39B68D',
+  red: '#ff4646',
 };
 
 export const BackGroundColors = [

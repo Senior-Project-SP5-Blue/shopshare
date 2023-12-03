@@ -51,11 +51,14 @@ export type ListStackParamList = {
 };
 
 export type AccountStackParamList = {
-  Accounts: undefined;
+  Settings: undefined;
+  Requests: undefined;
+  'Change Password': undefined;
 };
 export type GroupsStackParamList = {
   GroupStack: NavigatorScreenParams<GroupStackParamList>;
   Groups: undefined;
+  'Create Group': undefined;
 };
 export type GroupStackParamList = {
   Group: {

@@ -77,12 +77,12 @@ const WelcomeScreen = (props: WelcomeScreenProps) => {
           <Image
             source={require('../assets/grocery2.png')}
             style={{
-              height: 200,
-              width: 200,
+              height: 190,
+              width: 190,
               borderRadius: 20,
               position: 'absolute',
-              top: 200,
-              left: 140,
+              top: 190,
+              left: 160,
               transform: [
                 {translateX: 50},
                 {translateY: 50},
@@ -91,12 +91,11 @@ const WelcomeScreen = (props: WelcomeScreenProps) => {
             }}
           />
         </View>
-
         <View
           style={{
             paddingHorizontal: 22,
             position: 'absolute',
-            top: 500,
+            top: 450,
             width: '100%',
           }}>
           <Text

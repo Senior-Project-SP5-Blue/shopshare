@@ -39,12 +39,16 @@ const GroupCard: React.FC<GroupCardProps> = ({group}) => {
         width: 200,
         backgroundColor: color || COLORS.grey,
       }}>
-      <View>
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
         <Text
           numberOfLines={1}
           style={{
-            fontSize: 16,
-            fontWeight: '600',
+            fontSize: 22,
+            fontWeight: '800',
             paddingHorizontal: 16,
             borderRadius: 6,
             color: COLORS.white,
@@ -55,7 +59,7 @@ const GroupCard: React.FC<GroupCardProps> = ({group}) => {
         <Text
           numberOfLines={1}
           style={{
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: '600',
             paddingHorizontal: 16,
             borderRadius: 6,
@@ -67,7 +71,7 @@ const GroupCard: React.FC<GroupCardProps> = ({group}) => {
         <Text
           numberOfLines={1}
           style={{
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: '600',
             paddingHorizontal: 16,
             borderRadius: 6,
@@ -79,8 +83,8 @@ const GroupCard: React.FC<GroupCardProps> = ({group}) => {
         <Text
           numberOfLines={1}
           style={{
-            fontSize: 16,
-            fontWeight: '600',
+            fontSize: 20,
+            fontWeight: '400',
             paddingHorizontal: 16,
             borderRadius: 6,
             color: COLORS.white,
