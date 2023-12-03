@@ -51,10 +51,7 @@ export type ListStackParamList = {
 };
 
 export type AccountStackParamList = {
-  Settings: {
-    _modalVisible?: boolean;
-    _selectedGroup?: string;
-  };
+  Settings: undefined;
   Invitations: undefined;
   'Change Password': undefined;
 };

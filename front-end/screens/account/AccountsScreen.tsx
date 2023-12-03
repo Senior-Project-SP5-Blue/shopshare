@@ -36,15 +36,12 @@ type AccountsScreenPropsType = NativeStackScreenProps<
 export type AccountsScreenNavigationProp =
   AccountsScreenPropsType['navigation'];
 
-const AccountsScreen: React.FC<AccountsScreenPropsType> = props => {
+const AccountsScreen: React.FC<AccountsScreenPropsType> = _props => {
   const user = useSelector(selectCurrentUser);
-  const {_selectedGroup, _modalVisible} = props.route.params;
 
-  const [modalVisible, setModalVisible] = useState(_modalVisible);
+  const [modalVisible, setModalVisible] = useState(false);
   const [newMemberUsername, setNewMemberUsername] = useState<string>();
-  const [selectedGroup, setSelectedGroup] = useState<string | undefined>(
-    _selectedGroup,
-  );
+  const [selectedGroup, setSelectedGroup] = useState<string>();
   const navigation = useNavigation<AccountsScreenNavigationProp>();
 
   const {data: groups} = useGetGroupsQuery({
