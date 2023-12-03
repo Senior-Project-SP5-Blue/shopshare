@@ -1,8 +1,8 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React from 'react';
 import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import COLORS from '../constants/colors';
-import {AccountStackParamList} from './types';
+import COLORS from '../../constants/colors';
+import {AccountStackParamList} from '../types';
 
 type InvitationsScreenPropsType = NativeStackScreenProps<
   AccountStackParamList,

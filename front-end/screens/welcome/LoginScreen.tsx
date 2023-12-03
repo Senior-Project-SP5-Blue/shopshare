@@ -12,14 +12,14 @@ import {
   View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import COLORS from '../constants/colors';
-import {useSignInMutation} from '../redux/slices/authApiSlice';
-import {useAppDispatch} from '../redux/store';
-import {setAuthContext} from '../redux/slices/authSlice';
-import Button from '../components/Button';
-import SSTextInput from '../components/SSTextInput';
-import SSPasswordInput from '../components/SSPasswordInput';
-import KeyboardAvoidingContainer from '../components/KeyboardAvoidingContainer';
+import COLORS from '../../constants/colors';
+import {useSignInMutation} from '../../redux/slices/authApiSlice';
+import {useAppDispatch} from '../../redux/store';
+import {setAuthContext} from '../../redux/slices/authSlice';
+import Button from '../../components/Button';
+import SSTextInput from '../../components/SSTextInput';
+import SSPasswordInput from '../../components/SSPasswordInput';
+import KeyboardAvoidingContainer from '../../components/KeyboardAvoidingContainer';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 interface LoginScreenProps {
@@ -63,7 +63,7 @@ const LoginScreen = (props: LoginScreenProps) => {
           height: '100%',
           width: '100%',
         }}
-        source={require('../assets/background.png')}
+        source={require('../../assets/background.png')}
       />
       <KeyboardAvoidingContainer
         scrollEnabled={false}
@@ -128,7 +128,7 @@ const LoginScreen = (props: LoginScreenProps) => {
                 justifyContent: 'center',
               }}
               resizeMode="cover"
-              source={require('../assets/loginpic2.jpg')}
+              source={require('../../assets/loginpic2.jpg')}
             />
           </View>
         </View>

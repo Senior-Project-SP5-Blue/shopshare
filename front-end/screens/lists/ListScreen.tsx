@@ -9,18 +9,18 @@ import {
 } from 'react-native';
 import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
 import {useSelector} from 'react-redux';
-import AddItemView from '../components/AddItemView';
-import CreateButton from '../components/CreateButton';
-import ListItemRow from '../components/ListItemRow';
-import COLORS from '../constants/colors';
-import EditListItemRequest from '../models/listitem/EditListItemRequest';
-import {selectCurrentUserId} from '../redux/slices/authSlice';
+import AddItemView from '../../components/AddItemView';
+import CreateButton from '../../components/CreateButton';
+import ListItemRow from '../../components/ListItemRow';
+import COLORS from '../../constants/colors';
+import EditListItemRequest from '../../models/listitem/EditListItemRequest';
+import {selectCurrentUserId} from '../../redux/slices/authSlice';
 import {
   useChangeItemMutation,
   useRemoveItemMutation,
-} from '../redux/slices/listItemApiSlice';
-import {useGetGroupShoppingListQuery} from '../redux/slices/shoppingListApiSlice';
-import {ListScreenPropsType} from './types';
+} from '../../redux/slices/listItemApiSlice';
+import {useGetGroupShoppingListQuery} from '../../redux/slices/shoppingListApiSlice';
+import {ListScreenPropsType} from '../types';
 
 export type ListScreenNavigationProp = ListScreenPropsType['navigation'];
 

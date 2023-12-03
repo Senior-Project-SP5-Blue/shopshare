@@ -3,7 +3,7 @@ import React from 'react';
 import {Text, TouchableHighlight, View} from 'react-native';
 import COLORS from '../constants/colors';
 import SlimShoppingListDto from '../models/shoppinglist/SlimShoppingListDto';
-import {ListsScreenNavigationProp} from '../screens/ListsScreen';
+import {ListsScreenNavigationProp} from '../screens/lists/ListsScreen';
 
 interface ListCardProps {
   list: SlimShoppingListDto;
@@ -21,6 +21,11 @@ const ListCard: React.FC<ListCardProps> = props => {
       params: {groupId, listId, color},
     });
   };
+
+  // const renderPrettyDate = (rawDate: string) => {
+  //   const date = new Date(rawDate);
+  //   // DeviceInfo.
+  // };
 
   return (
     <TouchableHighlight

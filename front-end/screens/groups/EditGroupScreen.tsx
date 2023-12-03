@@ -9,14 +9,14 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
-import COLORS, {BackGroundColors} from '../constants/colors';
-import CreateEditShopperGroupRequest from '../models/shoppergroup/CreateEditShopperGroupRequest';
-import {selectCurrentUserId} from '../redux/slices/authSlice';
+import COLORS, {BackGroundColors} from '../../constants/colors';
+import CreateEditShopperGroupRequest from '../../models/shoppergroup/CreateEditShopperGroupRequest';
+import {selectCurrentUserId} from '../../redux/slices/authSlice';
 import {
   useDeleteShopperGroupMutation,
   useEditGroupMutation,
-} from '../redux/slices/shopperGroupApiSlice';
-import {EditGroupScreenPropsType} from './types';
+} from '../../redux/slices/shopperGroupApiSlice';
+import {EditGroupScreenPropsType} from '../types';
 
 type EditGroupScreenNavigationProp = EditGroupScreenPropsType['navigation'];
 

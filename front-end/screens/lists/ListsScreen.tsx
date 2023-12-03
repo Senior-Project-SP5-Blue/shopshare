@@ -1,5 +1,3 @@
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -11,34 +9,34 @@ import {
   View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import COLORS from '../../constants/colors';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useSelector} from 'react-redux';
-import GroupCard from '../components/GroupCard';
-import COLORS from '../constants/colors';
-import {selectCurrentUserId} from '../redux/slices/authSlice';
-import {useGetGroupsQuery} from '../redux/slices/shopperGroupApiSlice';
-import {GroupsStackParamList} from './types';
+import ListCard from '../../components/ListCard';
+import {selectCurrentUserId} from '../../redux/slices/authSlice';
+import {useGetShoppingListsQuery} from '../../redux/slices/shoppingListApiSlice';
+import {ListsStackParamList} from '../types';
+import {useNavigation} from '@react-navigation/native';
 
-type GroupsScreenPropsType = NativeStackScreenProps<
-  GroupsStackParamList,
-  'Groups'
+type ListsScreenPropsType = NativeStackScreenProps<
+  ListsStackParamList,
+  'Lists'
 >;
 
-export type GroupsScreenNavigationProp = GroupsScreenPropsType['navigation'];
+export type ListsScreenNavigationProp = ListsScreenPropsType['navigation'];
 
-const GroupsScreen: React.FC<GroupsScreenPropsType> = _props => {
+const ListsScreen: React.FC<ListsScreenPropsType> = _props => {
+  const navigation = useNavigation<ListsScreenNavigationProp>();
   const _userId = useSelector(selectCurrentUserId);
-  const navigation = useNavigation<GroupsScreenNavigationProp>();
 
-  const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery(
+  const {data: lists, isLoading: isLoadingLists} = useGetShoppingListsQuery(
     {
       userId: _userId!,
     },
-    {
-      pollingInterval: 3000,
-    },
+    {pollingInterval: 3000},
   );
 
-  if (isLoadingGroups) {
+  if (isLoadingLists) {
     return (
       <SafeAreaView style={styles.container}>
         <ActivityIndicator size="large" color={COLORS.primary} />
@@ -53,37 +51,30 @@ const GroupsScreen: React.FC<GroupsScreenPropsType> = _props => {
         <Text style={styles.title}>
           Your{' '}
           <Text style={{fontWeight: '400', color: COLORS.secondary}}>
-            Groups
+            Lists
           </Text>
         </Text>
         <View style={styles.divider} />
       </View>
-      <View
-        style={{
-          marginVertical: 48,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+      <View style={{marginVertical: 48}}>
         <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('Create Group');
-          }}
-          style={styles.addButton}>
+          style={styles.addButton}
+          onPress={() => navigation.navigate('Create List', {})}>
           <Image
-            source={require('../assets/add.png')}
+            source={require('../../assets/add.png')}
             style={styles.addImage}
           />
         </TouchableOpacity>
-        <Text style={styles.addList}>Add Groups</Text>
+        <Text style={styles.addList}>Add List</Text>
       </View>
       <View style={{height: 275, justifyContent: 'center'}}>
         <FlatList
-          style={{width: '100%'}}
-          data={groups}
+          data={lists}
+          extraData={[...lists!]}
           keyExtractor={item => item.id}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          renderItem={({item}) => <GroupCard group={item} />}
+          renderItem={({item}) => <ListCard list={item} />}
         />
       </View>
     </SafeAreaView>
@@ -96,7 +87,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 0,
   },
   divider: {
     backgroundColor: COLORS.secondary,
@@ -114,7 +104,6 @@ const styles = StyleSheet.create({
     height: 30,
     resizeMode: 'contain',
     width: 30,
-    alignItems: 'center',
     justifyContent: 'center',
   },
   addButton: {
@@ -124,15 +113,12 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 62,
   },
   addList: {
     color: COLORS.secondary,
     fontWeight: '600',
     fontSize: 16,
     marginTop: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
-export default GroupsScreen;
+export default ListsScreen;

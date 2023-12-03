@@ -9,25 +9,25 @@ import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 import COLORS from './constants/colors';
 import {selectCurrentUser} from './redux/slices/authSlice';
-import AccountsScreen from './screens/AccountsScreen';
-import CreateListScreen from './screens/CreateListScreen';
-import EditGroupScreen from './screens/EditGroupScreen';
-import EmailConfirmationScreen from './screens/EmailConfirmationScreen';
-import GroupScreen from './screens/GroupScreen';
-import GroupsScreen from './screens/GroupsScreen';
-import ListScreen from './screens/ListScreen';
-import ListsScreen from './screens/ListsScreen';
-import LoginScreen from './screens/LoginScreen';
-import SignupScreen from './screens/SignupScreen';
-import Welcome from './screens/WelcomeScreen';
+import AccountsScreen from './screens/account/AccountsScreen';
+import CreateListScreen from './screens/lists/CreateListScreen';
+import EditGroupScreen from './screens/groups/EditGroupScreen';
+import EmailConfirmationScreen from './screens/welcome/EmailConfirmationScreen';
+import GroupScreen from './screens/groups/GroupScreen';
+import GroupsScreen from './screens/groups/GroupsScreen';
+import ListScreen from './screens/lists/ListScreen';
+import ListsScreen from './screens/lists/ListsScreen';
+import LoginScreen from './screens/welcome/LoginScreen';
+import SignupScreen from './screens/welcome/SignupScreen';
+import Welcome from './screens/welcome/WelcomeScreen';
 
 import ListBulletIcon from 'react-native-heroicons/mini/ListBulletIcon';
 import UserGroupIcon from 'react-native-heroicons/mini/UserGroupIcon';
 import UserIcon from 'react-native-heroicons/mini/UserIcon';
 
-import ChangePassword from './screens/ChangePassword';
-import CreateGroup from './screens/CreateGroup';
-import EditListScreen from './screens/EditListScreen';
+import ChangePassword from './screens/account/ChangePassword';
+import CreateGroup from './screens/groups/CreateGroupScreen';
+import EditListScreen from './screens/lists/EditListScreen';
 import {
   AccountStackParamList,
   AuthStackParamList,
@@ -38,7 +38,7 @@ import {
   MainTabParamList,
   RootStackParamList,
 } from './screens/types';
-import InvitationsScreen from './screens/InvitationScreen';
+import InvitationsScreen from './screens/account/InvitationScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const MainTab = createBottomTabNavigator<MainTabParamList>();

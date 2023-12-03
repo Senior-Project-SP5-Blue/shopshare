@@ -2,9 +2,9 @@ import {Pressable, Text} from 'react-native';
 import {View} from 'react-native';
 import React from 'react';
 import {LinearGradient} from 'react-native-linear-gradient';
-import COLORS from '../constants/colors';
+import COLORS from '../../constants/colors';
 import {Image} from 'react-native';
-import Button from '../components/Button';
+import Button from '../../components/Button';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 interface WelcomeScreenProps {
@@ -25,7 +25,7 @@ const WelcomeScreen = (props: WelcomeScreenProps) => {
       <View style={{flex: 1}}>
         <View>
           <Image
-            source={require('../assets/icon1.png')}
+            source={require('../../assets/icon1.png')}
             style={{
               height: 110,
               width: 110,
@@ -41,7 +41,7 @@ const WelcomeScreen = (props: WelcomeScreenProps) => {
             }}
           />
           <Image
-            source={require('../assets/icon2.png')}
+            source={require('../../assets/icon2.png')}
             style={{
               height: 110,
               width: 110,
@@ -58,7 +58,7 @@ const WelcomeScreen = (props: WelcomeScreenProps) => {
           />
 
           <Image
-            source={require('../assets/icon3.png')}
+            source={require('../../assets/icon3.png')}
             style={{
               height: 120,
               width: 120,
@@ -75,7 +75,7 @@ const WelcomeScreen = (props: WelcomeScreenProps) => {
           />
 
           <Image
-            source={require('../assets/grocery2.png')}
+            source={require('../../assets/grocery2.png')}
             style={{
               height: 190,
               width: 190,

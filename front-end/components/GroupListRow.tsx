@@ -3,7 +3,7 @@ import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import TrashIcon from 'react-native-heroicons/mini/TrashIcon';
 import COLORS from '../constants/colors';
 import {useNavigation} from '@react-navigation/native';
-import {GroupScreenNavigationProp} from '../screens/GroupScreen';
+import {GroupScreenNavigationProp} from '../screens/groups/GroupScreen';
 
 interface GroupListRowProps {
   id: string;

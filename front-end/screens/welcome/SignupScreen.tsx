@@ -1,16 +1,16 @@
 import {Platform, Pressable, Text, TextInput, View} from 'react-native';
 import React, {useState} from 'react';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import COLORS from '../constants/colors';
+import COLORS from '../../constants/colors';
 import CheckBox from '@react-native-community/checkbox';
-import Button from '../components/Button';
+import Button from '../../components/Button';
 import {ScrollView} from 'react-native';
-import {AuthApiSignUpReq} from '../redux/types';
-import {useSignUpMutation} from '../redux/slices/authApiSlice';
+import {AuthApiSignUpReq} from '../../redux/types';
+import {useSignUpMutation} from '../../redux/slices/authApiSlice';
 import {useNavigation} from '@react-navigation/native';
-import SSTextInput from '../components/SSTextInput';
-import SSPasswordInput from '../components/SSPasswordInput';
-import KeyboardAvoidingContainer from '../components/KeyboardAvoidingContainer';
+import SSTextInput from '../../components/SSTextInput';
+import SSPasswordInput from '../../components/SSPasswordInput';
+import KeyboardAvoidingContainer from '../../components/KeyboardAvoidingContainer';
 
 interface SignUpScreenProps {
   navigation: any;

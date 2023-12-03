@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Button, View} from 'react-native';
-import SSPasswordInput from '../components/SSPasswordInput';
-import COLORS from '../constants/colors';
+import SSPasswordInput from '../../components/SSPasswordInput';
+import COLORS from '../../constants/colors';
 
 interface ChangePasswordProps {
   navigation: any;

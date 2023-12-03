@@ -4,7 +4,7 @@ import React from 'react';
 import {Text, TouchableHighlight, View} from 'react-native';
 import COLORS from '../constants/colors';
 import SlimShopperGroupDto from '../models/shoppergroup/SlimShopperGroupDto';
-import {GroupsScreenNavigationProp} from '../screens/GroupsScreen';
+import {GroupsScreenNavigationProp} from '../screens/groups/GroupsScreen';
 import {GroupsStackParamList} from '../screens/types';
 
 interface GroupCardProps {

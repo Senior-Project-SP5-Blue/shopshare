@@ -14,13 +14,13 @@ import {
 import PencilSquareIcon from 'react-native-heroicons/mini/PencilSquareIcon';
 import UserPlusIcon from 'react-native-heroicons/mini/UserPlusIcon';
 import {useSelector} from 'react-redux';
-import GroupListRow from '../components/GroupListRow';
-import GroupUserRow from '../components/GroupUserRow';
-import COLORS from '../constants/colors';
-import SlimList from '../models/shoppinglist/SlimList';
-import {selectCurrentUserId} from '../redux/slices/authSlice';
-import {useGetGroupQuery} from '../redux/slices/shopperGroupApiSlice';
-import {GroupScreenPropsType} from './types';
+import GroupListRow from '../../components/GroupListRow';
+import GroupUserRow from '../../components/GroupUserRow';
+import COLORS from '../../constants/colors';
+import SlimList from '../../models/shoppinglist/SlimList';
+import {selectCurrentUserId} from '../../redux/slices/authSlice';
+import {useGetGroupQuery} from '../../redux/slices/shopperGroupApiSlice';
+import {GroupScreenPropsType} from '../types';
 
 export type GroupScreenNavigationProp = GroupScreenPropsType['navigation'];
 

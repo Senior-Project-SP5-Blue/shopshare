@@ -9,13 +9,13 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
-import COLORS, {BackGroundColors} from '../constants/colors';
-import {selectCurrentUserId} from '../redux/slices/authSlice';
+import COLORS, {BackGroundColors} from '../../constants/colors';
+import {selectCurrentUserId} from '../../redux/slices/authSlice';
 import {
   useDeleteShoppingListMutation,
   useEditShoppingListMutation,
-} from '../redux/slices/shoppingListApiSlice';
-import {EditListScreenPropsType} from './types';
+} from '../../redux/slices/shoppingListApiSlice';
+import {EditListScreenPropsType} from '../types';
 
 type EditListScreenNavigationProp = EditListScreenPropsType['navigation'];
 

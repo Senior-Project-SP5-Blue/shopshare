@@ -12,13 +12,14 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
-import SSPasswordInput from '../components/SSPasswordInput';
-import SSTextInput from '../components/SSTextInput';
-import COLORS from '../constants/colors';
-import {useSignOutMutation} from '../redux/slices/authApiSlice';
-import {clearAuthContext, selectCurrentUser} from '../redux/slices/authSlice';
-import {useAppDispatch} from '../redux/store';
-import {AccountStackParamList} from './types';
+import COLORS from '../../constants/colors';
+import {useSignOutMutation} from '../../redux/slices/authApiSlice';
+import {
+  clearAuthContext,
+  selectCurrentUser,
+} from '../../redux/slices/authSlice';
+import {useAppDispatch} from '../../redux/store';
+import {AccountStackParamList} from '../types';
 
 type AccountsScreenPropsType = NativeStackScreenProps<
   AccountStackParamList,

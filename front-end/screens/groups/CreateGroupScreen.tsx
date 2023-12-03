@@ -1,48 +1,66 @@
-import React, {useMemo, useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import React, {useState} from 'react';
 import {
-  View,
-  Text,
   KeyboardAvoidingView,
-  TouchableOpacity,
+  Text,
   TextInput,
-  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import COLORS, {BackGroundColors} from '../constants/colors';
-import {SelectList} from 'react-native-dropdown-select-list';
-import CreateEditShoppingListRequest from '../models/shoppinglist/CreateEditShoppingListRequest';
-import {ShoppingListApiCreateShoppingListReq} from '../redux/types';
-import {useGetGroupsQuery} from '../redux/slices/shopperGroupApiSlice';
+import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
-import {selectCurrentUserId} from '../redux/slices/authSlice';
+import COLORS, {BackGroundColors} from '../../constants/colors';
+import {selectCurrentUserId} from '../../redux/slices/authSlice';
+import {useCreateNewGroupMutation} from '../../redux/slices/shopperGroupApiSlice';
+import {ShopperGroupApiCreateGroupReq} from '../../redux/types';
+import {GroupsStackParamList} from '../types';
 
-interface CreateGroupModalProps {
-  navigation: any;
-}
+type CreateGroupScreenPropsType = NativeStackScreenProps<
+  GroupsStackParamList,
+  'Create Group'
+>;
 
-const CreateGroupScreen: React.FC<CreateGroupModalProps> = props => {
-  const group = () => props.navigation.navigate('Groups');
+export type CreateGroupScreenNavigationProp =
+  CreateGroupScreenPropsType['navigation'];
 
-  const _userId = useSelector(selectCurrentUserId); //this is the signed in user
-  const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery({
-    userId: _userId!,
-  });
-  // const {data: groups} = useGetGroupsQuery();
-  const [newList, setNewList] = useState<ShoppingListApiCreateShoppingListReq>({
-    userId: '',
-    groupId: '',
-    body: {
-      name: '',
-      color: '',
-    },
-  });
-
-  const [selectedColor, setSelectedColor] = useState<number>(0);
-  const handleSelectColor = (idx: number) => {
-    setNewList({
-      ...newList,
+const CreateGroupScreen: React.FC<CreateGroupScreenPropsType> = props => {
+  const _userId = useSelector(selectCurrentUserId);
+  const navigation = useNavigation<CreateGroupScreenNavigationProp>();
+  const [newGroupReq, setNewGroupReq] = useState<ShopperGroupApiCreateGroupReq>(
+    {
+      userId: _userId!,
       body: {
-        ...newList.body,
+        name: '',
+        color: BackGroundColors[0],
+      },
+    },
+  );
+  const [selectedColor, setSelectedColor] = useState<number>(0);
+  const [createGroup] = useCreateNewGroupMutation();
+
+  const handleCreateGroup = async () => {
+    createGroup(newGroupReq)
+      .unwrap()
+      .then(() => {
+        Toast.show({
+          type: 'success',
+          text1: 'Created group',
+        });
+        navigation.pop();
+      })
+      .catch(() => {
+        Toast.show({
+          type: 'error',
+          text1: 'Error created group',
+        });
+      });
+  };
+  const handleSelectColor = (idx: number) => {
+    setNewGroupReq({
+      ...newGroupReq,
+      body: {
+        ...newGroupReq.body,
         color: BackGroundColors[idx],
       },
     });
@@ -66,16 +84,6 @@ const CreateGroupScreen: React.FC<CreateGroupModalProps> = props => {
     });
   }
 
-  const groupChoices = useMemo(() => {
-    if (!groups) {
-      return [{}];
-    }
-    return groups.map(x => ({
-      key: `${x.id}`,
-      value: x.name,
-    }));
-  }, [groups]);
-
   return (
     <KeyboardAvoidingView
       behavior="padding"
@@ -84,18 +92,6 @@ const CreateGroupScreen: React.FC<CreateGroupModalProps> = props => {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      {/*<TouchableOpacity
-        onPress={lists}
-        style={{position: 'absolute', top: 64, left: 32}}>
-        <Text
-          style={{
-            fontSize: 18,
-            color: COLORS.black,
-            fontWeight: 'bold',
-          }}>
-          Back
-        </Text>
-      </TouchableOpacity>*/}
       <View style={{alignSelf: 'stretch', marginHorizontal: 32}}>
         <Text
           style={{
@@ -110,10 +106,10 @@ const CreateGroupScreen: React.FC<CreateGroupModalProps> = props => {
         <TextInput
           placeholder="New Group Name"
           onChangeText={text =>
-            setNewList({
-              ...newList,
+            setNewGroupReq({
+              ...newGroupReq,
               body: {
-                ...newList.body,
+                ...newGroupReq.body,
                 name: text,
               },
             })
@@ -128,28 +124,6 @@ const CreateGroupScreen: React.FC<CreateGroupModalProps> = props => {
             fontSize: 18,
           }}
         />
-        {/* <SelectList
-          placeholder="Select Group"
-          search={false}
-          searchPlaceholder="Select Group"
-          boxStyles={{
-            borderWidth: 1,
-            borderColor: COLORS.secondary,
-            borderRadius: 6,
-            height: 50,
-            marginTop: 8,
-            paddingHorizontal: 18,
-          }}
-          inputStyles={{fontSize: 18}}
-          data={groupChoices}
-          setSelected={(val: string) =>
-            setNewList({
-              ...newList,
-              groupId: val,
-            })
-          }
-          save="key"
-        /> */}
         <View
           style={{
             flexDirection: 'row',
@@ -160,7 +134,8 @@ const CreateGroupScreen: React.FC<CreateGroupModalProps> = props => {
           {renderColors()}
         </View>
         <TouchableOpacity
-          onPress={group}
+          onPress={handleCreateGroup}
+          disabled={!newGroupReq.body.name.trim()}
           style={{
             marginTop: 24,
             height: 50,
