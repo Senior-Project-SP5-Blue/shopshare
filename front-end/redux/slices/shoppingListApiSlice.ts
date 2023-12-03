@@ -53,13 +53,20 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
         method: 'GET',
       }),
       providesTags: result =>
-        result ? [{type: 'ShoppingList', id: result!.id}] : [],
+        result
+          ? [
+              ...result.items.map(x => ({type: 'ListItem' as const, id: x.id})),
+              {type: 'ShoppingList', id: result!.id},
+              {type: 'ListItem', id: 'LIST'},
+            ]
+          : [],
     }),
     addShoppingList: builder.mutation<
       ShoppingListDto,
       ShoppingListApiCreateShoppingListReq
     >({
       query: ({userId, groupId, body}) => ({
+        // {{public_url}}/users/{{user_id}}/groups/{{group_id}}/lists
         url: `/users/${userId}/groups/${groupId}/lists`,
         method: 'POST',
         body: JSON.stringify(body),
@@ -69,7 +76,7 @@ export const shoppingListApiSlice = apiSlice.injectEndpoints({
         {type: 'ShopperGroup', id: arg.groupId},
       ],
     }),
-    changeShoppingListName: builder.mutation<
+    editShoppingList: builder.mutation<
       SlimShoppingListDto,
       ShoppingListApiChangeShoppingListNameReq
     >({
@@ -106,6 +113,6 @@ export const {
   useGetGroupShoppingListsQuery,
   useGetGroupShoppingListQuery,
   useAddShoppingListMutation,
-  useChangeShoppingListNameMutation,
+  useEditShoppingListMutation,
   useDeleteShoppingListMutation,
 } = shoppingListApiSlice;

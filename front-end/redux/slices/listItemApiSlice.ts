@@ -30,7 +30,8 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShoppingList', id: arg.listId},
-        {type: 'ShopperGroup', id: arg.groupId},
+        {type: 'ListItem', id: arg.itemId},
+        // {type: 'ShopperGroup', id: arg.groupId},
       ],
     }),
     /** removes an item from a shopping list */
@@ -55,7 +56,7 @@ export const listItemApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, arg) => [
         {type: 'ShoppingList', id: arg.listId},
-        {type: 'ShopperGroup', id: arg.groupId},
+        {type: 'ShoppingList', id: arg.listId},
       ],
     }),
   }),

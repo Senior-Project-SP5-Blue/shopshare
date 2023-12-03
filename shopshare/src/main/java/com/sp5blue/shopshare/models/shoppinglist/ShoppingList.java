@@ -4,120 +4,144 @@ import com.sp5blue.shopshare.models.listitem.ListItem;
 import com.sp5blue.shopshare.models.shoppergroup.ShopperGroup;
 import com.sp5blue.shopshare.models.user.User;
 import jakarta.persistence.*;
-import org.springframework.lang.NonNull;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "shopping_lists")
 public class ShoppingList {
-    @Id
-    @Column(name = "id")
-    private final UUID id = UUID.randomUUID();
+  @Id
+  @Column(name = "id")
+  private final UUID id = UUID.randomUUID();
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @NonNull
-    @Column(name = "modified_on")
-    private LocalDateTime modifiedOn;
+  @NonNull
+  @Column(name = "modified_on")
+  private LocalDateTime modifiedOn = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modified_by")
-    private User modifiedBy;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "modified_by")
+  private User modifiedBy;
 
-    @OneToMany(mappedBy = "list", cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REMOVE})
-    private List<ListItem> items = new ArrayList<>();
+  @Column(name = "color")
+  private String color;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
-    private ShopperGroup group;
+  @OneToMany(
+      mappedBy = "list",
+      cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REMOVE})
+  private List<ListItem> items = new ArrayList<>();
 
-    public ShoppingList() {
-        modifiedOn = LocalDateTime.now();
-    }
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "group_id")
+  private ShopperGroup group;
 
-    public ShoppingList(String name) {
-        modifiedOn = LocalDateTime.now();
-        this.name = name;
-    }
+  public ShoppingList() {
+    modifiedOn = LocalDateTime.now();
+  }
 
+  public ShoppingList(String name) {
+    //    modifiedOn = LocalDateTime.now();
+    this.name = name;
+  }
 
-    public ShoppingList(String name, ShopperGroup group) {
-        modifiedOn = LocalDateTime.now();
-        this.name = name;
-        this.group = group;
-    }
+  public ShoppingList(String name, String color) {
+    //    modifiedOn = LocalDateTime.now();
+    this.name = name;
+    this.color = color;
+  }
 
-    public UUID getId() {
-        return id;
-    }
+  public ShoppingList(String name, ShopperGroup group) {
+    //    modifiedOn = LocalDateTime.now();
+    this.name = name;
+    this.group = group;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public ShoppingList(String name, ShopperGroup group, String color) {
+    //    modifiedOn = LocalDateTime.now();
+    this.name = name;
+    this.group = group;
+    this.color = color;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public LocalDateTime getModifiedOn() {
-        return modifiedOn;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setModifiedOn(LocalDateTime modifiedOn) {
-        this.modifiedOn = modifiedOn;
-    }
+  public String getColor() {
+    return color;
+  }
 
-    public User getModifiedBy() {
-        return modifiedBy;
-    }
+  public void setColor(String color) {
+    this.color = color;
+  }
 
-    public void setModifiedBy(User modifiedBy) {
-        this.modifiedBy = modifiedBy;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public List<ListItem> getItems() {
-        return items;
-    }
+  public LocalDateTime getModifiedOn() {
+    return modifiedOn;
+  }
 
-    public void setItems(List<ListItem> items) {
-        this.items = items;
-    }
+  public void setModifiedOn(LocalDateTime modifiedOn) {
+    this.modifiedOn = modifiedOn;
+  }
 
-    public ShopperGroup getGroup() {
-        return group;
-    }
+  public User getModifiedBy() {
+    return modifiedBy;
+  }
 
-    public void setGroup(ShopperGroup group) {
-        this.group = group;
-    }
+  public void setModifiedBy(User modifiedBy) {
+    this.modifiedBy = modifiedBy;
+  }
 
-    public void addItem(ListItem item) {
-        items.add(item);
-    }
+  public List<ListItem> getItems() {
+    return items;
+  }
 
-    public void removeItem(UUID itemId) {
-        items.removeIf(i -> i.getId().equals(itemId));
-    }
+  public void setItems(List<ListItem> items) {
+    this.items = items;
+  }
 
-    public void removeItem(ListItem item) {
-        this.items.remove(item);
-    }
+  public ShopperGroup getGroup() {
+    return group;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ShoppingList that)) return false;
-        return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName());
-    }
+  public void setGroup(ShopperGroup group) {
+    this.group = group;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName());
-    }
+  public void addItem(ListItem item) {
+    items.add(item);
+  }
+
+  public void removeItem(UUID itemId) {
+    items.removeIf(i -> i.getId().equals(itemId));
+  }
+
+  public void removeItem(ListItem item) {
+    this.items.remove(item);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof ShoppingList that)) return false;
+    return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getId(), getName());
+  }
 }

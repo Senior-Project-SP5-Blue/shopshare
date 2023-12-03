@@ -4,148 +4,154 @@ import com.sp5blue.shopshare.models.shoppinglist.ShoppingList;
 import com.sp5blue.shopshare.models.user.User;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Type;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "list_items")
 public class ListItem {
 
-    @Id
-    @Column(name = "id")
-    private final UUID id = UUID.randomUUID();
+  @Id
+  @Column(name = "id")
+  private final UUID id = UUID.randomUUID();
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @Column(name = "status", columnDefinition = "item_status")
-    @Enumerated(EnumType.STRING)
-    @Type(PostgreSQLEnumType.class)
-    private ItemStatus status = ItemStatus.ACTIVE;
+  @Column(name = "status", columnDefinition = "item_status")
+  @Enumerated(EnumType.STRING)
+  @Type(PostgreSQLEnumType.class)
+  private ItemStatus status = ItemStatus.ACTIVE;
 
-    @Column(name = "created_on")
-    private final LocalDateTime createdOn = LocalDateTime.now();
+  @Column(name = "created_on")
+  private final LocalDateTime createdOn = LocalDateTime.now();
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
-    private User createdBy;
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @JoinColumn(name = "created_by")
+  private User createdBy;
 
-    @Column(name = "locked")
-    private boolean locked = false;
+  @Column(name = "locked")
+  private boolean locked = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shopping_list_id")
-    private ShoppingList list;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "shopping_list_id")
+  private ShoppingList list;
 
-    public ListItem() {
-    }
+  public ListItem() {}
 
-    public ListItem(String name, User createdBy) {
-        this.name = name;
-        this.createdBy = createdBy;
-    }
+  public ListItem(String name, User createdBy) {
+    this.name = name;
+    this.createdBy = createdBy;
+  }
 
-    public ListItem(String name, ItemStatus status, boolean locked) {
-        this.name = name;
-        this.status = status;
-        this.locked = locked;
-    }
+  public ListItem(String name, ItemStatus status, boolean locked) {
+    this.name = name;
+    this.status = status;
+    this.locked = locked;
+  }
 
-    public ListItem(String name, ItemStatus status, User createdBy, boolean locked) {
-        this.name = name;
-        this.status = status;
-        this.createdBy = createdBy;
-        this.locked = locked;
-    }
+  public ListItem(String name, ItemStatus status, User createdBy, boolean locked) {
+    this.name = name;
+    this.status = status;
+    this.createdBy = createdBy;
+    this.locked = locked;
+  }
 
-    public ListItem(String name, User createdBy, boolean locked) {
-        this.name = name;
-        this.createdBy = createdBy;
-        this.locked = locked;
-    }
+  public ListItem(String name, User createdBy, boolean locked) {
+    this.name = name;
+    this.createdBy = createdBy;
+    this.locked = locked;
+  }
 
-    public ListItem(String name, User createdBy, boolean locked, ShoppingList list) {
-        this.name = name;
-        this.createdBy = createdBy;
-        this.locked = locked;
-        this.list = list;
-    }
+  public ListItem(String name, User createdBy, boolean locked, ShoppingList list) {
+    this.name = name;
+    this.createdBy = createdBy;
+    this.locked = locked;
+    this.list = list;
+  }
 
-    public ListItem(String name) {
-        this.name = name;
-    }
+  public ListItem(String name) {
+    this.name = name;
+  }
 
-    public UUID getId() {
-        return id;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public ItemStatus getStatus() {
-        return status;
-    }
+  public ItemStatus getStatus() {
+    return status;
+  }
 
-    public void setStatus(ItemStatus status) {
-        this.status = status;
-    }
+  public void setStatus(ItemStatus status) {
+    this.status = status;
+  }
 
-    public LocalDateTime getCreatedOn() {
-        return createdOn;
-    }
+  public LocalDateTime getCreatedOn() {
+    return createdOn;
+  }
 
-    public User getCreatedBy() {
-        return createdBy;
-    }
+  public User getCreatedBy() {
+    return createdBy;
+  }
 
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
-    }
+  public void setCreatedBy(User createdBy) {
+    this.createdBy = createdBy;
+  }
 
-    public boolean isLocked() {
-        return locked;
-    }
+  public boolean isLocked() {
+    return locked;
+  }
 
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
+  public void setLocked(boolean locked) {
+    this.locked = locked;
+  }
 
-    public ShoppingList getList() {
-        return list;
-    }
+  public ShoppingList getList() {
+    return list;
+  }
 
-    public void setList(ShoppingList list) {
-        this.list = list;
-    }
+  public void setList(ShoppingList list) {
+    this.list = list;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ListItem listItem)) return false;
-        return Objects.equals(getId(), listItem.getId()) && Objects.equals(getName(), listItem.getName()) && Objects.equals(getCreatedOn(), listItem.getCreatedOn());
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof ListItem listItem)) return false;
+    return Objects.equals(getId(), listItem.getId())
+        && Objects.equals(getName(), listItem.getName())
+        && Objects.equals(getCreatedOn(), listItem.getCreatedOn());
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getCreatedOn());
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(getId(), getName(), getCreatedOn());
+  }
 
-    @Override
-    public String toString() {
-        return "ListItem{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", status=" + status +
-                ", createdOn=" + createdOn +
-                ", locked=" + locked +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "ListItem{"
+        + "id="
+        + id
+        + ", name='"
+        + name
+        + '\''
+        + ", status="
+        + status
+        + ", createdOn="
+        + createdOn
+        + ", locked="
+        + locked
+        + '}';
+  }
 }

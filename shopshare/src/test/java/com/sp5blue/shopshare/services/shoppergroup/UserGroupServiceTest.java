@@ -148,7 +148,7 @@ class UserGroupServiceTest {
         UUID shopperId = UUID.randomUUID();
         UUID groupId = UUID.randomUUID();
 
-        var exception = assertThrows(GroupNotFoundException.class, () -> shopperGroupService1.changeShopperGroupName(shopperId, groupId, "New Name"));
+        var exception = assertThrows(GroupNotFoundException.class, () -> shopperGroupService1.modifyShopperGroup(shopperId, groupId, "New Name"));
         assertEquals("Shopper group does not exist - " + groupId, exception.getMessage());
     }
 
@@ -161,7 +161,7 @@ class UserGroupServiceTest {
         when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
         when(userService.userExistsAsAdminByGroup(user1.getId(), shopperGroup1.getId())).thenReturn(CompletableFuture.completedFuture(false));
 
-        var exception = assertThrows(InvalidUserPermissionsException.class, () -> shopperGroupService1.changeShopperGroupName(user1.getId(), shopperGroup1.getId(), "New Name"));
+        var exception = assertThrows(InvalidUserPermissionsException.class, () -> shopperGroupService1.modifyShopperGroup(user1.getId(), shopperGroup1.getId(), "New Name"));
         assertEquals("User - " + user1.getId() + " does not have permission to modify group", exception.getMessage());
     }
 
@@ -174,7 +174,7 @@ class UserGroupServiceTest {
         when(shopperGroupRepository.findById(shopperGroup1.getId())).thenReturn(Optional.of(shopperGroup1));
         when(userService.userExistsAsAdminByGroup(admin.getId(), shopperGroup1.getId())).thenReturn(CompletableFuture.completedFuture(true));
 
-        shopperGroupService1.changeShopperGroupName(admin.getId(), shopperGroup1.getId(), "New Name");
+        shopperGroupService1.modifyShopperGroup(admin.getId(), shopperGroup1.getId(), "New Name");
         verify(shopperGroup1).setName(newName.capture());
         assertEquals("New Name", shopperGroup1.getName());
         assertEquals("New Name", newName.getValue());

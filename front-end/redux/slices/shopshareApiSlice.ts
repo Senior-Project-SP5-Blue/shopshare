@@ -4,18 +4,13 @@ import {
   fetchBaseQuery,
 } from '@reduxjs/toolkit/query/react';
 // import {RootState} from '../store';
-import Config from 'react-native-config';
+// import Config from 'react-native-config';
+//@ts-ignore
+import {REACT_APP_API_URL} from '@env';
 import {setAuthContext, clearAuthContext} from './authSlice';
 
-// build.mutation<ReturnType, ArgType>. I
-// const headers: HeadersInit = {
-//   'Content-Type': 'application/json',
-//   'X-Request-Id': uuidv4(),
-//   Authorization: `Bearer <API_TOKEN>`,
-// };
-
 const baseQuery = fetchBaseQuery({
-  baseUrl: Config.API_URL ?? '',
+  baseUrl: REACT_APP_API_URL,
   prepareHeaders: (headers, {getState}) => {
     const state = getState() as any;
     const token = state.auth.accessToken;
@@ -34,7 +29,8 @@ const baseQueryWithReAuth = async (
 ) => {
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result?.error?.status === 403) {
+  // Change to 401, WHEN YOU PUSH NEW SPRING CHANGES
+  if (result?.error?.status === 401) {
     const _state = api.getState() as any;
     console.log('Sending refresh token');
     const refreshResult: any = await baseQuery(
@@ -64,6 +60,6 @@ const baseQueryWithReAuth = async (
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReAuth,
-  tagTypes: ['User', 'ShopperGroup', 'ShoppingList', 'ListItem'],
+  tagTypes: ['User', 'ShopperGroup', 'ShoppingList', 'ListItem', 'Invitation'],
   endpoints: _builder => ({}),
 });
