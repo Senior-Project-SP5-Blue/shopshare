@@ -4,6 +4,7 @@ import com.sp5blue.shopshare.filters.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -71,6 +72,12 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                 .permitAll()
                 .anyRequest()
                 .authenticated());
+    http.exceptionHandling(
+        sec ->
+            sec.authenticationEntryPoint(
+                (req, res, e) -> {
+                  res.setStatus(HttpStatus.UNAUTHORIZED.value());
+                }));
     http.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
     http.logout(

@@ -10,29 +10,31 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import COLORS from '../constants/colors';
-//import {useSelector} from 'react-redux';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useSelector} from 'react-redux';
 import ListCard from '../components/ListCard';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {useGetShoppingListsQuery} from '../redux/slices/shoppingListApiSlice';
 import {ListsStackParamList} from './types';
+import {useNavigation} from '@react-navigation/native';
 
-// interface ListScreenProps {
-//   navigation: any;
-// }
+type ListsScreenPropsType = NativeStackScreenProps<
+  ListsStackParamList,
+  'Lists'
+>;
 
-type ListsScreenProps = NativeStackScreenProps<ListsStackParamList, 'Lists'>;
+export type ListsScreenNavigationProp = ListsScreenPropsType['navigation'];
 
-export type ListsScreenNavigationProp = ListsScreenProps['navigation'];
-
-const ListsScreen: React.FC<ListsScreenProps> = props => {
-  const createList = () => props.navigation.navigate('Create List');
+const ListsScreen: React.FC<ListsScreenPropsType> = _props => {
+  const navigation = useNavigation<ListsScreenNavigationProp>();
   const _userId = useSelector(selectCurrentUserId);
 
-  const {data: lists, isLoading: isLoadingLists} = useGetShoppingListsQuery({
-    userId: _userId!,
-  });
+  const {data: lists, isLoading: isLoadingLists} = useGetShoppingListsQuery(
+    {
+      userId: _userId!,
+    },
+    {pollingInterval: 3000},
+  );
 
   if (isLoadingLists) {
     return (
@@ -55,7 +57,9 @@ const ListsScreen: React.FC<ListsScreenProps> = props => {
         <View style={styles.divider} />
       </View>
       <View style={{marginVertical: 48}}>
-        <TouchableOpacity style={styles.addButton} onPress={createList}>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate('Create List', {})}>
           <Image
             source={require('../assets/add.png')}
             style={styles.addImage}
@@ -66,6 +70,7 @@ const ListsScreen: React.FC<ListsScreenProps> = props => {
       <View style={{height: 275, justifyContent:"center"}}>
         <FlatList
           data={lists}
+          extraData={[...lists!]}
           keyExtractor={item => item.id}
           horizontal={true}
           showsHorizontalScrollIndicator={false}

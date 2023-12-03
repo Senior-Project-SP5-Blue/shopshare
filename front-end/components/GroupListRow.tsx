@@ -1,7 +1,9 @@
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import TrashIcon from 'react-native-heroicons/mini/TrashIcon';
 import COLORS from '../constants/colors';
+import {useNavigation} from '@react-navigation/native';
+import {GroupScreenNavigationProp} from '../screens/GroupScreen';
 
 interface GroupListRowProps {
   id: string;
@@ -9,11 +11,15 @@ interface GroupListRowProps {
 }
 
 const GroupListRow: React.FC<GroupListRowProps> = ({name}) => {
+  const navigation = useNavigation<GroupScreenNavigationProp>();
   return (
     <View style={styles.wrapper}>
       <Text style={styles.name}>{name}</Text>
       <TouchableOpacity style={styles.trash}>
-        <TrashIcon color={COLORS.primary} />
+        <TrashIcon
+          onPress={() => Alert.alert('IMPL DELETE')}
+          color={COLORS.primary}
+        />
       </TouchableOpacity>
     </View>
   );

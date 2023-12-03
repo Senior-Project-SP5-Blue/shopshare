@@ -1,4 +1,6 @@
-import React, {useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -9,36 +11,32 @@ import {
   View,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import COLORS from '../constants/colors';
-//import {useSelector} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useSelector} from 'react-redux';
 import GroupCard from '../components/GroupCard';
-import ListItemDto from '../models/listitem/ListItemDto';
+import COLORS from '../constants/colors';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {useGetGroupsQuery} from '../redux/slices/shopperGroupApiSlice';
-import {GroupStackParamList} from './types';
+import {GroupsStackParamList} from './types';
 
-interface ListScreenProps {
-  navigation: any;
-}
+type GroupsScreenPropsType = NativeStackScreenProps<
+  GroupsStackParamList,
+  'Groups'
+>;
 
-type GroupScreenProps = NativeStackScreenProps<GroupStackParamList, 'Group'>;
+export type GroupsScreenNavigationProp = GroupsScreenPropsType['navigation'];
 
-export type GroupScreenNavigationProp = GroupScreenProps['navigation'];
-
-const GroupsScreen: React.FC<ListScreenProps> = props => {
-  // const [selectedItem, setSelectedItem] = useState<ListItemDto>();
-  // const navigation = useNavigation<GroupScreenNavigationProp>();
+const GroupsScreen: React.FC<GroupsScreenPropsType> = _props => {
   const _userId = useSelector(selectCurrentUserId);
+  const navigation = useNavigation<GroupsScreenNavigationProp>();
 
-  const createGroup = () => props.navigation.navigate('Create Group');
-
-
-  const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery({
-    userId: _userId!,
-  });
+  const {data: groups, isLoading: isLoadingGroups} = useGetGroupsQuery(
+    {
+      userId: _userId!,
+    },
+    {
+      pollingInterval: 3000,
+    },
+  );
 
   if (isLoadingGroups) {
     return (
@@ -60,8 +58,17 @@ const GroupsScreen: React.FC<ListScreenProps> = props => {
         </Text>
         <View style={styles.divider} />
       </View>
-      <View style={{marginVertical: 48, justifyContent:'center', alignItems:'center'}}>
-        <TouchableOpacity onPress={createGroup} style={styles.addButton}>
+      <View
+        style={{
+          marginVertical: 48,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Create Group');
+          }}
+          style={styles.addButton}>
           <Image
             source={require('../assets/add.png')}
             style={styles.addImage}
@@ -69,7 +76,7 @@ const GroupsScreen: React.FC<ListScreenProps> = props => {
         </TouchableOpacity>
         <Text style={styles.addList}>Add Groups</Text>
       </View>
-      <View style={{height: 275, justifyContent:"center"}}>
+      <View style={{height: 275, justifyContent: 'center'}}>
         <FlatList
           style={{width: '100%'}}
           data={groups}

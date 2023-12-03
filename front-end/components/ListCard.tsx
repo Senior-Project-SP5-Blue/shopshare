@@ -18,14 +18,14 @@ const ListCard: React.FC<ListCardProps> = props => {
   const handleOnListPress = () => {
     navigation.navigate('ListStack' as any, {
       screen: 'List',
-      params: {groupId, listId},
+      params: {groupId, listId, color},
     });
   };
 
   return (
     <TouchableHighlight
       onPress={handleOnListPress}
-      underlayColor={COLORS.blue}
+      underlayColor={COLORS.grey}
       style={{
         paddingVertical: 32,
         paddingHorizontal: 16,
@@ -35,9 +35,11 @@ const ListCard: React.FC<ListCardProps> = props => {
         width: 200,
         backgroundColor: color || COLORS.grey,
       }}>
-      <View style={{            
-            alignItems:'center',
-            justifyContent:'center'}}>
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
         <Text
           numberOfLines={1}
           style={{
@@ -60,22 +62,22 @@ const ListCard: React.FC<ListCardProps> = props => {
             color: COLORS.white,
             marginBottom: 18,
           }}>
-            Completed Items:
+          Completed Items:
         </Text>
-        <View style={{
-            alignItems:'center',
-            justifyContent:'center',
-            marginTop:3,
-            marginBottom:50
-            }}>
-          <Text
+        <View
           style={{
-            fontSize: 16,
-            fontWeight: '600',
-            color: COLORS.white,
-          }}
-          >
-          {`${completed}/${total}`}
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: 3,
+            marginBottom: 50,
+          }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: '600',
+              color: COLORS.white,
+            }}>
+            {`${completed}/${total}`}
           </Text>
         </View>
         <Text
@@ -92,13 +94,13 @@ const ListCard: React.FC<ListCardProps> = props => {
           Last Edited On
         </Text>
         <View>
-          <Text 
-          style={{
-            fontSize: 16,
-            fontWeight: '600',
-            color: COLORS.white,
-          }}>
-          {`${modifiedOn}`}
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: '600',
+              color: COLORS.white,
+            }}>
+            {`${modifiedOn}`}
           </Text>
         </View>
         <View>

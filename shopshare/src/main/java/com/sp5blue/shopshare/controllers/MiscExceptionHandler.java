@@ -2,6 +2,8 @@ package com.sp5blue.shopshare.controllers;
 
 import com.sp5blue.shopshare.controllers.shoppinglist.ShoppingListErrorResponse;
 import java.time.LocalDateTime;
+
+import com.sp5blue.shopshare.exceptions.shoppergroup.InvalidUserPermissionsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,10 +18,10 @@ public class MiscExceptionHandler {
   private final Logger logger = LoggerFactory.getLogger(MiscExceptionHandler.class);
 
   @ExceptionHandler
-  public ResponseEntity<ShoppingListErrorResponse> handleException(
+  public ResponseEntity<MiscExceptionErrorResponse> handleException(
       AccessDeniedException exception) {
-    ShoppingListErrorResponse error =
-        new ShoppingListErrorResponse(
+    MiscExceptionErrorResponse error =
+        new MiscExceptionErrorResponse(
             HttpStatus.NOT_FOUND.value(),
             HttpStatus.NOT_FOUND.getReasonPhrase(),
             LocalDateTime.now());
@@ -27,16 +29,25 @@ public class MiscExceptionHandler {
   }
 
   @ExceptionHandler
-  public ResponseEntity<ShoppingListErrorResponse> handleException(
+  public ResponseEntity<MiscExceptionErrorResponse> handleException(
       MethodArgumentTypeMismatchException exception) {
-    //        exception.printStackTrace();
-    //        logger.warn(exception.getMessage());
-    ShoppingListErrorResponse error =
-        new ShoppingListErrorResponse(
+    MiscExceptionErrorResponse error =
+        new MiscExceptionErrorResponse(
             HttpStatus.BAD_REQUEST.value(),
             HttpStatus.BAD_REQUEST.getReasonPhrase(),
             LocalDateTime.now());
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler
+  public ResponseEntity<MiscExceptionErrorResponse> handleException(
+          InvalidUserPermissionsException exception) {
+    MiscExceptionErrorResponse error =
+        new MiscExceptionErrorResponse(
+            HttpStatus.FORBIDDEN.value(),
+            exception.getMessage(),
+            LocalDateTime.now());
+    return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
   }
 
   //    @ExceptionHandler

@@ -1,4 +1,5 @@
 import {StackActions, useNavigation} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useMemo, useState} from 'react';
 import {
   KeyboardAvoidingView,
@@ -8,32 +9,38 @@ import {
   View,
 } from 'react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
-import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 import COLORS, {BackGroundColors} from '../constants/colors';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {useGetGroupsQuery} from '../redux/slices/shopperGroupApiSlice';
 import {useAddShoppingListMutation} from '../redux/slices/shoppingListApiSlice';
 import {ShoppingListApiCreateShoppingListReq} from '../redux/types';
-import {CreateListScreenPropsType} from './types';
+import {ListsStackParamList} from './types';
 
-export type CreateListScreenNavigationProp =
-  CreateListScreenPropsType['navigation'];
+interface CreateListModalProps {
+  navigation: any;
+}
+type CreateEditListScreenProps = NativeStackScreenProps<
+  ListsStackParamList,
+  'Create List'
+>;
 
-const CreateListScreen: React.FC<CreateListScreenPropsType> = props => {
+type CreateEditListScreenNavigationProp =
+  CreateEditListScreenProps['navigation'];
+
+const CreateListScreen: React.FC<CreateListModalProps> = _props => {
   const _userId = useSelector(selectCurrentUserId); //this is the signed in user
-  // const [defaultSelectedGroup] = useState<>();
-  const [selectedColor, setSelectedColor] = useState<number>(0);
   const [newListReq, setNewListReq] =
     useState<ShoppingListApiCreateShoppingListReq>({
       userId: _userId!,
       groupId: '',
       body: {
         name: '',
-        color: BackGroundColors[selectedColor],
+        color: '',
       },
     });
-  const navigation = useNavigation<CreateListScreenNavigationProp>();
+  const [selectedColor, setSelectedColor] = useState<number>(0);
+  const navigation = useNavigation<CreateEditListScreenNavigationProp>();
   const {data: groups} = useGetGroupsQuery({
     userId: _userId!,
   });
@@ -60,16 +67,6 @@ const CreateListScreen: React.FC<CreateListScreenPropsType> = props => {
             params: {groupId: newListReq.groupId, listId: res.id},
           }),
         );
-        Toast.show({
-          type: 'success',
-          text1: 'Successfully added list!',
-        });
-      })
-      .catch(_err => {
-        Toast.show({
-          type: 'error',
-          text1: 'Error adding list',
-        });
       });
   };
 
@@ -92,17 +89,13 @@ const CreateListScreen: React.FC<CreateListScreenPropsType> = props => {
 
   const groupChoices = useMemo(() => {
     if (!groups) {
-      return [];
+      return [{}];
     }
     return groups.map(x => ({
       key: `${x.id}`,
       value: x.name,
     }));
   }, [groups]);
-
-  const defaultSelectedGroup = groupChoices.find(
-    x => x.key === props.route.params?.groupId,
-  );
 
   return (
     <KeyboardAvoidingView
@@ -147,7 +140,6 @@ const CreateListScreen: React.FC<CreateListScreenPropsType> = props => {
         <SelectList
           placeholder="Select Group"
           search={false}
-          defaultOption={defaultSelectedGroup}
           boxStyles={{
             borderWidth: 1,
             borderColor: COLORS.secondary,

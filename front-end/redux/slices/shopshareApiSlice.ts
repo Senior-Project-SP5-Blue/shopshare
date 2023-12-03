@@ -29,7 +29,8 @@ const baseQueryWithReAuth = async (
 ) => {
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result?.error?.status === 403) {
+  // Change to 401, WHEN YOU PUSH NEW SPRING CHANGES
+  if (result?.error?.status === 401) {
     const _state = api.getState() as any;
     console.log('Sending refresh token');
     const refreshResult: any = await baseQuery(

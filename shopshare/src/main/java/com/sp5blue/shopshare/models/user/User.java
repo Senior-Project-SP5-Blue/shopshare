@@ -52,7 +52,7 @@ public class User implements UserDetails {
 
   @JsonIgnore
   @Column(name = "active")
-  private boolean active = false;
+  private boolean active = true;
 
   public List<Token> getTokens() {
     return tokens;

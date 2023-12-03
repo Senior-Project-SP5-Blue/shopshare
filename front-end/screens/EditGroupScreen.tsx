@@ -10,83 +10,83 @@ import {
 import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 import COLORS, {BackGroundColors} from '../constants/colors';
+import CreateEditShopperGroupRequest from '../models/shoppergroup/CreateEditShopperGroupRequest';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
 import {
-  useDeleteShoppingListMutation,
-  useEditShoppingListMutation,
-} from '../redux/slices/shoppingListApiSlice';
-import {EditListScreenPropsType} from './types';
+  useDeleteShopperGroupMutation,
+  useEditGroupMutation,
+} from '../redux/slices/shopperGroupApiSlice';
+import {EditGroupScreenPropsType} from './types';
 
-type EditListScreenNavigationProp = EditListScreenPropsType['navigation'];
+type EditGroupScreenNavigationProp = EditGroupScreenPropsType['navigation'];
 
-const EditListScreen: React.FC<EditListScreenPropsType> = props => {
-  const {
-    list: {id: listId, name},
-    groupId,
-    color,
-  } = props.route.params;
+const EditGroupScreen: React.FC<EditGroupScreenPropsType> = props => {
+  const {group, color} = props.route.params;
   const [selectedColor, setSelectedColor] = useState<number>(
     BackGroundColors.indexOf(color) === -1
       ? 0
       : BackGroundColors.indexOf(color),
   );
   const _userId = useSelector(selectCurrentUserId); //this is the signed in user
-  const navigation = useNavigation<EditListScreenNavigationProp>();
-  const [newListBody, setNewListBody] = useState<{
-    name: string;
-    color?: string;
-  }>({
-    name: name,
-    color: color,
-  });
-  const [saveListChanges] = useEditShoppingListMutation();
-  const [deleteList] = useDeleteShoppingListMutation();
+  const navigation = useNavigation<EditGroupScreenNavigationProp>();
+  const [newGroupBody, setNewGroupBody] =
+    useState<CreateEditShopperGroupRequest>({name: group.name, color});
+  const [saveGroupChanges] = useEditGroupMutation();
+  const [deleteList] = useDeleteShopperGroupMutation();
 
-  const handleChangeListSave = async () => {
-    saveListChanges({
+  const handleChangeGroupSave = async () => {
+    saveGroupChanges({
       userId: _userId!,
-      groupId,
-      listId,
+      groupId: group.id,
       body: {
-        name: newListBody.name,
-        color: newListBody.color,
+        name: newGroupBody.name,
+        color: newGroupBody.color,
       },
     })
       .unwrap()
       .then(() => {
         Toast.show({
           type: 'success',
-          text1: 'Edited shopping list',
+          text1: 'Edited group',
         });
         navigation.pop();
+      })
+      .catch(() => {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Permissions',
+          text2: 'Must be group admin to modify group',
+          onHide: () => navigation.pop(),
+        });
       });
   };
 
-  const handleDeleteList = async () => {
+  const handleDeleteGroup = async () => {
     deleteList({
       userId: _userId!,
-      groupId,
-      listId,
+      groupId: group.id,
     })
       .unwrap()
       .then(() => {
         Toast.show({
           type: 'success',
-          text1: 'Deleted shopping list',
+          text1: 'Deleted group',
         });
-        navigation.navigate('Lists');
+        navigation.navigate('Groups');
       })
-      .catch(_err => {
+      .catch(() => {
         Toast.show({
           type: 'error',
-          text1: 'There was an error deleting list',
+          text1: 'Invalid Permissions',
+          text2: 'Must be group admin to delete group',
+          onHide: () => navigation.pop(),
         });
       });
   };
 
   const handleSelectColor = (idx: number) => {
-    setNewListBody({
-      ...newListBody,
+    setNewGroupBody({
+      ...newGroupBody,
       color: BackGroundColors[idx],
     });
     setSelectedColor(idx);
@@ -130,8 +130,8 @@ const EditListScreen: React.FC<EditListScreenPropsType> = props => {
         </Text>
         <TextInput
           placeholder="Rename List"
-          defaultValue={newListBody.name}
-          onChangeText={text => setNewListBody({...newListBody, name: text})}
+          defaultValue={newGroupBody.name}
+          onChangeText={text => setNewGroupBody({...newGroupBody, name: text})}
           style={{
             borderWidth: 1,
             borderColor: COLORS.secondary,
@@ -152,7 +152,7 @@ const EditListScreen: React.FC<EditListScreenPropsType> = props => {
           {renderColors()}
         </View>
         <TouchableOpacity
-          onPress={handleChangeListSave}
+          onPress={handleChangeGroupSave}
           style={{
             marginTop: 24,
             height: 50,
@@ -171,7 +171,7 @@ const EditListScreen: React.FC<EditListScreenPropsType> = props => {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={handleDeleteList}
+          onPress={handleDeleteGroup}
           style={{
             marginTop: 24,
             height: 50,
@@ -186,11 +186,11 @@ const EditListScreen: React.FC<EditListScreenPropsType> = props => {
               fontWeight: '600',
               fontSize: 18,
             }}>
-            Delete List
+            Delete Group
           </Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 };
-export default EditListScreen;
+export default EditGroupScreen;

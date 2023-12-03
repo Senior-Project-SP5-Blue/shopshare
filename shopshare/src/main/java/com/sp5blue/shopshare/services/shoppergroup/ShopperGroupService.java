@@ -140,7 +140,25 @@ public class ShopperGroupService implements IShopperGroupService {
   @Override
   @Transactional
   @Async
-  public CompletableFuture<SlimShopperGroupDto> changeShopperGroupName(
+  public CompletableFuture<SlimShopperGroupDto> modifyShopperGroup(
+      UUID userId, UUID groupId, String newName, String newColor) {
+    ShopperGroup shopperGroup =
+        shopperGroupRepository
+            .findById(groupId)
+            .orElseThrow(
+                () -> new GroupNotFoundException("Shopper group does not exist - " + groupId));
+    if (!userIsAdmin(userId, groupId))
+      throw new InvalidUserPermissionsException(
+          "User - " + userId + " does not have permission to modify group");
+    shopperGroup.setName(newName);
+    shopperGroup.setColor(newColor);
+    return CompletableFuture.completedFuture(new SlimShopperGroupDto(shopperGroup));
+  }
+
+  @Override
+  @Transactional
+  @Async
+  public CompletableFuture<SlimShopperGroupDto> modifyShopperGroup(
       UUID userId, UUID groupId, String newName) {
     ShopperGroup shopperGroup =
         shopperGroupRepository

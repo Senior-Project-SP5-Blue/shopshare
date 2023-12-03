@@ -1,19 +1,23 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import PlusIcon from 'react-native-heroicons/mini/PlusIcon';
+import XMarkIcon from 'react-native-heroicons/mini/XMarkIcon';
 import COLORS from '../constants/colors';
 
 interface CreateButtonProps {
   onPress: Function;
+  addActive: boolean;
 }
 
-const CreateButton: React.FC<CreateButtonProps> = props => {
+const CreateButton: React.FC<CreateButtonProps> = ({addActive, onPress}) => {
   return (
     <View>
-      <TouchableOpacity
-        style={styles.actionButton}
-        onPress={() => props.onPress()}>
-        <PlusIcon color={COLORS.white} />
+      <TouchableOpacity style={styles.actionButton} onPress={() => onPress()}>
+        {addActive ? (
+          <XMarkIcon color={COLORS.white} />
+        ) : (
+          <PlusIcon color={COLORS.white} />
+        )}
       </TouchableOpacity>
     </View>
   );

@@ -1,17 +1,15 @@
 import CheckBox from '@react-native-community/checkbox';
-import React, {PropsWithChildren, useCallback, useMemo, useState} from 'react';
-import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
-import LockClosedIcon from 'react-native-heroicons/mini/LockClosedIcon';
-import LockOpenIcon from 'react-native-heroicons/mini/LockOpenIcon';
+import React, {PropsWithChildren, useMemo, useState} from 'react';
+import {StyleSheet, Text, TextInput, View} from 'react-native';
+import {TouchableHighlight} from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import TrashIcon from 'react-native-heroicons/mini/TrashIcon';
 import {useSelector} from 'react-redux';
 import COLORS from '../constants/colors';
+import EditListItemRequest from '../models/listitem/EditListItemRequest';
 import ListItemDto from '../models/listitem/ListItemDto';
 import ListItemStatus from '../models/listitem/ListItemStatus';
 import {selectCurrentUserId} from '../redux/slices/authSlice';
-import EditListItemRequest from '../models/listitem/EditListItemRequest';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-import {TouchableHighlight} from 'react-native-gesture-handler';
-import TrashIcon from 'react-native-heroicons/mini/TrashIcon';
 
 interface ListItemRowProps {
   item: ListItemDto;
@@ -19,71 +17,91 @@ interface ListItemRowProps {
     itemId: string,
     editedItem: EditListItemRequest,
   ) => Promise<any>;
-  // setSelectedItem: (item: ListItemDto) => void;
+  onDeleteItem: (itemId: string) => Promise<any>;
 }
 
 const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
   item,
   onSaveItemChanges,
+  onDeleteItem,
 }) => {
-  const userId = useSelector(selectCurrentUserId);
+  const _userId = useSelector(selectCurrentUserId);
   const [name, setName] = useState<string>(item.name);
   const [status, setStatus] = useState<ListItemStatus>(item.status);
-  const [locked, setLocked] = useState<boolean>(item.locked);
 
   const completed = useMemo(
     () => status === ListItemStatus.COMPLETED,
     [status],
   );
 
+  // console.log(`${name} is ${completed ? 'completed' : 'active'}`);
+  // console.log(`Item completion is ${completed ? 'completed' : 'active'}\n`);
+
+  // useEffect(() => {
+  //   console.log('===== ITEM STATUS =====');
+  // });
+
+  // useEffect(() => {
+  //   console.log(`${name} is ${completed ? 'completed' : 'active'}`);
+  //   console.log('\n\n');
+  // });
+  // useEffect(() => {
+  //   console.log('\n\n');
+  // });
+
   const handleToggleStatus = async (val: any) => {
     const newStatus = val ? ListItemStatus.COMPLETED : ListItemStatus.ACTIVE;
-    await onSaveItemChanges(item.id, {name, status: newStatus, locked}).then(
-      () => setStatus(newStatus),
-    );
+    await onSaveItemChanges(item.id, {
+      name,
+      status: newStatus,
+      locked: item.locked,
+    }).then(() => setStatus(newStatus));
   };
 
-  const renderRightActions = (x: any) => {
+  const renderRightActions = () => {
     return (
       <View
         style={{
-          // flex: 1,
-          height: '100%',
-          alignContent: 'center',
+          flex: 1,
+          backgroundColor: 'red',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
           justifyContent: 'center',
           margin: 0,
           padding: 0,
           width: 90,
-          // height: 90,
         }}>
-        <TouchableHighlight style={{backgroundColor: 'red'}}>
-          <TrashIcon color={COLORS.white} />
+        <TouchableHighlight
+          style={{
+            position: 'relative',
+            right: 20,
+            justifyContent: 'flex-start',
+            backgroundColor: 'red',
+            marginLeft: 20,
+          }}>
+          <View style={{alignItems: 'center'}}>
+            <TrashIcon size={20} color={COLORS.white} />
+            <Text style={{color: 'white'}}>Delete</Text>
+          </View>
         </TouchableHighlight>
       </View>
     );
   };
   return (
     <Swipeable
+      rightThreshold={100}
       renderRightActions={renderRightActions}
-      onSwipeableOpen={() => {}}>
+      onSwipeableWillOpen={() => onDeleteItem(item.id)}>
       <View style={styles.wrapper}>
         <TextInput
           style={[
             styles.name,
-            {
-              color:
-                item.locked && userId !== item.createdBy
-                  ? COLORS.grey
-                  : COLORS.black,
-            },
             {textDecorationLine: completed ? 'line-through' : 'none'},
           ]}
           defaultValue={item.name}
-          editable={!item.locked || userId === item.createdBy}
-          selectTextOnFocus={!item.locked || userId === item.createdBy}
           onChangeText={newName => setName(newName)}
           onSubmitEditing={() =>
-            onSaveItemChanges(item.id, {name, status, locked})
+            onSaveItemChanges(item.id, {name, status, locked: item.locked})
           }
         />
         <CheckBox
@@ -92,8 +110,9 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
           value={completed}
           onValueChange={handleToggleStatus}
           style={styles.checkbox}
-          disabled={item.locked && userId !== item.createdBy}
-          onTouchEnd={() => onSaveItemChanges(item.id, {name, status, locked})}
+          onTouchEnd={() =>
+            onSaveItemChanges(item.id, {name, status, locked: item.locked})
+          }
         />
         {
           // TO-DO: MAYBE IMPLEMENT LOCKING FEATURE

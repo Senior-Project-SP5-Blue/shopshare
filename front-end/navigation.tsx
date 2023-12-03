@@ -4,50 +4,52 @@ import React from 'react';
 
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
+import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 import COLORS from './constants/colors';
 import {selectCurrentUser} from './redux/slices/authSlice';
 import AccountsScreen from './screens/AccountsScreen';
 import CreateListScreen from './screens/CreateListScreen';
+import EditGroupScreen from './screens/EditGroupScreen';
 import EmailConfirmationScreen from './screens/EmailConfirmationScreen';
 import GroupScreen from './screens/GroupScreen';
 import GroupsScreen from './screens/GroupsScreen';
 import ListScreen from './screens/ListScreen';
 import ListsScreen from './screens/ListsScreen';
 import LoginScreen from './screens/LoginScreen';
-import ShopScreen from './screens/ShopScreen';
 import SignupScreen from './screens/SignupScreen';
 import Welcome from './screens/WelcomeScreen';
 
 import ListBulletIcon from 'react-native-heroicons/mini/ListBulletIcon';
 import UserGroupIcon from 'react-native-heroicons/mini/UserGroupIcon';
-import PencilSquare from 'react-native-heroicons/mini/PencilSquareIcon';
 import UserIcon from 'react-native-heroicons/mini/UserIcon';
 
-
+import ChangePassword from './screens/ChangePassword';
+import CreateGroup from './screens/CreateGroup';
+import EditListScreen from './screens/EditListScreen';
 import {
+  AccountStackParamList,
   AuthStackParamList,
   GroupStackParamList,
+  GroupsStackParamList,
   ListStackParamList,
   ListsStackParamList,
   MainTabParamList,
   RootStackParamList,
 } from './screens/types';
-import Requests from './screens/Requests';
-import AddItemsToListScreen from './screens/AddItemsToListScreen';
-import EditListScreen from './screens/EditListScreen';
-import CreateGroup from './screens/CreateGroup';
-import ChangePassword from './screens/ChangePassword';
+import InvitationsScreen from './screens/InvitationScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const MainTab = createBottomTabNavigator<MainTabParamList>();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
 const ListsStack = createNativeStackNavigator<ListsStackParamList>();
-const AccountStack = createNativeStackNavigator();
-const GroupsStack = createNativeStackNavigator<GroupStackParamList>();
+const AccountStack = createNativeStackNavigator<AccountStackParamList>();
+const GroupsStack = createNativeStackNavigator<GroupsStackParamList>();
 
 const ListStack = createNativeStackNavigator<ListStackParamList>();
+const GroupStack = createNativeStackNavigator<GroupStackParamList>();
 
 interface ScreenTitleProps {
   title?: string;
@@ -85,7 +87,6 @@ const ListsStackScreen: React.FC = () => {
           headerShown: false,
         }}
       />
-      <ListsStack.Screen name="ShopScreen" component={ShopScreen} />
     </ListsStack.Navigator>
   );
 };
@@ -94,23 +95,8 @@ const ListStackScreen: React.FC = () => {
   return (
     <ListStack.Navigator>
       <ListStack.Screen name="List" component={ListScreen} />
-      <ListStack.Screen name="Add Items" component={AddItemsToListScreen} />
       <ListStack.Screen name="Edit List" component={EditListScreen} />
     </ListStack.Navigator>
-  );
-};
-
-const AccountStackScreen: React.FC = () => {
-  return (
-    <AccountStack.Navigator screenOptions={{headerShown: true}}>
-      <AccountStack.Screen
-        name="Settings"
-        component={AccountsScreen}
-        options={{headerShown: true, headerTitleStyle: {fontSize:19}}}
-      />
-      <AccountStack.Screen name="Requests" component={Requests} options={{headerShown: true, headerTitleStyle: {fontSize: 19}}}/>
-      <AccountStack.Screen name="Change Password" component={ChangePassword} options={{headerShown: true, headerTitleStyle: {fontSize: 19}}}/>
-    </AccountStack.Navigator>
   );
 };
 
@@ -123,13 +109,47 @@ const GroupsStackScreen: React.FC = () => {
         component={GroupsScreen}
       />
       <GroupsStack.Screen
-        options={{presentation: 'modal', headerRight: renderEditButton}}
-        name="Group"
-        component={GroupScreen}
+        name="GroupStack"
+        component={GroupStackScreen}
+        options={{
+          presentation: 'modal',
+          headerRight: renderEditButton,
+          headerShown: false,
+        }}
       />
       <GroupsStack.Screen name="Create Group" component={CreateGroup} />
-
     </GroupsStack.Navigator>
+  );
+};
+
+const GroupStackScreen: React.FC = () => {
+  return (
+    <GroupStack.Navigator>
+      <GroupStack.Screen name="Group" component={GroupScreen} />
+      <GroupStack.Screen name="Edit Group" component={EditGroupScreen} />
+    </GroupStack.Navigator>
+  );
+};
+
+const AccountStackScreen: React.FC = () => {
+  return (
+    <AccountStack.Navigator screenOptions={{headerShown: true}}>
+      <AccountStack.Screen
+        name="Settings"
+        component={AccountsScreen}
+        options={{headerShown: true, headerTitleStyle: {fontSize: 19}}}
+      />
+      <AccountStack.Screen
+        name="Requests"
+        component={InvitationsScreen}
+        options={{headerShown: true, headerTitleStyle: {fontSize: 19}}}
+      />
+      <AccountStack.Screen
+        name="Change Password"
+        component={ChangePassword}
+        options={{headerShown: true, headerTitleStyle: {fontSize: 19}}}
+      />
+    </AccountStack.Navigator>
   );
 };
 
@@ -155,20 +175,33 @@ const MainStackScreens: React.FC = () => {
       <MainTab.Screen
         name="ListsStack"
         component={ListsStackScreen}
-        options={{tabBarLabel: 'Lists', tabBarLabelStyle:{fontSize:14} ,tabBarIcon: ({}) => (
-          <ListBulletIcon color={COLORS.secondary} size={30} />)}}
+        options={{
+          tabBarLabel: 'Lists',
+          tabBarLabelStyle: {fontSize: 14},
+          tabBarIcon: () => (
+            <ListBulletIcon color={COLORS.secondary} size={30} />
+          ),
+        }}
       />
       <MainTab.Screen
         name="GroupsStack"
         component={GroupsStackScreen}
-        options={{tabBarLabel: 'Groups', tabBarLabelStyle:{fontSize:14} ,tabBarIcon: ({}) => (
-          <UserGroupIcon color={COLORS.secondary} size={30} />)}}
+        options={{
+          tabBarLabel: 'Groups',
+          tabBarLabelStyle: {fontSize: 14},
+          tabBarIcon: () => (
+            <UserGroupIcon color={COLORS.secondary} size={30} />
+          ),
+        }}
       />
       <MainTab.Screen
         name="AccountStack"
         component={AccountStackScreen}
-        options={{tabBarLabel: 'Account', tabBarLabelStyle:{fontSize:14} ,tabBarIcon: ({}) => (
-          <UserIcon color={COLORS.secondary} size={30} />)}}
+        options={{
+          tabBarLabel: 'Account',
+          tabBarLabelStyle: {fontSize: 14},
+          tabBarIcon: () => <UserIcon color={COLORS.secondary} size={30} />,
+        }}
       />
     </MainTab.Navigator>
   );
@@ -186,18 +219,16 @@ const AppNavigator: React.FC = () => {
           <Stack.Screen name="WelcomeStack" component={AuthStackScreens} />
         )}
       </Stack.Navigator>
+      <Toast visibilityTime={2000} />
     </NavigationContainer>
   );
 };
 
 const styles = StyleSheet.create({
   screenTitle: {
-    // flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    // paddingHorizontal: 22,
-    // paddingRight: 50,
   },
   touchable: {
     alignItems: 'flex-start',

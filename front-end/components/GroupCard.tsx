@@ -4,27 +4,31 @@ import React from 'react';
 import {Text, TouchableHighlight, View} from 'react-native';
 import COLORS from '../constants/colors';
 import SlimShopperGroupDto from '../models/shoppergroup/SlimShopperGroupDto';
-import {GroupStackParamList} from '../screens/types';
+import {GroupsScreenNavigationProp} from '../screens/GroupsScreen';
+import {GroupsStackParamList} from '../screens/types';
 
 interface GroupCardProps {
   group: SlimShopperGroupDto;
 }
 
-type GroupScreenProps = NativeStackScreenProps<GroupStackParamList, 'Group'>;
+type GroupsScreenProps = NativeStackScreenProps<GroupsStackParamList, 'Groups'>;
 
-export type GroupScreenNavigationProp = GroupScreenProps['navigation'];
+export type GroupScreenNavigationProp = GroupsScreenProps['navigation'];
 
 const GroupCard: React.FC<GroupCardProps> = ({group}) => {
   const {id, name, userCount, listCount, admin, color} = group;
-  const navigation = useNavigation<GroupScreenNavigationProp>();
+  const navigation = useNavigation<GroupsScreenNavigationProp>();
 
-  const handleOnListPress = () => {
-    navigation.navigate('Group', {groupId: id});
+  const handleOnGroupPress = () => {
+    navigation.navigate('GroupStack', {
+      screen: 'Group',
+      params: {groupId: id, color: color || COLORS.grey},
+    });
   };
 
   return (
     <TouchableHighlight
-      onPress={handleOnListPress}
+      onPress={handleOnGroupPress}
       underlayColor={COLORS.blue}
       style={{
         paddingVertical: 32,
@@ -35,9 +39,11 @@ const GroupCard: React.FC<GroupCardProps> = ({group}) => {
         width: 200,
         backgroundColor: color || COLORS.grey,
       }}>
-      <View style={{            
-            alignItems:'center',
-            justifyContent:'center'}}>
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
         <Text
           numberOfLines={1}
           style={{

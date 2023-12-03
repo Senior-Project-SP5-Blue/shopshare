@@ -87,7 +87,7 @@ public class ShopperGroupController implements ShopperGroupControllerBase {
       @PathVariable("group_id") UUID groupId,
       @RequestBody @Valid CreateEditShopperGroupRequest request) {
     return ResponseEntity.ok()
-        .body(shopperGroupService.changeShopperGroupName(userId, groupId, request.name()).join());
+        .body(shopperGroupService.modifyShopperGroup(userId, groupId, request.name(), request.color()).join());
   }
 
   @Override
