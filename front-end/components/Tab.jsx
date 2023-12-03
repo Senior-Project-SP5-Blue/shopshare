@@ -3,6 +3,8 @@ import listsScreen from "../screens/listsScreen";
 import AccountsScreen from "../screens/AccountsScreen";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import COLORS from "../constants/colors";
+import ListBulletIcon from "react-native-heroicons/mini/list-bullet";
+
 
 const Tab = createBottomTabNavigator();
 
@@ -22,7 +24,14 @@ const Tabs = () => {
             }
         }}
         >
-            <Tab.Screen name="Lists" component={listsScreen}/>
+            <Tab.Screen 
+            name="Lists" 
+            component={listsScreen}         
+            options={{
+                tabBarIcon: ({}) => (
+                    <HeroIcon name="academic-cap" color={COLORS.secondary} size={25} />
+          )
+        }}/>
             <Tab.Screen name="AccountsScreen" component={AccountsScreen}/>
 
 

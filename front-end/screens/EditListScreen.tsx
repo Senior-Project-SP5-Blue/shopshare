@@ -21,7 +21,7 @@ type EditListScreenProps = NativeStackScreenProps<
 type EditListScreenNavigationProp = EditListScreenProps['navigation'];
 
 const EditListScreen: React.FC<EditListScreenProps> = props => {
-  // const Shop = () => props.navigation.navigate('ShopScreen');
+  const Shop = () => props.navigation.navigate('ShopScreen');
   const _userId = useSelector(selectCurrentUserId); //this is the signed in user
   const {
     list: {id: listId, groupId},
@@ -128,7 +128,7 @@ const EditListScreen: React.FC<EditListScreenProps> = props => {
           {renderColors()}
         </View>
         <TouchableOpacity
-          // onPress={Shop}
+          onPress={Shop}
           style={{
             marginTop: 24,
             height: 50,
