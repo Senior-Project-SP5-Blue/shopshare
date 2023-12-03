@@ -1,10 +1,10 @@
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React from 'react';
-import {Text, TouchableHighlight, View} from 'react-native';
+import {Platform, Text, TouchableHighlight, View} from 'react-native';
 import COLORS from '../constants/colors';
 import SlimShopperGroupDto from '../models/shoppergroup/SlimShopperGroupDto';
-import {GroupsScreenNavigationProp} from '../screens/GroupsScreen';
+import {GroupsScreenNavigationProp} from '../screens/groups/GroupsScreen';
 import {GroupsStackParamList} from '../screens/types';
 
 interface GroupCardProps {
@@ -49,7 +49,7 @@ const GroupCard: React.FC<GroupCardProps> = ({group}) => {
           style={{
             fontSize: 22,
             fontWeight: '800',
-            paddingHorizontal: 16,
+            paddingHorizontal: 10,
             borderRadius: 6,
             color: COLORS.white,
             marginBottom: 18,

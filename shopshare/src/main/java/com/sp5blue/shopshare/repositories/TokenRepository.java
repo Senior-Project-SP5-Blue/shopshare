@@ -55,16 +55,16 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
   Optional<Token> findByToken(String token);
 
   @Query(nativeQuery = true, value = """
-SELECT * FROM tokens t WHERE t.type = 'CONFIRMATION'
+SELECT * FROM tokens t WHERE t.type = 'CONFIRMATION' AND t.token = :token
 """)
-  Optional<Token> findByConfirmationToken(String token);
+  Optional<Token> findByConfirmationToken(@Param("token") String token);
 
   @Query(
       nativeQuery = true,
       value = """
-    SELECT * FROM tokens t WHERE t.type = 'INVITATION'
+    SELECT * FROM tokens t WHERE t.type = 'INVITATION' AND t.token = :token
     """)
-  Optional<Token> findByInvitationToken(String token);
+  Optional<Token> findByInvitationToken(@Param("token") String token);
 
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   @Query(

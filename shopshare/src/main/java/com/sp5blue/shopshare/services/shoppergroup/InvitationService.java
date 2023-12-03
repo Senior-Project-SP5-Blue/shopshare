@@ -131,6 +131,20 @@ public class InvitationService implements IInvitationService {
   @Override
   @Transactional
   @Async
+  public CompletableFuture<Void> declineInvite(UUID groupId, UUID userId) {
+    InvitationId inviteId = new InvitationId(groupId, userId);
+    boolean hasInvite = invitationRepository.existsById(inviteId);
+
+    if (!hasInvite) throw new UserNotInvitedException("Invalid Invitation");
+
+    invitationRepository.deleteById(inviteId);
+    invitationRepository.flush();
+    return null;
+  }
+
+  @Override
+  @Transactional
+  @Async
   public CompletableFuture<Void> acceptInvite(String inviteToken) {
     Token invitationToken = tokenService.readByInvitationToken(inviteToken).join();
     UUID userId = UUID.fromString(jwtService.extractSubject(inviteToken));

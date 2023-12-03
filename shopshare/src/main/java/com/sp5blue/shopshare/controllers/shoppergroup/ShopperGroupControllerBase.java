@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -45,7 +46,11 @@ public interface ShopperGroupControllerBase {
   ResponseEntity<ShopperGroupDto> getShopperGroup(
       @PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId);
 
-  @GroupAdminPermission
+@UserPermission
+  ResponseEntity<?> declineShopperGroupInvitation(
+          @PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId);
+
+  @GroupPermission
   @Operation(summary = "Deletes a group. This also deletes all lists and items of that group.")
   ResponseEntity<?> deleteShopperGroup(
       @PathVariable("user_id") UUID userId, @PathVariable("group_id") UUID groupId);

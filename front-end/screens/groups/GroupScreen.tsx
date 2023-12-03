@@ -14,13 +14,13 @@ import {
 import PencilSquareIcon from 'react-native-heroicons/mini/PencilSquareIcon';
 import UserPlusIcon from 'react-native-heroicons/mini/UserPlusIcon';
 import {useSelector} from 'react-redux';
-import GroupListRow from '../components/GroupListRow';
-import GroupUserRow from '../components/GroupUserRow';
-import COLORS from '../constants/colors';
-import SlimList from '../models/shoppinglist/SlimList';
-import {selectCurrentUserId} from '../redux/slices/authSlice';
-import {useGetGroupQuery} from '../redux/slices/shopperGroupApiSlice';
-import {GroupScreenPropsType} from './types';
+import GroupListRow from '../../components/GroupListRow';
+import GroupUserRow from '../../components/GroupUserRow';
+import COLORS from '../../constants/colors';
+import SlimList from '../../models/shoppinglist/SlimList';
+import {selectCurrentUserId} from '../../redux/slices/authSlice';
+import {useGetGroupQuery} from '../../redux/slices/shopperGroupApiSlice';
+import {GroupScreenPropsType} from '../types';
 
 export type GroupScreenNavigationProp = GroupScreenPropsType['navigation'];
 
@@ -64,9 +64,16 @@ const GroupScreen: React.FC<GroupScreenPropsType> = props => {
     return (
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionHeaderTitle}>Users</Text>
-        <TouchableOpacity>
+        {/* <TouchableOpacity
+          onPress={() => {
+            navigation.pop();
+            navigation.navigate('AccountStack', {
+              screen: 'Settings',
+              params: {},
+            });
+          }}>
           <UserPlusIcon color={COLORS.primary1} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     );
   };
@@ -97,20 +104,9 @@ const GroupScreen: React.FC<GroupScreenPropsType> = props => {
     return (
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionHeaderTitle}>Lists</Text>
-        {/* <TouchableOpacity>
-          <PlusCircleIcon
-            onPress={() =>
-              navigation.navigate('ListsStack', {
-                screen: 'Create List',
-                params: {groupId: groupId},
-              })
-            }
-            color={COLORS.primary1}
-          />
-        </TouchableOpacity> */}
       </View>
     );
-  }, [groupId, navigation]);
+  }, []);
 
   const DATA = useMemo(() => {
     return isLoadingGroup

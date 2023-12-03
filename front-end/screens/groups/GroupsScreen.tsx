@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -12,11 +12,11 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
-import GroupCard from '../components/GroupCard';
-import COLORS from '../constants/colors';
-import {selectCurrentUserId} from '../redux/slices/authSlice';
-import {useGetGroupsQuery} from '../redux/slices/shopperGroupApiSlice';
-import {GroupsStackParamList} from './types';
+import GroupCard from '../../components/GroupCard';
+import COLORS from '../../constants/colors';
+import {selectCurrentUserId} from '../../redux/slices/authSlice';
+import {useGetGroupsQuery} from '../../redux/slices/shopperGroupApiSlice';
+import {GroupsStackParamList} from '../types';
 
 type GroupsScreenPropsType = NativeStackScreenProps<
   GroupsStackParamList,
@@ -37,6 +37,9 @@ const GroupsScreen: React.FC<GroupsScreenPropsType> = _props => {
       pollingInterval: 3000,
     },
   );
+  const renderEmptyListComponent = useMemo(() => {
+    return <Text style={{fontSize: 20}}>No groups added</Text>;
+  }, []);
 
   if (isLoadingGroups) {
     return (
@@ -70,20 +73,20 @@ const GroupsScreen: React.FC<GroupsScreenPropsType> = _props => {
           }}
           style={styles.addButton}>
           <Image
-            source={require('../assets/add.png')}
+            source={require('../../assets/add.png')}
             style={styles.addImage}
           />
         </TouchableOpacity>
-        <Text style={styles.addList}>Add Groups</Text>
+        <Text style={styles.addGroup}>Add Groups</Text>
       </View>
       <View style={{height: 275, justifyContent: 'center'}}>
         <FlatList
-          style={{width: '100%'}}
           data={groups}
           keyExtractor={item => item.id}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           renderItem={({item}) => <GroupCard group={item} />}
+          ListEmptyComponent={renderEmptyListComponent}
         />
       </View>
     </SafeAreaView>
@@ -126,7 +129,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 62,
   },
-  addList: {
+  addGroup: {
     color: COLORS.secondary,
     fontWeight: '600',
     fontSize: 16,

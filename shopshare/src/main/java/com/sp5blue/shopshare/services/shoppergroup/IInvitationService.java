@@ -2,6 +2,9 @@ package com.sp5blue.shopshare.services.shoppergroup;
 
 import com.sp5blue.shopshare.dtos.shoppergroup.InvitationDto;
 import com.sp5blue.shopshare.exceptions.shoppergroup.UserAlreadyInGroupException;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -15,5 +18,7 @@ public interface IInvitationService {
 
   CompletableFuture<Void> acceptInvite(UUID groupId, UUID shopperId);
 
-  CompletableFuture<Void> acceptInvite(String inviteToken);
+    CompletableFuture<Void> declineInvite(UUID groupId, UUID userId);
+
+    CompletableFuture<Void> acceptInvite(String inviteToken);
 }
