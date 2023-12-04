@@ -25,29 +25,13 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
   onSaveItemChanges,
   onDeleteItem,
 }) => {
-  const _userId = useSelector(selectCurrentUserId);
   const [name, setName] = useState<string>(item.name);
-  const [status, setStatus] = useState<ListItemStatus>(item.status);
+  const [status] = useState<ListItemStatus>(item.status);
 
   const completed = useMemo(
-    () => status === ListItemStatus.COMPLETED,
-    [status],
+    () => item.status === ListItemStatus.COMPLETED,
+    [item.status],
   );
-
-  // console.log(`${name} is ${completed ? 'completed' : 'active'}`);
-  // console.log(`Item completion is ${completed ? 'completed' : 'active'}\n`);
-
-  // useEffect(() => {
-  //   console.log('===== ITEM STATUS =====');
-  // });
-
-  // useEffect(() => {
-  //   console.log(`${name} is ${completed ? 'completed' : 'active'}`);
-  //   console.log('\n\n');
-  // });
-  // useEffect(() => {
-  //   console.log('\n\n');
-  // });
 
   const handleToggleStatus = async (val: any) => {
     const newStatus = val ? ListItemStatus.COMPLETED : ListItemStatus.ACTIVE;
@@ -55,7 +39,7 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
       name,
       status: newStatus,
       locked: item.locked,
-    }).then(() => setStatus(newStatus));
+    });
   };
 
   const renderRightActions = () => {
@@ -110,9 +94,6 @@ const ListItemRow: React.FC<PropsWithChildren<ListItemRowProps>> = ({
           value={completed}
           onValueChange={handleToggleStatus}
           style={styles.checkbox}
-          onTouchEnd={() =>
-            onSaveItemChanges(item.id, {name, status, locked: item.locked})
-          }
         />
         {
           // TO-DO: MAYBE IMPLEMENT LOCKING FEATURE

@@ -20,9 +20,14 @@ export type InvitationsScreenNavigationProp =
 const InvitationsScreen: React.FC<InvitationsScreenPropsType> = _props => {
   const _userId = useSelector(selectCurrentUserId);
   const {data: invitations, isLoading: isLoadingInvitations} =
-    useGetGroupInvitationsQuery({
-      userId: _userId!,
-    });
+    useGetGroupInvitationsQuery(
+      {
+        userId: _userId!,
+      },
+      {
+        pollingInterval: 3000,
+      },
+    );
 
   const renderEmptyListComponent = useMemo(() => {
     return (

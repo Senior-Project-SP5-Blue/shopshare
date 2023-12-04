@@ -40,10 +40,11 @@ const ListCard: React.FC<ListCardProps> = props => {
     locale = locale.replace('_', '-');
 
     return date.toLocaleDateString(locale, {
-      // weekday: 'long',
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
