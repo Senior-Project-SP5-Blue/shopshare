@@ -83,6 +83,7 @@ const GroupsScreen: React.FC<GroupsScreenPropsType> = _props => {
         <FlatList
           data={groups}
           keyExtractor={item => item.id}
+          extraData={[...groups!]}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           renderItem={({item}) => <GroupCard group={item} />}

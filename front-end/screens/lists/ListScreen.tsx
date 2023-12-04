@@ -28,7 +28,6 @@ const ListScreen: React.FC<ListScreenPropsType> = props => {
   const [isAddMode, setIsAddMode] = useState<boolean>(false);
   const navigation = useNavigation<ListScreenNavigationProp>();
   const _userId = useSelector(selectCurrentUserId);
-  // const _username = useSelector(selectCurrentUser)?.username;
   const {groupId, listId, color} = props.route.params;
   const {data: list, isLoading: isLoadingList} = useGetGroupShoppingListQuery(
     {
@@ -111,7 +110,7 @@ const ListScreen: React.FC<ListScreenPropsType> = props => {
       ) : (
         <>
           <FlatList
-            // extraData={(() => {})()}
+            extraData={[...list!.items]}
             ListHeaderComponent={listHeaderComponent}
             data={list?.items}
             renderItem={({item}) => (

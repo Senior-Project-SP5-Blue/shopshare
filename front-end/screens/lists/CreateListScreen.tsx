@@ -50,6 +50,13 @@ const CreateListScreen: React.FC<CreateListScreenPropsType> = props => {
   };
 
   const handleCreateList = async () => {
+    if (!newListReq.groupId) {
+      Toast.show({
+        type: 'error',
+        text1: 'Must select a group',
+      });
+      return;
+    }
     createList(newListReq)
       .unwrap()
       .then(res => {
